@@ -2,6 +2,7 @@
 #include <gmp.h>
 #include <stdlib.h>
 #include "DataStructures/UnorderedList.h"
+#include "routine_test.h"
 
 #define AUDIT if(1)
 
@@ -12,9 +13,20 @@ void PollardSRhoFunction(mpz_t x, mpz_t modulo) {
     mpz_mod(x, x, modulo);
 }
 
-void printFactor(void *data) {
-    printf("Factor: %s\n", mpz_get_str(NULL, 10, data));
+
+
+
+
+
+
+
+
+
+void printFactor(void **data) {
+    fprintf(stderr, "Factor: %s\n", mpz_get_str(NULL, 10, *data));
 }
+
+
 
 UnorderedList *PollardSRhoAlgorithm(mpz_t input) {
 
@@ -73,6 +85,10 @@ UnorderedList *PollardSRhoAlgorithm(mpz_t input) {
 }
 
 int main() {
+
+    computeFactorBase_test();
+
+    /*
     mpz_t input;
 
 
@@ -81,8 +97,7 @@ int main() {
 
     UnorderedList *factorList = PollardSRhoAlgorithm(input);
 
-    printf(" %s\n", mpz_get_str(NULL, 10, input));
-    performAction(factorList, printFactor);
-
+    performAction(factorList, &printFactor);
+*/
     return 0;
 }

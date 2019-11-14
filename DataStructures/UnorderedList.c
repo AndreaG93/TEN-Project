@@ -51,10 +51,13 @@ void insert(UnorderedList *list, void *data) {
     list->length++;
 }
 
-void performAction(UnorderedList *list, void(*function)(void *)) {
+void performAction(UnorderedList *list, void(*function)(void **)) {
 
-    for (UnorderedListNode *current = list->head; current != NULL; current = current->next) {
-        function(current->data);
+    UnorderedListNode *current = list->head;
+
+    while (current != NULL) {
+        (*function)(&current->data);
+        current = current->next;
     }
 }
 

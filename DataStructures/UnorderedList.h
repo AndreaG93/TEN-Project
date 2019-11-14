@@ -32,7 +32,7 @@ typedef struct {
 
 UnorderedList *allocUnorderedList();
 void insert(UnorderedList *list, void *data);
-void performAction(UnorderedList *list, void(*function)(void *));
+void performAction(UnorderedList *list, void(*function)(void **));
 void *get(UnorderedList *list, int index);
 
 #endif //UNTITLED_UNORDEREDLIST_H

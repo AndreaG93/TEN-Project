@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.10)
+project(TEN-Project)
+
+LINK_LIBRARIES("gmp")
+set(CMAKE_C_STANDARD 11)
+
+add_executable(untitled main.c Logger/Logger.c Logger/Logger.h Error/Error.c Error/Error.h)

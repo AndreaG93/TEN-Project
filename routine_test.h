@@ -10,6 +10,35 @@
 #include <stdbool.h>
 #include "routines.h"
 
+
+void getMultiplicativeInverseWithExtendedEuclideanAlgorithm_test(){
+
+    mpz_t input;
+    mpz_t modulo;
+    mpz_t *inverse;
+
+    if (mpz_init_set_str(input, "5", 10) != 0)
+        exit(EXIT_FAILURE);
+
+    if (mpz_init_set_str(modulo, "178", 10) != 0)
+        exit(EXIT_FAILURE);
+
+    inverse = getMultiplicativeInverseWithExtendedEuclideanAlgorithm(input, modulo);
+    fprintf(stderr, "%s\n", mpz_get_str(NULL, 10, *inverse));
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 void printGMPNumber(void **data) {
     fprintf(stderr, "%s\n", mpz_get_str(NULL, 10, *data));
 }

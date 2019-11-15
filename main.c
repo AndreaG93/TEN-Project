@@ -86,7 +86,8 @@ UnorderedList *PollardSRhoAlgorithm(mpz_t input) {
 
 int main() {
 
-    computeFactorBase_test();
+    getMultiplicativeInverseWithExtendedEuclideanAlgorithm_test();
+//computeFactorBase_test();
 
     /*
     mpz_t input;

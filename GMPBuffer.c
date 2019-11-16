@@ -1,33 +1,34 @@
 
 #include <gmp.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define GMPBufferLength 10
 
-mpz_ptr getNumberFromGMPBuffer(mpz_ptr *buffer, int index) {
+__mpz_struct* getNumberFromGMPBuffer(__mpz_struct **buffer, int index) {
     return *(buffer + index);
 }
 
-mpz_ptr *initGMPBuffer() {
+__mpz_struct **initGMPBuffer() {
 
-    mpz_ptr *output = malloc(GMPBufferLength);
+    __mpz_struct **output = malloc(GMPBufferLength * sizeof(__mpz_struct*));
     if (output == NULL)
         exit(EXIT_FAILURE);
     else
         for (int i = 0; i < GMPBufferLength; i++) {
 
-            mpz_ptr number = malloc(sizeof(mpz_ptr));
+            __mpz_struct *number = malloc(sizeof(__mpz_struct));
             if (number == NULL)
                 exit(EXIT_FAILURE);
 
-            //mpz_init(number);
+            mpz_init(number);
             *(output + i) = number;
         }
 
     return output;
 }
 
-void freeGMPBuffer(mpz_ptr *buffer) {
+void freeGMPBuffer(__mpz_struct **buffer) {
 
     for (int i = 0; i <= GMPBufferLength; i++) {
         mpz_clear(*(buffer + i));

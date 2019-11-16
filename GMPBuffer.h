@@ -5,8 +5,10 @@
 #ifndef TEN_PROJECT_GMPBUFFER_H
 #define TEN_PROJECT_GMPBUFFER_H
 
-mpz_ptr* initGMPBuffer();
-mpz_ptr getNumberFromGMPBuffer(mpz_ptr* buffer, int index);
-void freeGMPBuffer(mpz_ptr *buffer);
+__mpz_struct **initGMPBuffer();
+
+__mpz_struct *getNumberFromGMPBuffer(__mpz_struct **buffer, int index);
+
+void freeGMPBuffer(__mpz_struct **buffer);
 
 #endif //TEN_PROJECT_GMPBUFFER_H

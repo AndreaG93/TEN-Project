@@ -20,7 +20,7 @@ mpz_ptr *initGMPBuffer() {
             if (number == NULL)
                 exit(EXIT_FAILURE);
 
-            mpz_init(number);
+            //mpz_init(number);
             *(output + i) = number;
         }
 

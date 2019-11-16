@@ -15,6 +15,6 @@ typedef UnorderedList FactorList;
 
 
 FactorBase *computeFactorBase(mpz_ptr smoothnessBound);
-mpz_t *getMultiplicativeInverseWithExtendedEuclideanAlgorithm(mpz_t* buffer, mpz_t input, mpz_t modulo);
+mpz_ptr getMultiplicativeInverseWithExtendedEuclideanAlgorithm(mpz_ptr* buffer, mpz_ptr input, mpz_ptr modulo);
 
 #endif //TEN_PROJECT_ROUTINES_H

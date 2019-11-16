@@ -15,16 +15,10 @@
 void getMultiplicativeInverseWithExtendedEuclideanAlgorithm_test(){
 
     mpz_ptr* GMPBuffer = initGMPBuffer();
-    mpz_ptr input = getNumberFromGMPBuffer(GMPBuffer, 1);
-    mpz_ptr modulo = getNumberFromGMPBuffer(GMPBuffer, 9);
+    mpz_ptr input = malloc(sizeof(mpz_ptr));
+    mpz_ptr modulo = malloc(sizeof(mpz_ptr));
+    mpz_ptr inverse;
 
-    mpz_set_si(input, 13);
-    mpz_set_si(modulo, 1);
-
-    mpz_sub(input, modulo, input);
-    fprintf(stderr, "%s\n", mpz_get_str(NULL, 10, input));
-
-    /*
     if (mpz_init_set_str(input, "5", 10) != 0)
         exit(EXIT_FAILURE);
 
@@ -32,8 +26,7 @@ void getMultiplicativeInverseWithExtendedEuclideanAlgorithm_test(){
         exit(EXIT_FAILURE);
 
     inverse = getMultiplicativeInverseWithExtendedEuclideanAlgorithm(GMPBuffer, input, modulo);
-    fprintf(stderr, "%s\n", mpz_get_str(NULL, 10, *inverse));
-     */
+    fprintf(stderr, "%s\n", mpz_get_str(NULL, 10, inverse));
 }
 
 

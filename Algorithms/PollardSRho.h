@@ -1,8 +1,0 @@
-//
-// Created by Andrea on 14/11/2019.
-//
-
-#ifndef TEN_PROJECT_POLLARDSRHO_H
-#define TEN_PROJECT_POLLARDSRHO_H
-
-#endif //TEN_PROJECT_POLLARDSRHO_H

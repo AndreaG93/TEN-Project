@@ -20,15 +20,14 @@ __mpz_struct *getNumberFromApplicationBuffer(__mpz_struct **buffer, int index) {
     return *(buffer + index);
 }
 
-__mpz_struct **allocateApplicationBuffer() {
+__mpz_struct **allocateAuxiliaryBuffer() {
 
     __mpz_struct **output = malloc(GMPBufferLength * sizeof(__mpz_struct *));
     if (output == NULL)
         exit(EXIT_FAILURE);
     else
-        for (int i = 0; i < GMPBufferLength; i++) {
+        for (int i = 0; i < GMPBufferLength; i++)
             *(output + i) = allocateAndInitializeNewGMPNumber();
-        }
 
     return output;
 }
@@ -37,7 +36,7 @@ void printNumber(__mpz_struct *input, const char *messageLabel) {
     fprintf(stderr, "%s: %s\n", messageLabel, mpz_get_str(NULL, 10, input));
 }
 
-void freeApplicationBuffer(__mpz_struct **appBuffer) {
+void freeAuxiliaryBuffer(__mpz_struct **appBuffer) {
 
     for (int i = 0; i < GMPBufferLength; i++) {
         mpz_clear(*(appBuffer + i));

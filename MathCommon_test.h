@@ -22,6 +22,15 @@ void getInverseMultiplicative_test() {
     inverse = getInverseMultiplicative(input, modulo, controlBlock->auxiliaryNumberBuffer);
     if ((mpz_cmp_si(inverse,-71)) != 0)
         exit(EXIT_FAILURE);
+
+    if (mpz_set_str(input, "2", 10) != 0)
+        exit(EXIT_FAILURE);
+
+    if (mpz_set_str(modulo, "178", 10) != 0)
+        exit(EXIT_FAILURE);
+
+    inverse = getInverseMultiplicative(input, modulo, controlBlock->auxiliaryNumberBuffer);
+    printNumber(inverse, "");
 }
 
 void generatePrimeDatabase_test(){

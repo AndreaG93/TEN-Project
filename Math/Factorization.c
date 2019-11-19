@@ -78,9 +78,17 @@ OrderedFactorList *factorize(ApplicationBuffer *applicationBuffer, __mpz_struct 
             if (mpz_cmp_si(factor, 1) > 0) {
 
                 mpz_div(numberToFactorize, numberToFactorize, factor);
-                factorizeTrialDivision(output, factor, aux1, aux2);
-                break;
 
+                if (mpz_probab_prime_p(factor,15) == 1){
+
+                    __mpz_struct *newBase = allocateAndSetNumber(aux1);
+                    insertNewFactor(output, newBase);
+
+                } else {
+                    factorizeTrialDivision(output, factor, aux1, aux2);
+                    break;
+                }
+                
             } else if (mpz_cmp(factor, number) == 0) {
 
                 trial++;

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stdlib.h>
-#include "NumberBuffer.h"
+#include "Math/NumberBuffer.h"
 
 
 
@@ -30,8 +30,8 @@ void initializeControlBlock() {
         if (controlBlock->mainNumberBuffer == NULL)
             exit(EXIT_FAILURE);
 
-        controlBlock->auxiliaryNumberBuffer = allocateAuxiliaryBuffer();
-        if (controlBlock->auxiliaryNumberBuffer == NULL)
-            exit(EXIT_FAILURE);
+        //controlBlock->auxiliaryNumberBuffer = allocateAuxiliaryBuffer();
+        //if (controlBlock->auxiliaryNumberBuffer == NULL)
+        //    exit(EXIT_FAILURE);
     }
 }

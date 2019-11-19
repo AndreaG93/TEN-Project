@@ -3,7 +3,7 @@
 #include <gmp.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include "GMPCommon.h"
+#include "Math/Buffer/ApplicationBuffer.h"
 
 typedef struct {
     __mpz_struct *base;

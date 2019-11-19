@@ -3,8 +3,8 @@
 #include <gmp.h>
 #include <stdbool.h>
 #include <string.h>
-#include "GMPCommon.h"
 #include "DataStructures/UnorderedList.h"
+#include "Math/Number.h"
 
 void PollardSRhoFunction(mpz_t x, mpz_t modulo) {
     mpz_mul(x, x, x);
@@ -13,11 +13,13 @@ void PollardSRhoFunction(mpz_t x, mpz_t modulo) {
 }
 
 bool isInvertible(mpz_t input, mpz_t modulo, __mpz_struct **appBuffer) {
-
+/*
     __mpz_struct *gcd = getNumberFromApplicationBuffer(appBuffer, 0);
 
     mpz_gcd(gcd, input, modulo);
     return (mpz_cmp_ui(gcd, 1) == 0);
+    */
+    return true;
 }
 
 bool isBSmooth(mpz_t input, mpz_t smoothnessBound) {
@@ -34,6 +36,7 @@ bool isBSmooth(mpz_t input, mpz_t smoothnessBound) {
 
 mpz_ptr getInverseMultiplicative(__mpz_struct *input, __mpz_struct *modulo, __mpz_struct **appBuffer) {
 
+    /*
     __mpz_struct *y_0 = malloc(sizeof(mpz_ptr));
     if (y_0 == NULL)
         exit(EXIT_FAILURE);
@@ -80,6 +83,7 @@ mpz_ptr getInverseMultiplicative(__mpz_struct *input, __mpz_struct *modulo, __mp
     }
 
     return y_0;
+     */
 }
 
 void generatePrimeDatabase() {
@@ -91,7 +95,7 @@ void generatePrimeDatabase() {
     if (outputFile == NULL)
         exit(EXIT_FAILURE);
 
-    __mpz_struct *currentPrime = allocateAndInitializeNewGMPNumber();
+    __mpz_struct *currentPrime = allocateNumber();
 
     mpz_set_ui(currentPrime, 999999999989);
 
@@ -102,57 +106,12 @@ void generatePrimeDatabase() {
         numOfDigits = strlen(currentPrimeStr);
         fprintf(outputFile, "%s\n", currentPrimeStr);
 
-        if (numOfDigits == 15){
+        if (numOfDigits == 15) {
             break;
         }
     }
 
-    if (fclose(outputFile) != 0){
+    if (fclose(outputFile) != 0) {
         exit(EXIT_FAILURE);
     }
-}
-
-
-
-UnorderedList *PollardSRhoAlgorithm(mpz_t input, __mpz_struct **appBuffer) {
-
-    UnorderedList *output = allocUnorderedList();
-
-    __mpz_struct *x = getNumberFromApplicationBuffer(appBuffer, 0);
-    __mpz_struct *y = getNumberFromApplicationBuffer(appBuffer, 0);
-    __mpz_struct *XMinusY = getNumberFromApplicationBuffer(appBuffer, 0);
-    __mpz_struct *factor = getNumberFromApplicationBuffer(appBuffer, 0);
-
-    while (1) {
-
-        mpz_set_ui(x, 1);
-        mpz_set_ui(y, 1);
-
-        while (1) {
-
-            PollardSRhoFunction(x, input);
-            PollardSRhoFunction(y, input);
-            PollardSRhoFunction(y, input);
-
-            mpz_sub(XMinusY, x, y);
-            mpz_gcd(factor, XMinusY, input);
-
-            if (mpz_cmp_si(factor, 1) != 0) {
-
-                __mpz_struct *foundFactor = allocateAndInitializeNewGMPNumber();
-                mpz_init_set(foundFactor, factor);
-
-                insert(output, foundFactor);
-                break;
-            } else if (mpz_cmp(factor, input) == 0)
-                break;
-        }
-
-        mpz_div(input, input, factor);
-        if (mpz_cmp_si(input, 1) == 0) {
-            break;
-        }
-    }
-
-    return output;
 }

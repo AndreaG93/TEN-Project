@@ -3,10 +3,10 @@
 #include <stdlib.h>
 #include <gmp.h>
 #include "NumberBuffer.h"
-#include "GMPCommon.h"
 
 void numberBuffer_test() {
 
+    /*
     __mpz_struct *x = allocateAndInitializeNewGMPNumber();
     __mpz_struct *y = allocateAndInitializeNewGMPNumber();
     __mpz_struct *z = allocateAndInitializeNewGMPNumber();
@@ -41,4 +41,5 @@ void numberBuffer_test() {
 
     if (chainedHashTableSearch(controlBlock->mainNumberBuffer, s, controlBlock->stringBuffer) != s)
         exit(EXIT_FAILURE);
+        */
 }

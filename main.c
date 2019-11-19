@@ -7,43 +7,16 @@
 //#define EXECUTE_TESTS // Comment to disable tests...
 #define AUDIT if(1)
 
-int gcd(int a, int b) {
-    int remainder;
-    while (b != 0) {
-        remainder = a % b;
-        a = b;
-        b = remainder;
-    }
-    return a;
-}
 
 int main() {
 
-/*
-    int number = 72, loop = 1, count;
-    int x_fixed = 2, x = 1, size = 2, factor;
-    int y = 1;
-    do {
-        printf("----   loop %4i   ----\n", loop);
-        count = size;
-        do {
-            x = (x * x + 1) % number;
-            y = (y * y + 1) % number;
-            y = (y * y + 1) % number;
-            factor = gcd(abs(x - y), number);
-            printf("count = %4i  x = %6i  factor = %i\n", size - count + 1, x, factor);
-        } while (--count && (factor == 1));
-        size *= 2;
-        x_fixed = x;
-        loop = loop + 1;
-    } while (factor == 1);
-    printf("factor is %i\n", factor);
 
-    */
+
+
 
     ApplicationBuffer *applicationBuffer = allocateApplicationBuffer();
 
-    __mpz_struct *number = allocateAndSetULLNumber(72);
+    __mpz_struct *number = allocateAndSetULLNumber(7242342342352);
 
     OrderedFactorList *orderedFactorList = factorize(applicationBuffer, number);
     OrderedFactorListNode *currentNode = orderedFactorList->head;

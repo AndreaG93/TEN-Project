@@ -21,10 +21,33 @@ void doublePollardSRhoFunction(__mpz_struct *input, __mpz_struct *modulo) {
 }
 
 
+void
+factorizeTrialDivision(OrderedFactorList *factorList, __mpz_struct *input, __mpz_struct *aux1, __mpz_struct *aux2) {
+
+    mpz_set_ui(aux1, 2);
+
+    while (mpz_cmp_si(input, 1) > 0) {
+
+        mpz_mod(aux2, input, aux1);
+        if (mpz_cmp_si(aux2, 0) == 0) {
+
+            __mpz_struct *newBase = allocateAndSetNumber(aux1);
+            insertNewFactor(factorList, newBase);
+
+            mpz_div(input, input, aux1);
+
+        } else {
+            mpz_add_ui(aux1, aux1, 1);
+        }
+
+    }
+}
+
+
 OrderedFactorList *factorize(ApplicationBuffer *applicationBuffer, __mpz_struct *number) {
 
     OrderedFactorList *output = allocateOrderedFactorList();
-    bool firstTimeInnerLoop = true;
+    int trial = 0;
 
     __mpz_struct *x = getAuxiliaryNumber(applicationBuffer, 0);
     __mpz_struct *y = getAuxiliaryNumber(applicationBuffer, 1);
@@ -34,14 +57,13 @@ OrderedFactorList *factorize(ApplicationBuffer *applicationBuffer, __mpz_struct 
     __mpz_struct *actualExponent = getAuxiliaryNumber(applicationBuffer, 5);
     __mpz_struct *aux1 = getAuxiliaryNumber(applicationBuffer, 6);
     __mpz_struct *aux2 = getAuxiliaryNumber(applicationBuffer, 7);
-    __mpz_struct *aux3 = getAuxiliaryNumber(applicationBuffer, 8);
 
     mpz_set(numberToFactorize, number);
 
     while (mpz_cmp_ui(numberToFactorize, 1)) {
 
-        mpz_set_ui(x, 1);
-        mpz_set_ui(y, 1);
+        mpz_set_ui(x, trial);
+        mpz_set_ui(y, trial);
         mpz_set_ui(actualExponent, 0);
 
         while (1) {
@@ -55,16 +77,18 @@ OrderedFactorList *factorize(ApplicationBuffer *applicationBuffer, __mpz_struct 
 
             if (mpz_cmp_si(factor, 1) > 0) {
 
-                __mpz_struct *newBase = allocateAndSetNumber(factor);
-                insertNewFactor(output, newBase);
+                mpz_div(numberToFactorize, numberToFactorize, factor);
+                factorizeTrialDivision(output, factor, aux1, aux2);
+                break;
 
+            } else if (mpz_cmp(factor, number) == 0) {
+
+                trial++;
                 break;
             }
-
-
-            mpz_div(numberToFactorize, aux2, aux3);
         }
     }
 
     return output;
 }
+

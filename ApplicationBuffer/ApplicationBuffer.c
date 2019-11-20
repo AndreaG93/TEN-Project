@@ -23,14 +23,7 @@ __mpz_struct *retrieveAuxiliaryNumber(ApplicationBuffer *applicationBuffer) {
 }
 
 void releaseAuxiliaryNumber(ApplicationBuffer *applicationBuffer, unsigned long long amount) {
-
-    while (amount != 0){
-
-        mpz_set_ui(*(applicationBuffer->auxiliaryNumbersBuffer + applicationBuffer->currentAvailableNumber), 0);
-        applicationBuffer->currentAvailableNumber--;
-
-        amount--;
-    }
+    applicationBuffer->currentAvailableNumber = applicationBuffer->currentAvailableNumber - amount;
 }
 
 void deallocateApplicationBuffer(ApplicationBuffer *applicationBuffer) {

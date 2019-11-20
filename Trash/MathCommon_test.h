@@ -4,9 +4,9 @@
 #include <gmp.h>
 #include <stdlib.h>
 #include "MathCommon.h"
-#include "../ControlBlock.h"
 #include "../Math/Number.h"
 
+/*
 void getInverseMultiplicative_test() {
 
     __mpz_struct *input = allocateNumber();
@@ -42,3 +42,4 @@ void isInvertible_test() {
     if (isInvertible(input, modulo, controlBlock->auxiliaryNumberBuffer) != true)
         exit(EXIT_FAILURE);
 }
+*/

@@ -19,7 +19,7 @@ DiscreteLogarithm *allocateDiscreteLogarithm(char *base, char *argument, __mpz_s
 
 bool isCorrect(DiscreteLogarithm *dLog, ApplicationBuffer *appBuffer) {
 
-    __mpz_struct *computedDLogArgument = getAuxiliaryNumber(appBuffer, 0);
+    __mpz_struct *computedDLogArgument = retrieveAuxiliaryNumber(appBuffer);
 
     mpz_powm(computedDLogArgument, dLog->base, dLog->value, dLog->moduloOfMultiplicativeGroup);
 

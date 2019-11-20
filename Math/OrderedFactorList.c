@@ -10,7 +10,6 @@ OrderedFactorList *allocateOrderedFactorList() {
         exit(EXIT_FAILURE);
     } else {
         output->head = NULL;
-        output->length = 0;
 
         return output;
     }
@@ -28,7 +27,7 @@ OrderedFactorListNode *allocateOrderedFactorListNode(void *factor) {
     } else {
 
         output->factor = newFactor;
-        output->next_factor = NULL;
+        output->next_node = NULL;
 
         return output;
     }
@@ -41,6 +40,7 @@ void insertNewFactor(OrderedFactorList *list, __mpz_struct *newBaseFactor) {
 
     if (list->head == NULL) {
         list->head = allocateOrderedFactorListNode(newBaseFactor);
+        list->tail = list->head;
     } else {
         while (currentNode != NULL) {
 
@@ -55,23 +55,46 @@ void insertNewFactor(OrderedFactorList *list, __mpz_struct *newBaseFactor) {
 
                 OrderedFactorListNode *newNode = allocateOrderedFactorListNode(newBaseFactor);
 
-                if (list->length == 1)
+                if (list->head == list->tail)
                     list->head = newNode;
                 else
-                    previousNode->next_factor = newNode;
+                    previousNode->next_node = newNode;
 
-                newNode->next_factor = currentNode;
-
-                list->length++;
+                newNode->next_node = currentNode;
                 return;
+
             } else {
                 previousNode = currentNode;
-                currentNode = currentNode->next_factor;
+                currentNode = currentNode->next_node;
             }
         }
 
-        previousNode->next_factor = allocateOrderedFactorListNode(newBaseFactor);
+        currentNode = allocateOrderedFactorListNode(newBaseFactor);
+
+        previousNode->next_node = currentNode;
+        list->tail = currentNode;
+    }
+}
+
+void deallocateOrderedFactorList(OrderedFactorList *list) {
+
+    OrderedFactorListNode *currentNode = list->head;
+    OrderedFactorListNode *nextNode;
+    Factor *currentFactor;
+
+    while (currentNode != NULL) {
+
+        nextNode = currentNode->next_node;
+        currentFactor = currentNode->factor;
+
+        mpz_clear(currentFactor->base);
+        mpz_clear(currentFactor->exponent);
+
+        free(currentFactor);
+        free(currentNode);
+
+        currentNode = nextNode;
     }
 
-    list->length++;
+    free(list);
 }

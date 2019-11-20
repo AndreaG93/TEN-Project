@@ -14,10 +14,16 @@ allocateDLogProblemInstance(char *moduloOfMultiplicativeGroup, char *dLogBase, c
         output->applicationBuffer = allocateApplicationBuffer();
 
         output->moduloOfMultiplicativeGroup = allocateAndSetNumberFromString(moduloOfMultiplicativeGroup);
+        output->moduloOfMultiplicativeGroupMinusOne = allocateNumber();
+        mpz_sub_ui(output->moduloOfMultiplicativeGroupMinusOne, output->moduloOfMultiplicativeGroup, 1);
 
         output->discreteLogarithmToCompute = allocateDiscreteLogarithm(dLogBase, dLogArgument,
                                                                        output->moduloOfMultiplicativeGroup);
 
+        output->maxRandomInteger = allocateAndSetNumberFromULL(15);
+
+        output->secondPhaseOutput = allocateSecondPhaseOutput(4); //TODO
+        output->factorBase = allocateNumbersArray(4); //TODO
     }
 
     return output;

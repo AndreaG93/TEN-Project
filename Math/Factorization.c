@@ -20,6 +20,13 @@ void doublePollardSRhoFunction(__mpz_struct *input, __mpz_struct *modulo) {
     pollardSRhoFunction(input, modulo);
 }
 
+bool isBSmooth(OrderedFactorList *factorList, __mpz_struct *smoothnessBound) {
+
+    if (factorList->tail != NULL && mpz_cmp(factorList->tail->factor->base, smoothnessBound) <= 0)
+        return true;
+    else
+        return false;
+}
 
 void
 factorizeTrialDivision(OrderedFactorList *factorList, __mpz_struct *input, __mpz_struct *aux1, __mpz_struct *aux2) {
@@ -44,19 +51,20 @@ factorizeTrialDivision(OrderedFactorList *factorList, __mpz_struct *input, __mpz
 }
 
 
-OrderedFactorList *factorize(ApplicationBuffer *applicationBuffer, __mpz_struct *number) {
+OrderedFactorList *factorizeCheckingBSmoothness(ApplicationBuffer *applicationBuffer, __mpz_struct *number,
+                                                __mpz_struct *smoothnessBound) {
 
     OrderedFactorList *output = allocateOrderedFactorList();
     int trial = 0;
 
-    __mpz_struct *x = getAuxiliaryNumber(applicationBuffer, 0);
-    __mpz_struct *y = getAuxiliaryNumber(applicationBuffer, 1);
-    __mpz_struct *XMinusY = getAuxiliaryNumber(applicationBuffer, 2);
-    __mpz_struct *factor = getAuxiliaryNumber(applicationBuffer, 3);
-    __mpz_struct *numberToFactorize = getAuxiliaryNumber(applicationBuffer, 4);
-    __mpz_struct *actualExponent = getAuxiliaryNumber(applicationBuffer, 5);
-    __mpz_struct *aux1 = getAuxiliaryNumber(applicationBuffer, 6);
-    __mpz_struct *aux2 = getAuxiliaryNumber(applicationBuffer, 7);
+    __mpz_struct *x = retrieveAuxiliaryNumber(applicationBuffer);
+    __mpz_struct *y = retrieveAuxiliaryNumber(applicationBuffer);
+    __mpz_struct *XMinusY = retrieveAuxiliaryNumber(applicationBuffer);
+    __mpz_struct *factor = retrieveAuxiliaryNumber(applicationBuffer);
+    __mpz_struct *numberToFactorize = retrieveAuxiliaryNumber(applicationBuffer);
+    __mpz_struct *actualExponent = retrieveAuxiliaryNumber(applicationBuffer);
+    __mpz_struct *aux1 = retrieveAuxiliaryNumber(applicationBuffer);
+    __mpz_struct *aux2 = retrieveAuxiliaryNumber(applicationBuffer);
 
     mpz_set(numberToFactorize, number);
 
@@ -79,7 +87,7 @@ OrderedFactorList *factorize(ApplicationBuffer *applicationBuffer, __mpz_struct 
 
                 mpz_div(numberToFactorize, numberToFactorize, factor);
 
-                if (mpz_probab_prime_p(factor,15) == 1){
+                if (mpz_probab_prime_p(factor, 15) == 1) {
 
                     __mpz_struct *newBase = allocateAndSetNumberFromNumber(aux1);
                     insertNewFactor(output, newBase);
@@ -95,8 +103,16 @@ OrderedFactorList *factorize(ApplicationBuffer *applicationBuffer, __mpz_struct 
                 break;
             }
         }
+
+        if (isBSmooth(output, smoothnessBound) == false) {
+
+            deallocateOrderedFactorList(output);
+            releaseAuxiliaryNumber(applicationBuffer, 8);
+            return NULL;
+        }
     }
 
+    releaseAuxiliaryNumber(applicationBuffer, 8);
     return output;
 }
 

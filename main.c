@@ -1,8 +1,8 @@
 #include "ApplicationBuffer/ApplicationBuffer.h"
 #include "Math/OrderedFactorList.h"
-#include "Math/Factorization.h"
 #include "Math/Number.h"
 #include "DLogIndexMethod/DLogProblemInstance.h"
+#include "DLogIndexMethod/ThirdPhase.h"
 
 //#define EXECUTE_TESTS // Comment to disable tests...
 #define AUDIT if(1)
@@ -10,15 +10,25 @@
 
 int main() {
 
-    DLogProblemInstance* instance = allocateDLogProblemInstance("179", "2", "13");
+    DLogProblemInstance *instance = allocateDLogProblemInstance("179", "2", "13");
+
     instance->primitiveRoot = allocateAndSetNumberFromString("2");
+    instance->factorBaseLength = 4;
 
-    __mpz_struct *max = allocateAndSetNumberFromString("253");
-    __mpz_struct *randomNumber1 = getUniformlyDistributedRandomInteger(instance->randomIntegerGenerator, max);
-    __mpz_struct *randomNumber2 = getUniformlyDistributedRandomInteger(instance->randomIntegerGenerator, max);
+    mpz_set_ui(*(instance->factorBase), 2);
+    mpz_set_ui(*(instance->factorBase + 1), 3);
+    mpz_set_ui(*(instance->factorBase + 2), 5);
+    mpz_set_ui(*(instance->factorBase + 3), 7);
 
-    gmp_printf("%Zd", randomNumber1);
-    gmp_printf("%Zd", randomNumber2);
+    mpz_set_ui(*(instance->secondPhaseOutput->solution), 1);
+    mpz_set_ui(*(instance->secondPhaseOutput->solution + 1), 108);
+    mpz_set_ui(*(instance->secondPhaseOutput->solution + 2), 138);
+    mpz_set_ui(*(instance->secondPhaseOutput->solution + 3), 171);
+
+    instance->smoothnessBound = allocateAndSetNumberFromULL(7);
+
+    startThirdPhase(instance);
+
 
 /*
     ApplicationBuffer *applicationBuffer = allocateApplicationBuffer();
@@ -30,7 +40,7 @@ int main() {
 
     while (currentNode != NULL){
         gmp_printf("%Zd^%Zd ", currentNode->factor->base, currentNode->factor->exponent);
-        currentNode = currentNode->next_factor;
+        currentNode = currentNode->next_node;
     }
 
 */

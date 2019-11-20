@@ -22,17 +22,6 @@ bool isInvertible(mpz_t input, mpz_t modulo, __mpz_struct **appBuffer) {
     return true;
 }
 
-bool isBSmooth(mpz_t input, mpz_t smoothnessBound) {
-/*
-    FactorList* factorList;
-
-    if (factorList->length != 0 && mpz_cmp(factorList->tail->data, smoothnessBound) <= 0)
-        return true;
-    else
-        return false;
-        */
-    return false;
-}
 
 mpz_ptr getInverseMultiplicative(__mpz_struct *input, __mpz_struct *modulo, __mpz_struct **appBuffer) {
 

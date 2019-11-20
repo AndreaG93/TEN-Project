@@ -6,4 +6,4 @@ typedef __gmp_randstate_struct RandomIntegerGenerator;
 
 RandomIntegerGenerator* initializeRandomIntegerGenerator();
 
-__mpz_struct* getUniformlyDistributedRandomInteger(RandomIntegerGenerator* generator, __mpz_struct* max);
+void selectUniformlyDistributedRandomInteger(RandomIntegerGenerator* generator, __mpz_struct* max, __mpz_struct* output);

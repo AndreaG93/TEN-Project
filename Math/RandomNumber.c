@@ -14,10 +14,6 @@ RandomIntegerGenerator *initializeRandomIntegerGenerator() {
     }
 }
 
-__mpz_struct* getUniformlyDistributedRandomInteger(RandomIntegerGenerator* generator, __mpz_struct* max) {
-
-    __mpz_struct *output = allocateNumber();
+void selectUniformlyDistributedRandomInteger(RandomIntegerGenerator* generator, __mpz_struct* max, __mpz_struct* output) {
     mpz_urandomm(output, generator, max);
-
-    return output;
 }

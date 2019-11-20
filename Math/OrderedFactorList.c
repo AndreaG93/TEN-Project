@@ -20,7 +20,7 @@ OrderedFactorListNode *allocateOrderedFactorListNode(void *factor) {
 
     Factor *newFactor = allocateFactor();
     newFactor->base = factor;
-    newFactor->exponent = allocateAndSetULLNumber(1);
+    newFactor->exponent = allocateAndSetNumberFromULL(1);
 
     OrderedFactorListNode *output = malloc(sizeof(OrderedFactorListNode));
     if (output == NULL) {

@@ -1,6 +1,6 @@
 /*
  ============================================================================
- Name        : Logger.c
+ Name        : Trash.c
  Author      : Andrea Graziani
  Version     : 1.0
  Description : ANSI C implementation of a logger.

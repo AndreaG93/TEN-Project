@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include "DataStructures/UnorderedList.h"
-#include "Math/Number.h"
+#include "../Math/Number.h"
 
 void PollardSRhoFunction(mpz_t x, mpz_t modulo) {
     mpz_mul(x, x, x);

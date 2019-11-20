@@ -4,8 +4,8 @@
 #include <gmp.h>
 #include <stdlib.h>
 #include "MathCommon.h"
-#include "ControlBlock.h"
-#include "Math/Number.h"
+#include "../ControlBlock.h"
+#include "../Math/Number.h"
 
 void getInverseMultiplicative_test() {
 

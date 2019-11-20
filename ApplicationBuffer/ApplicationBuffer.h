@@ -14,4 +14,4 @@ ApplicationBuffer *allocateApplicationBuffer();
 
 __mpz_struct *getAuxiliaryNumber(ApplicationBuffer *applicationBuffer, int index);
 
-void freeAuxiliaryNumbersBuffer(ApplicationBuffer *applicationBuffer);
+void deallocateApplicationBuffer(ApplicationBuffer *applicationBuffer);

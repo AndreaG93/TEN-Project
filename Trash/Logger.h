@@ -1,6 +1,6 @@
 /*
  ============================================================================
- Name        : Logger.h
+ Name        : Trash.h
  Author      : Andrea Graziani
  Version     : 1.0
  Description : ANSI C implementation of a logger. (HEADER)

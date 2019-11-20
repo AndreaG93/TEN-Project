@@ -31,7 +31,7 @@ factorizeTrialDivision(OrderedFactorList *factorList, __mpz_struct *input, __mpz
         mpz_mod(aux2, input, aux1);
         if (mpz_cmp_si(aux2, 0) == 0) {
 
-            __mpz_struct *newBase = allocateAndSetNumber(aux1);
+            __mpz_struct *newBase = allocateAndSetNumberFromNumber(aux1);
             insertNewFactor(factorList, newBase);
 
             mpz_div(input, input, aux1);
@@ -81,14 +81,14 @@ OrderedFactorList *factorize(ApplicationBuffer *applicationBuffer, __mpz_struct 
 
                 if (mpz_probab_prime_p(factor,15) == 1){
 
-                    __mpz_struct *newBase = allocateAndSetNumber(aux1);
+                    __mpz_struct *newBase = allocateAndSetNumberFromNumber(aux1);
                     insertNewFactor(output, newBase);
 
                 } else {
                     factorizeTrialDivision(output, factor, aux1, aux2);
                     break;
                 }
-                
+
             } else if (mpz_cmp(factor, number) == 0) {
 
                 trial++;

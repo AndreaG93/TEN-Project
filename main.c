@@ -2,6 +2,7 @@
 #include "Math/OrderedFactorList.h"
 #include "Math/Factorization.h"
 #include "Math/Number.h"
+#include "DLogIndexMethod/DLogProblemInstance.h"
 
 //#define EXECUTE_TESTS // Comment to disable tests...
 #define AUDIT if(1)
@@ -9,9 +10,15 @@
 
 int main() {
 
-    D
+    DLogProblemInstance* instance = allocateDLogProblemInstance("179", "2", "13");
+    instance->primitiveRoot = allocateAndSetNumberFromString("2");
 
+    __mpz_struct *max = allocateAndSetNumberFromString("253");
+    __mpz_struct *randomNumber1 = getUniformlyDistributedRandomInteger(instance->randomIntegerGenerator, max);
+    __mpz_struct *randomNumber2 = getUniformlyDistributedRandomInteger(instance->randomIntegerGenerator, max);
 
+    gmp_printf("%Zd", randomNumber1);
+    gmp_printf("%Zd", randomNumber2);
 
 /*
     ApplicationBuffer *applicationBuffer = allocateApplicationBuffer();

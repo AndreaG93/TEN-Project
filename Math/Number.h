@@ -1,7 +1,5 @@
 #pragma once
 
-
-
 __mpz_struct **allocateNumbersArray(unsigned long long size);
 
 void deallocateNumbersArray(__mpz_struct **input, unsigned long long size);

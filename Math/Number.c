@@ -62,8 +62,3 @@ __mpz_struct *allocateAndSetNumberFromNumber(__mpz_struct *number) {
     mpz_init_set(output, number);
     return output;
 }
-
-__mpz_struct *getRandomNumber() {
-
-    mpz_urandomm
-}

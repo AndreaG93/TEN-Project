@@ -9,7 +9,7 @@ allocateDLogProblemInstance(char *moduloOfMultiplicativeGroup, char *dLogBase, c
         exit(EXIT_FAILURE);
     else {
 
-        output->randomIntegerGenerator = initializeRandomNumberGenerator();
+        output->randomIntegerGenerator = initializeRandomIntegerGenerator();
 
         output->applicationBuffer = allocateApplicationBuffer();
 

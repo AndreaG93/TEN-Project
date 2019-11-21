@@ -110,7 +110,6 @@ Relation *computeRelation(DLogProblemInstance *instance) {
     return output;
 }
 
-
 void startThirdPhase(DLogProblemInstance *instance) {
 
     Relation *relation = computeRelation(instance);

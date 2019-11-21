@@ -5,47 +5,142 @@
 #include "DLogIndexMethod/FactorBase.h"
 #include "DLogIndexMethod/FirstPhase.h"
 #include "DLogIndexMethod/SecondPhase.h"
+#include "Math/Common.h"
 
 #define MAX_RANDOM_INTEGER 20
 
 //#define EXECUTE_TESTS // Comment to disable tests...
 #define AUDIT if(1)
 
-__mpz_struct ***allocateMatrix(unsigned long long row, unsigned long long column) {
+typedef struct {
+    __mpz_struct ***structure;
 
-    __mpz_struct ***matrix = malloc(column * sizeof(__mpz_struct **));
-    if (matrix == NULL)
+    unsigned long long rowLength;
+    unsigned long long columnLength;
+} Matrix;
+
+Matrix *allocateMatrix(unsigned long long row, unsigned long long column) {
+
+    Matrix *output = malloc(sizeof(Matrix));
+    if (output == NULL)
         exit(EXIT_FAILURE);
     else {
-        for (unsigned long long columnIndex = 0; columnIndex < column; columnIndex++) {
 
-            *(matrix + columnIndex) = malloc(row * sizeof(__mpz_struct *));
-            __mpz_struct **currentColumn = *(matrix + columnIndex);
+        output->columnLength = column;
+        output->rowLength = row;
 
-            if (currentColumn == NULL)
-                exit(EXIT_FAILURE);
-            else {
+        output->structure = malloc(column * sizeof(__mpz_struct **));
+        if (output->structure == NULL)
+            exit(EXIT_FAILURE);
+        else {
+            for (unsigned long long columnIndex = 0; columnIndex < column; columnIndex++) {
 
-                for (unsigned long long rowIndex = 0; rowIndex < row; rowIndex++) {
-                    *(currentColumn + row) = NULL;
+                *(output->structure + columnIndex) = malloc(row * sizeof(__mpz_struct *));
+                __mpz_struct **currentColumn = *(output->structure + columnIndex);
+
+                if (currentColumn == NULL)
+                    exit(EXIT_FAILURE);
+                else {
+
+                    for (unsigned long long rowIndex = 0; rowIndex < row; rowIndex++) {
+                        *(currentColumn + row) = NULL;
+                    }
                 }
             }
         }
     }
 
-    return matrix;
+    return output;
 }
 
-void setMatrixNumber(__mpz_struct ***matrix, unsigned long long row, unsigned long long column, __mpz_struct *number) {
+void setMatrixNumber(Matrix *matrix, unsigned long long row, unsigned long long column, __mpz_struct *number) {
 
-    __mpz_struct **targetColumn = *(matrix + column);
+    __mpz_struct **targetColumn = *(matrix->structure + column);
     *(targetColumn + row) = number;
 }
 
-void printNumberIntoMatrix(__mpz_struct ***matrix, unsigned long long row, unsigned long long column) {
+void printNumberIntoMatrix(Matrix *matrix, unsigned long long row, unsigned long long column) {
 
-    __mpz_struct **targetColumn = *(matrix + column);
+    __mpz_struct **targetColumn = *(matrix->structure + column);
     gmp_printf("%Zd\n", *(targetColumn + row));
+}
+
+
+void swapRows(Matrix *matrix, unsigned long long row1, unsigned long long row2) {
+
+    for (unsigned long long column = 0; column < matrix->columnLength; column++){
+
+        __mpz_struct *firstElement = *(*(matrix->structure + column) + row1);
+        __mpz_struct *secondElement = *(*(matrix->structure + column) + row2);
+
+        *(*(matrix->structure + column) + row2) = firstElement;
+        *(*(matrix->structure + column) + row1) = secondElement;
+    }
+}
+
+void multiplyRowByScalar(Matrix *matrix, unsigned long long rowIndex, __mpz_struct* scalar, __mpz_struct* modulo) {
+
+    for (unsigned long long column = 0; column < matrix->columnLength; column++){
+
+        __mpz_struct *element = *(*(matrix->structure + column) + rowIndex);
+
+        mpz_mul(element, element, scalar);
+        mpz_mod(element, element, modulo);
+    }
+}
+
+void sumRows(Matrix *matrix, unsigned long long sourceRow, unsigned long long targetRow, __mpz_struct* multiplier, __mpz_struct* modulo) {
+
+    __mpz_struct *aux = allocateNumber();
+
+    for (unsigned long long column = 0; column < matrix->columnLength; column++){
+
+        __mpz_struct *sourceElement = *(*(matrix->structure + column) + sourceRow);
+        __mpz_struct *targetElement = *(*(matrix->structure + column) + targetRow);
+
+        mpz_mul(aux, sourceElement, multiplier);
+        mpz_add(targetElement, targetElement, aux);
+        mpz_mod(targetElement, targetElement, modulo);
+    }
+}
+
+void gauss(Matrix *matrix, ApplicationBuffer* buffer, __mpz_struct* modulo) {
+
+    unsigned long long actualTargetRow = 0;
+
+    for (unsigned long long column = 0; column < matrix->columnLength; column++) {
+        for (unsigned long long row = actualTargetRow; row < matrix->rowLength; row++) {
+
+            __mpz_struct* currentElement = *(*(matrix->structure + column) + row);
+
+            if (mpz_cmp_ui(currentElement, 0) != 0) {
+                swapRows(matrix, row, actualTargetRow);
+
+                __mpz_struct *inverseOfCurrentElement = getInverseMultiplicative(buffer, currentElement, modulo);
+                multiplyRowByScalar(matrix, actualTargetRow, inverseOfCurrentElement, modulo);
+
+                mpz_clear(inverseOfCurrentElement);
+                free(inverseOfCurrentElement);
+
+                for (unsigned long long subRow = 0; subRow < matrix->rowLength; subRow++) {
+
+                    if (subRow != actualTargetRow) {
+
+                        __mpz_struct *multiplier = allocateNumber();
+                        mpz_set(multiplier, *(*(matrix->structure + column) + subRow));
+                        mpz_mul_si(multiplier, multiplier, -1);
+
+                        sumRows(matrix, actualTargetRow, subRow, multiplier, modulo);
+
+                        mpz_clear(multiplier);
+                        free(multiplier);
+                    }
+                }
+
+                actualTargetRow++;
+            }
+        }
+    }
 }
 
 
@@ -54,54 +149,69 @@ int main() {
     DLogProblemInstance* instance = allocateDLogProblemInstance("179", "2", "13");
     setSmoothnessBound(instance, "7");
     initializeRandIntegerGenerator(instance, MAX_RANDOM_INTEGER);
-
-    startFirstPhase(instance);
-    startSecondPhase(instance);
-
-    //todo to cancel
-    mpz_set_ui(*(instance->secondPhaseOutput->solution), 1);
-    mpz_set_ui(*(instance->secondPhaseOutput->solution + 1), 108);
-    mpz_set_ui(*(instance->secondPhaseOutput->solution + 2), 138);
-    mpz_set_ui(*(instance->secondPhaseOutput->solution + 3), 171);
-    //todo to cancel
-
-    startThirdPhase(instance);
-
-
-
-
-
-
-
-
     /*
-    Buffers *applicationBuffer = allocateApplicationBuffer();
-    unsigned long long columnSize = 2;
-    unsigned long long rowSize = 2;
+       startFirstPhase(instance);
+       startSecondPhase(instance);
 
-    __mpz_struct *number1 = allocateAndSetNumberFromULL(12);
-    __mpz_struct *number2 = allocateAndSetNumberFromULL(8);
-    __mpz_struct *number3 = allocateAndSetNumberFromULL(3);
-    __mpz_struct *number4 = allocateAndSetNumberFromULL(2);
+       //todo to cancel
+       mpz_set_ui(*(instance->secondPhaseOutput->solution), 1);
+       mpz_set_ui(*(instance->secondPhaseOutput->solution + 1), 108);
+       mpz_set_ui(*(instance->secondPhaseOutput->solution + 2), 138);
+       mpz_set_ui(*(instance->secondPhaseOutput->solution + 3), 171);
+       //todo to cancel
 
-    __mpz_struct ***matrix = allocateMatrix(2, 2);
+       startThirdPhase(instance);
+   */
+
+
+    __mpz_struct *modulo = allocateAndSetNumberFromULL(178);
+
+    __mpz_struct *number1 = allocateAndSetNumberFromString("2");
+    __mpz_struct *number2 = allocateAndSetNumberFromString("2");
+    __mpz_struct *number3 = allocateAndSetNumberFromString("1");
+    __mpz_struct *number4 = allocateAndSetNumberFromString("0");
+    __mpz_struct *number5 = allocateAndSetNumberFromString("3");
+    __mpz_struct *number6 = allocateAndSetNumberFromString("-1");
+    __mpz_struct *number7 = allocateAndSetNumberFromString("2");
+    __mpz_struct *number8 = allocateAndSetNumberFromString("-1");
+    __mpz_struct *number9 = allocateAndSetNumberFromString("5");
+    __mpz_struct *number10 = allocateAndSetNumberFromString("-2");
+    __mpz_struct *number11 = allocateAndSetNumberFromString("-1");
+    __mpz_struct *number12 = allocateAndSetNumberFromString("1");
+
+    Matrix *matrix = allocateMatrix(3, 4);
     setMatrixNumber(matrix, 0, 0, number1);
     setMatrixNumber(matrix, 0, 1, number2);
-    setMatrixNumber(matrix, 1, 0, number3);
-    setMatrixNumber(matrix, 1, 1, number4);
+    setMatrixNumber(matrix, 0, 2, number3);
+    setMatrixNumber(matrix, 0, 3, number4);
+    setMatrixNumber(matrix, 1, 0, number5);
+    setMatrixNumber(matrix, 1, 1, number6);
+    setMatrixNumber(matrix, 1, 2, number7);
+    setMatrixNumber(matrix, 1, 3, number8);
+    setMatrixNumber(matrix, 2, 0, number9);
+    setMatrixNumber(matrix, 2, 1, number10);
+    setMatrixNumber(matrix, 2, 2, number11);
+    setMatrixNumber(matrix, 2, 3, number12);
 
+    printNumberIntoMatrix(matrix, 0, 0);
+    printNumberIntoMatrix(matrix, 0, 1);
+    printNumberIntoMatrix(matrix, 0, 2);
+    printNumberIntoMatrix(matrix, 0, 3);
+    printNumberIntoMatrix(matrix, 1, 0);
+    printNumberIntoMatrix(matrix, 1, 1);
+    printNumberIntoMatrix(matrix, 1, 2);
+    printNumberIntoMatrix(matrix, 1, 3);
+    printNumberIntoMatrix(matrix, 2, 0);
+    printNumberIntoMatrix(matrix, 2, 1);
+    printNumberIntoMatrix(matrix, 2, 2);
+    printNumberIntoMatrix(matrix, 2, 3);
+
+    gauss(matrix, instance->applicationBuffer, modulo);
 
     printNumberIntoMatrix(matrix, 0, 0);
     printNumberIntoMatrix(matrix, 0, 1);
     printNumberIntoMatrix(matrix, 1, 0);
     printNumberIntoMatrix(matrix, 1, 1);
-
-
-    for (unsigned long long columnIndex = 0; columnIndex < columnSize; columnIndex++) {
-
-    }
-*/
-
 
 
 

@@ -3,6 +3,7 @@
 #include "Math/Number.h"
 #include "DLogIndexMethod/DLogProblemInstance.h"
 #include "DLogIndexMethod/ThirdPhase.h"
+#include "DLogIndexMethod/FactorBase.h"
 
 //#define EXECUTE_TESTS // Comment to disable tests...
 #define AUDIT if(1)
@@ -47,6 +48,14 @@ void printNumberIntoMatrix(__mpz_struct ***matrix, unsigned long long row, unsig
 
 int main() {
 
+    __mpz_struct* smoothnessBound = allocateAndSetNumberFromULL(15489000);
+    FactorBase* factorBase = allocateFactorBase();
+    populateFactorBase(factorBase, smoothnessBound);
+
+    gmp_printf("%Zd", factorBase->tail->primeNumber);
+
+
+    /*
     ApplicationBuffer *applicationBuffer = allocateApplicationBuffer();
     unsigned long long columnSize = 2;
     unsigned long long rowSize = 2;
@@ -72,7 +81,7 @@ int main() {
     for (unsigned long long columnIndex = 0; columnIndex < columnSize; columnIndex++) {
 
     }
-
+*/
 
 
 

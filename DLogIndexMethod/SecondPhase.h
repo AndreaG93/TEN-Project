@@ -1,13 +1,8 @@
 #pragma once
 
 #include <gmp.h>
-
-typedef struct {
-
-    __mpz_struct** solution;
-    __mpz_struct* base;
-
-} SecondPhaseOutput;
+#include "DLogProblemInstance.h"
 
 SecondPhaseOutput* allocateSecondPhaseOutput(unsigned long long size);
 
+void startSecondPhase(DLogProblemInstance *instance);

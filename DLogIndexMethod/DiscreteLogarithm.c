@@ -1,7 +1,6 @@
 
 #include "DiscreteLogarithm.h"
 #include "../Math/Number.h"
-#include "../ApplicationBuffer/ApplicationBuffer.h"
 
 DiscreteLogarithm *allocateDiscreteLogarithm(char *base, char *argument, __mpz_struct* moduloOfMultiplicativeGroup) {
 

@@ -1,6 +1,7 @@
 #pragma once
 
-#include "../ApplicationBuffer/ApplicationBuffer.h"
+
+#include "../Buffers/ApplicationBuffer.h"
 
 bool isInvertible(ApplicationBuffer *applicationBuffer, mpz_t input, mpz_t modulo);
 

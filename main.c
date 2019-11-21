@@ -1,9 +1,12 @@
-#include "ApplicationBuffer/ApplicationBuffer.h"
 #include "Math/OrderedFactorList.h"
 #include "Math/Number.h"
 #include "DLogIndexMethod/DLogProblemInstance.h"
 #include "DLogIndexMethod/ThirdPhase.h"
 #include "DLogIndexMethod/FactorBase.h"
+#include "DLogIndexMethod/FirstPhase.h"
+#include "DLogIndexMethod/SecondPhase.h"
+
+#define MAX_RANDOM_INTEGER 20
 
 //#define EXECUTE_TESTS // Comment to disable tests...
 #define AUDIT if(1)
@@ -48,15 +51,31 @@ void printNumberIntoMatrix(__mpz_struct ***matrix, unsigned long long row, unsig
 
 int main() {
 
-    __mpz_struct* smoothnessBound = allocateAndSetNumberFromULL(15489000);
-    FactorBase* factorBase = allocateFactorBase();
-    populateFactorBase(factorBase, smoothnessBound);
+    DLogProblemInstance* instance = allocateDLogProblemInstance("179", "2", "13");
+    setSmoothnessBound(instance, "7");
+    initializeRandIntegerGenerator(instance, MAX_RANDOM_INTEGER);
 
-    gmp_printf("%Zd", factorBase->tail->primeNumber);
+    startFirstPhase(instance);
+    startSecondPhase(instance);
+
+    //todo to cancel
+    mpz_set_ui(*(instance->secondPhaseOutput->solution), 1);
+    mpz_set_ui(*(instance->secondPhaseOutput->solution + 1), 108);
+    mpz_set_ui(*(instance->secondPhaseOutput->solution + 2), 138);
+    mpz_set_ui(*(instance->secondPhaseOutput->solution + 3), 171);
+    //todo to cancel
+
+    startThirdPhase(instance);
+
+
+
+
+
+
 
 
     /*
-    ApplicationBuffer *applicationBuffer = allocateApplicationBuffer();
+    Buffers *applicationBuffer = allocateApplicationBuffer();
     unsigned long long columnSize = 2;
     unsigned long long rowSize = 2;
 
@@ -192,7 +211,7 @@ startThirdPhase(instance);
 */
 
 /*
-    ApplicationBuffer *applicationBuffer = allocateApplicationBuffer();
+    Buffers *applicationBuffer = allocateApplicationBuffer();
 
   __mpz_struct *number = allocateAndSetNumberFromULL(7242342342352);
 

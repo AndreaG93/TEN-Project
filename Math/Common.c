@@ -6,7 +6,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "Common.h"
-#include "../ApplicationBuffer/ApplicationBuffer.h"
 #include "Number.h"
 
 bool isInvertible(ApplicationBuffer *applicationBuffer, mpz_t input, mpz_t modulo) {

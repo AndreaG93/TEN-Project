@@ -9,8 +9,6 @@ allocateDLogProblemInstance(char *moduloOfMultiplicativeGroup, char *dLogBase, c
         exit(EXIT_FAILURE);
     else {
 
-        output->randomIntegerGenerator = initializeRandomIntegerGenerator();
-
         output->applicationBuffer = allocateApplicationBuffer();
 
         output->moduloOfMultiplicativeGroup = allocateAndSetNumberFromString(moduloOfMultiplicativeGroup);
@@ -19,12 +17,17 @@ allocateDLogProblemInstance(char *moduloOfMultiplicativeGroup, char *dLogBase, c
 
         output->discreteLogarithmToCompute = allocateDiscreteLogarithm(dLogBase, dLogArgument,
                                                                        output->moduloOfMultiplicativeGroup);
-
-        output->maxRandomInteger = allocateAndSetNumberFromULL(15);
-
-        output->secondPhaseOutput = allocateSecondPhaseOutput(4); //TODO
-        output->factorBase = allocateNumbersArray(4); //TODO
     }
 
     return output;
+}
+
+void setSmoothnessBound(DLogProblemInstance *instance, char *smoothnessBoundAsString) {
+    instance->smoothnessBound = allocateAndSetNumberFromString(smoothnessBoundAsString);
+}
+
+void initializeRandIntegerGenerator(DLogProblemInstance *instance, unsigned long long maxRandomInteger) {
+
+    instance->randomIntegerGenerator = initializeRandomIntegerGenerator();
+    instance->maxRandomInteger = allocateAndSetNumberFromULL(maxRandomInteger);
 }

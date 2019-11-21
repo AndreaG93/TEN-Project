@@ -1,10 +1,15 @@
 #pragma once
-
 #include <gmp.h>
 #include "DiscreteLogarithm.h"
-#include "../ApplicationBuffer/ApplicationBuffer.h"
 #include "../Math/RandomNumber.h"
-#include "SecondPhase.h"
+#include "FactorBase.h"
+
+typedef struct {
+
+    __mpz_struct** solution;
+    __mpz_struct* base;
+
+} SecondPhaseOutput;
 
 typedef struct {
 
@@ -12,9 +17,8 @@ typedef struct {
     __mpz_struct* moduloOfMultiplicativeGroup;
     __mpz_struct* moduloOfMultiplicativeGroupMinusOne;
     __mpz_struct* smoothnessBound;
-    __mpz_struct** factorBase;
-    unsigned long long factorBaseLength;
 
+    FactorBase* factorBase;
     DiscreteLogarithm *discreteLogarithmToCompute;
 
     ApplicationBuffer* applicationBuffer;
@@ -29,3 +33,6 @@ typedef struct {
 } DLogProblemInstance;
 
 DLogProblemInstance* allocateDLogProblemInstance(char *moduloOfMultiplicativeGroup, char *dLogBase, char *dLogArgument);
+
+void setSmoothnessBound(DLogProblemInstance *instance, char *smoothnessBoundAsString);
+void initializeRandIntegerGenerator(DLogProblemInstance *instance, unsigned long long maxRandomInteger);

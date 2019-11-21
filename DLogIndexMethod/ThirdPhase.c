@@ -17,7 +17,7 @@ typedef struct {
 
 Relation *allocateRelation(unsigned long long leftSideRelationLength) {
 
-    Relation* output = malloc(sizeof(Relation));
+    Relation *output = malloc(sizeof(Relation));
     if (output == NULL)
         exit(EXIT_FAILURE);
     else {
@@ -28,29 +28,39 @@ Relation *allocateRelation(unsigned long long leftSideRelationLength) {
     }
 }
 
-__mpz_struct* computeRequiredDiscreteLogarithmValue(DLogProblemInstance *instance, Relation *relation) {
+__mpz_struct *computeRequiredDiscreteLogarithmValue(DLogProblemInstance *instance, Relation *relation) {
+
+    __mpz_struct *leftBaseValue;
+    __mpz_struct *leftExponentValue;
+    __mpz_struct *RightBaseValue;
+    __mpz_struct *RightExponentValue;
 
     __mpz_struct *aux = retrieveAuxiliaryNumber(instance->applicationBuffer);
     __mpz_struct *output = allocateAndSetNumberFromULL(0);
 
+    OrderedFactorListNode *currentFactorNodeRight = relation->rightFactors->head;
+    FactorBaseNode *currentFactorNodeLeft = instance->factorBase->head;
 
-    OrderedFactorListNode *currentFactorListNode = relation->rightFactors->head;
+    for (unsigned long long index = 0; index < instance->factorBase->length; index++) {
 
-    for (unsigned long long index = 0; index < instance->factorBaseLength; index++) {
+        leftBaseValue = currentFactorNodeLeft->primeNumber;
+        leftExponentValue = *(relation->leftExponentValues + index);
 
-        __mpz_struct *leftBaseValue = *(instance->factorBase + index);
-        __mpz_struct *leftExponentValue = *(relation->leftExponentValues + index);
-
-        __mpz_struct *RightBaseValue = currentFactorListNode->factor->base;
-        __mpz_struct *RightExponentValue = currentFactorListNode->factor->exponent;
+        RightBaseValue = currentFactorNodeRight->factor->base;
+        RightExponentValue = currentFactorNodeRight->factor->exponent;
 
         if (mpz_cmp(leftBaseValue, RightBaseValue) != 0) {
             RightExponentValue = allocateAndSetNumberFromULL(0);
+        } else {
+            if (currentFactorNodeRight->next_node != NULL)
+                currentFactorNodeRight = currentFactorNodeRight->next_node;
         }
 
         mpz_sub(aux, RightExponentValue, leftExponentValue);
         mpz_mul(aux, aux, *(instance->secondPhaseOutput->solution + index));
         mpz_add(output, output, aux);
+
+        currentFactorNodeLeft = currentFactorNodeLeft->next_node;
     }
 
     mpz_mod(output, output, instance->moduloOfMultiplicativeGroupMinusOne);
@@ -60,31 +70,38 @@ __mpz_struct* computeRequiredDiscreteLogarithmValue(DLogProblemInstance *instanc
 }
 
 
-Relation* computeRelation(DLogProblemInstance* instance) {
+Relation *computeRelation(DLogProblemInstance *instance) {
 
-    Relation* output = allocateRelation(instance->factorBaseLength);
+    Relation *output = allocateRelation(instance->factorBase->length);
 
     __mpz_struct *randomProduct = retrieveAuxiliaryNumber(instance->applicationBuffer);
     __mpz_struct *powerModuloP = retrieveAuxiliaryNumber(instance->applicationBuffer);
 
     while (true) {
 
+        __mpz_struct *currentExponent;
+        __mpz_struct *currentFactor;
+
         mpz_set(randomProduct, instance->discreteLogarithmToCompute->argument);
 
-        for (unsigned long long index = 0; index < instance->factorBaseLength; index++) {
+        FactorBaseNode *currentFactorBaseNode = instance->factorBase->head;
 
-            __mpz_struct *currentExponent = *(output->leftExponentValues + index);
-            __mpz_struct *currentFactor = *(instance->factorBase + index);
+        for (unsigned long long index = 0; index < instance->factorBase->length; index++) {
+
+            currentExponent = *(output->leftExponentValues + index);
+            currentFactor = currentFactorBaseNode->primeNumber;
 
             selectUniformlyDistributedRandomInteger(instance->randomIntegerGenerator, instance->maxRandomInteger,
                                                     currentExponent);
             mpz_powm(powerModuloP, currentFactor, currentExponent, instance->moduloOfMultiplicativeGroup);
             mpz_mul(randomProduct, randomProduct, powerModuloP);
             mpz_mod(randomProduct, randomProduct, instance->moduloOfMultiplicativeGroup);
+
+            currentFactorBaseNode = currentFactorBaseNode->next_node;
         }
 
         output->rightFactors = factorizeCheckingBSmoothness(instance->applicationBuffer, randomProduct,
-                                                                 instance->smoothnessBound);
+                                                            instance->smoothnessBound);
         if (output->rightFactors != NULL)
             break;
     }
@@ -94,10 +111,10 @@ Relation* computeRelation(DLogProblemInstance* instance) {
 }
 
 
-void startThirdPhase(DLogProblemInstance* instance) {
+void startThirdPhase(DLogProblemInstance *instance) {
 
     Relation *relation = computeRelation(instance);
-    __mpz_struct* output = computeRequiredDiscreteLogarithmValue(instance, relation);
+    __mpz_struct *output = computeRequiredDiscreteLogarithmValue(instance, relation);
 
     gmp_printf("%Zd", output);
 }

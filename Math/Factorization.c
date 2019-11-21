@@ -6,7 +6,6 @@
 #include <stdbool.h>
 #include "Factorization.h"
 #include "OrderedFactorList.h"
-#include "../ApplicationBuffer/ApplicationBuffer.h"
 #include "Number.h"
 
 void pollardSRhoFunction(__mpz_struct *input, __mpz_struct *modulo) {

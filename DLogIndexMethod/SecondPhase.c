@@ -6,7 +6,7 @@
 #include "SecondPhase.h"
 #include "../Math/Number.h"
 
-SecondPhaseOutput* allocateSecondPhaseOutput(unsigned long long size){
+SecondPhaseOutput *allocateSecondPhaseOutput(unsigned long long size) {
 
     SecondPhaseOutput *output = malloc(sizeof(SecondPhaseOutput));
     if (output == NULL)
@@ -16,4 +16,8 @@ SecondPhaseOutput* allocateSecondPhaseOutput(unsigned long long size){
     }
 
     return output;
+}
+
+void startSecondPhase(DLogProblemInstance *instance) {
+    instance->secondPhaseOutput = allocateSecondPhaseOutput(instance->factorBase->length);
 }

@@ -21,7 +21,7 @@ bool isInvertible(ApplicationBuffer *applicationBuffer, mpz_t input, mpz_t modul
     return output;
 }
 
-__mpz_struct* getInverseMultiplicative(ApplicationBuffer *applicationBuffer, __mpz_struct *input, __mpz_struct *modulo) {
+__mpz_struct* getInverseMultiplicative(ApplicationBuffer *applicationBuffer, __mpz_struct *number, __mpz_struct *modulo) {
 
     __mpz_struct *y_0 = allocateAndSetNumberFromULL(0);
 
@@ -35,6 +35,9 @@ __mpz_struct* getInverseMultiplicative(ApplicationBuffer *applicationBuffer, __m
     __mpz_struct *aux_2 = retrieveAuxiliaryNumber(applicationBuffer);
     __mpz_struct *aux_3 = retrieveAuxiliaryNumber(applicationBuffer);
     __mpz_struct *aux_4 = retrieveAuxiliaryNumber(applicationBuffer);
+
+    __mpz_struct *input = retrieveAuxiliaryNumber(applicationBuffer);
+    mpz_mod(input, number, modulo);
 
     mpz_set_si(x_0, 1);
     mpz_set_si(x_1, 0);
@@ -65,5 +68,6 @@ __mpz_struct* getInverseMultiplicative(ApplicationBuffer *applicationBuffer, __m
     }
 
     releaseAuxiliaryNumber(applicationBuffer, 10);
+    mpz_mod(y_0, y_0, modulo);
     return y_0;
 }

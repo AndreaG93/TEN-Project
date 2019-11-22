@@ -12,7 +12,7 @@ SecondPhaseOutput *allocateSecondPhaseOutput(unsigned long long size) {
     if (output == NULL)
         exit(EXIT_FAILURE);
     else {
-        output->solution = allocateNumbersArray(size);
+        output->solution = allocateNumbersArray(size, true);
     }
 
     return output;

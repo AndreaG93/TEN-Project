@@ -21,7 +21,7 @@ Relation *allocateRelation(unsigned long long leftSideRelationLength) {
     if (output == NULL)
         exit(EXIT_FAILURE);
     else {
-        output->leftExponentValues = allocateNumbersArray(leftSideRelationLength);
+        output->leftExponentValues = allocateNumbersArray(leftSideRelationLength, true);
         output->rightFactors = NULL;
 
         return output;

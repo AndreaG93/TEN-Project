@@ -1,6 +1,7 @@
 #pragma once
+#include <stdbool.h>
 
-__mpz_struct **allocateNumbersArray(unsigned long long size);
+__mpz_struct **allocateNumbersArray(unsigned long long size, bool isNumberAllocated);
 
 void deallocateNumbersArray(__mpz_struct **input, unsigned long long size);
 

@@ -1,15 +1,18 @@
 #include <gmp.h>
 #include <stdlib.h>
+
 #include "Number.h"
 
-__mpz_struct **allocateNumbersArray(unsigned long long size) {
+__mpz_struct **allocateNumbersArray(unsigned long long size, bool isNumberAllocated) {
 
     __mpz_struct **output = malloc(size * sizeof(__mpz_struct *));
     if (output == NULL)
         exit(EXIT_FAILURE);
-    else
-        for (unsigned long long i = 0; i < size; i++)
-            *(output + i) = allocateNumber();
+    else {
+        if (isNumberAllocated)
+            for (unsigned long long i = 0; i < size; i++)
+                *(output + i) = allocateNumber();
+    }
 
     return output;
 }

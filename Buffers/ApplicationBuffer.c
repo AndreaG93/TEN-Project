@@ -7,7 +7,7 @@ ApplicationBuffer *allocateApplicationBuffer() {
     if (output == NULL)
         exit(EXIT_FAILURE);
     else {
-        output->auxiliaryNumbersBuffer = allocateNumbersArray(AuxiliaryNumbersBufferLength);
+        output->auxiliaryNumbersBuffer = allocateNumbersArray(AuxiliaryNumbersBufferLength, true);
         output->currentAvailableNumber = 0;
     }
 

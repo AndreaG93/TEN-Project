@@ -125,3 +125,16 @@ void printMatrix(Matrix *matrix) {
         fprintf(stdout, "\n");
     }
 }
+
+void freeMatrix(Matrix *matrix){
+
+}
+
+
+
+
+
+
+
+
+

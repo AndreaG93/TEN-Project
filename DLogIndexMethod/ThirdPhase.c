@@ -10,69 +10,8 @@
 #include "../Buffers/CircularBuffer.h"
 #include "../ThreadsPool/ThreadsPool.h"
 
-typedef struct {
 
-    __mpz_struct **leftExponentValues;
-    OrderedFactorList *rightFactors;
-
-} Relation;
-
-Relation *allocateRelation(unsigned long long leftSideRelationLength) {
-
-    Relation *output = malloc(sizeof(Relation));
-    if (output == NULL)
-        exit(EXIT_FAILURE);
-    else {
-        output->leftExponentValues = allocateNumbersArray(leftSideRelationLength, true);
-        output->rightFactors = NULL;
-
-        return output;
-    }
-}
-
-__mpz_struct *computeRequiredDiscreteLogarithmValue(DLogProblemInstance *instance, Relation *relation) {
-
-    __mpz_struct *leftBaseValue;
-    __mpz_struct *leftExponentValue;
-    __mpz_struct *RightBaseValue;
-    __mpz_struct *RightExponentValue;
-
-    __mpz_struct *aux = retrieveAuxiliaryNumber(instance->applicationBuffer);
-    __mpz_struct *output = allocateAndSetNumberFromULL(0);
-
-    OrderedFactorListNode *currentFactorNodeRight = relation->rightFactors->head;
-    FactorBaseNode *currentFactorNodeLeft = instance->factorBase->head;
-
-    for (unsigned long long index = 0; index < instance->factorBase->length; index++) {
-
-        leftBaseValue = currentFactorNodeLeft->primeNumber;
-        leftExponentValue = *(relation->leftExponentValues + index);
-
-        RightBaseValue = currentFactorNodeRight->factor->base;
-        RightExponentValue = currentFactorNodeRight->factor->exponent;
-
-        if (mpz_cmp(leftBaseValue, RightBaseValue) != 0) {
-            RightExponentValue = allocateAndSetNumberFromULL(0);
-        } else {
-            if (currentFactorNodeRight->next_node != NULL)
-                currentFactorNodeRight = currentFactorNodeRight->next_node;
-        }
-
-        mpz_sub(aux, RightExponentValue, leftExponentValue);
-        mpz_mul(aux, aux, *(instance->secondPhaseOutput->solution + index));
-        mpz_add(output, output, aux);
-
-        currentFactorNodeLeft = currentFactorNodeLeft->next_node;
-    }
-
-    mpz_mod(output, output, instance->moduloOfMultiplicativeGroupMinusOne);
-
-    releaseAuxiliaryNumber(instance->applicationBuffer, 1);
-    return output;
-}
-
-
-__mpz_struct *computeRequiredDiscreteLogarithmValue22222(__mpz_struct **relation, DLogProblemInstance* instance) {
+__mpz_struct *computeRequiredDiscreteLogarithmValue(__mpz_struct **relation, DLogProblemInstance* instance) {
 
     __mpz_struct *aux = retrieveAuxiliaryNumber(instance->applicationBuffer);
     __mpz_struct *output = allocateAndSetNumberFromULL(0);
@@ -89,9 +28,6 @@ __mpz_struct *computeRequiredDiscreteLogarithmValue22222(__mpz_struct **relation
     return output;
 }
 
-
-
-
 __mpz_struct **getNewRelation(ApplicationBuffer* threadAppBuffer, RandomIntegerGenerator* threadRandIntGen, DLogProblemInstance *instance) {
 
     __mpz_struct **outputRelation = allocateNumbersArray(instance->factorBase->length, true);
@@ -102,7 +38,6 @@ __mpz_struct **getNewRelation(ApplicationBuffer* threadAppBuffer, RandomIntegerG
     OrderedFactorList *factorListOfBSmoothNumber = NULL;
 
     while (factorListOfBSmoothNumber == NULL) {
-        fprintf(stdout, "111\n");
         __mpz_struct *currentExponent;
         __mpz_struct *currentFactor;
 

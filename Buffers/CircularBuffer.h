@@ -18,6 +18,6 @@ CircularBuffer *allocateCircularBuffer();
 
 void pushCircularBuffer(CircularBuffer *buffer, void *data);
 
-__mpz_struct *popCircularBuffer(CircularBuffer *buffer);
+void *popCircularBuffer(CircularBuffer *buffer);
 
 void freeCircularBuffer(CircularBuffer *buffer);

@@ -27,7 +27,7 @@ CircularBuffer *allocateCircularBuffer() {
         output->tail = 0;
         output->bufferSize = 10000;
 
-        output->buffer = calloc(output->bufferSize, sizeof(__mpz_struct *));
+        output->buffer = calloc(output->bufferSize, sizeof(void *));
         if (output->buffer == NULL)
             exit(EXIT_FAILURE);
         else
@@ -52,7 +52,7 @@ void pushCircularBuffer(CircularBuffer *buffer, void *data) {
 
 }
 
-__mpz_struct *popCircularBuffer(CircularBuffer *buffer) {
+void *popCircularBuffer(CircularBuffer *buffer) {
 
     pthread_mutex_lock(&buffer->pthreadMutex);
 

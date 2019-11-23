@@ -15,7 +15,7 @@ SecondPhaseOutput *allocateSecondPhaseOutput(unsigned long long size) {
     if (output == NULL)
         exit(EXIT_FAILURE);
     else {
-        output->solution = allocateNumbersArray(size, false);
+        output->solution = allocateNumbersArray(size, true);
     }
 
     return output;
@@ -59,7 +59,5 @@ typedef struct {
 
 
 void startSecondPhase(DLogProblemInstance *instance) {
-
-
     instance->secondPhaseOutput = allocateSecondPhaseOutput(instance->factorBase->length);
 }

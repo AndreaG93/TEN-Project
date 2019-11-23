@@ -2,7 +2,7 @@
 #include "../Math/Number.h"
 
 DLogProblemInstance *
-allocateDLogProblemInstance(char *moduloOfMultiplicativeGroup, char *dLogBase, char *dLogArgument) {
+allocateDLogProblemInstance(char *moduloOfMultiplicativeGroup, char *dLogBase, char *dLogArgument, unsigned long long maxRandomInteger) {
 
     DLogProblemInstance *output = malloc(sizeof(DLogProblemInstance));
     if (output == NULL)
@@ -17,6 +17,8 @@ allocateDLogProblemInstance(char *moduloOfMultiplicativeGroup, char *dLogBase, c
 
         output->discreteLogarithmToCompute = allocateDiscreteLogarithm(dLogBase, dLogArgument,
                                                                        output->moduloOfMultiplicativeGroup);
+
+        output->maxRandomInteger = allocateAndSetNumberFromULL(maxRandomInteger);
     }
 
     return output;
@@ -24,10 +26,4 @@ allocateDLogProblemInstance(char *moduloOfMultiplicativeGroup, char *dLogBase, c
 
 void setSmoothnessBound(DLogProblemInstance *instance, char *smoothnessBoundAsString) {
     instance->smoothnessBound = allocateAndSetNumberFromString(smoothnessBoundAsString);
-}
-
-void initializeRandIntegerGenerator(DLogProblemInstance *instance, unsigned long long maxRandomInteger) {
-
-    instance->randomIntegerGenerator = initializeRandomIntegerGenerator();
-    instance->maxRandomInteger = allocateAndSetNumberFromULL(maxRandomInteger);
 }

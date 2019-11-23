@@ -2,8 +2,16 @@
 
 #include <gmp.h>
 
-typedef __gmp_randstate_struct RandomIntegerGenerator;
+typedef struct {
 
-RandomIntegerGenerator* initializeRandomIntegerGenerator();
+    __gmp_randstate_struct state;
+    __mpz_struct *maxRandomInteger;
 
-void selectUniformlyDistributedRandomInteger(RandomIntegerGenerator* generator, __mpz_struct* max, __mpz_struct* output);
+} RandomIntegerGenerator;
+
+
+RandomIntegerGenerator *allocateRandomIntegerGenerator(__mpz_struct *maxRandomInteger);
+
+void selectUniformlyDistributedRandomInteger(RandomIntegerGenerator *input, __mpz_struct *output);
+
+void deallocateRandomIntegerGenerator(RandomIntegerGenerator *input);

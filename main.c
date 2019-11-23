@@ -13,31 +13,24 @@
 #define AUDIT if(1)
 
 
-
-
-
-
-
-
 int main() {
 
 
-    DLogProblemInstance *instance = allocateDLogProblemInstance("179", "2", "13");
+    DLogProblemInstance *instance = allocateDLogProblemInstance("179", "2", "13", MAX_RANDOM_INTEGER);
     setSmoothnessBound(instance, "7");
-    initializeRandIntegerGenerator(instance, MAX_RANDOM_INTEGER);
-    /*
-       startFirstPhase(instance);
-       startSecondPhase(instance);
 
-       //todo to cancel
-       mpz_set_ui(*(instance->secondPhaseOutput->solution), 1);
-       mpz_set_ui(*(instance->secondPhaseOutput->solution + 1), 108);
-       mpz_set_ui(*(instance->secondPhaseOutput->solution + 2), 138);
-       mpz_set_ui(*(instance->secondPhaseOutput->solution + 3), 171);
-       //todo to cancel
+    startFirstPhase(instance);
+    startSecondPhase(instance);
 
-       startThirdPhase(instance);
-   */
+    //todo to cancel
+    mpz_set_ui(*(instance->secondPhaseOutput->solution), 1);
+    mpz_set_ui(*(instance->secondPhaseOutput->solution + 1), 108);
+    mpz_set_ui(*(instance->secondPhaseOutput->solution + 2), 138);
+    mpz_set_ui(*(instance->secondPhaseOutput->solution + 3), 171);
+    //todo to cancel
+
+    startThirdPhase(instance);
+
 
 /*
     __mpz_struct *modulo = allocateAndSetNumberFromULL(178);
@@ -90,86 +83,6 @@ int main() {
     fprintf(stdout, "===\n");
 
     printMatrix(matrix);
-
-*/
-
-
-/*
-
-
-    for (
-            k = 0;
-            k < n - 1; k++) {
-
-        if (a[k][k] == 0) {
-            printf("Can't solve this linear equations by Gaussian-elimination.\n");
-            return 1;
-        }
-        for (
-                i = k + 1;
-                i < n;
-                i++) {
-            l[i][k] = a[i][k] / a[k][k];
-            c++;
-        }
-        for (
-                i = k + 1;
-                i < n;
-                i++) {
-            for (
-                    j = k + 1;
-                    j < n;
-                    j++) {
-                a[i][j] = a[i][j] - l[i][k] * a[k][j];
-                c++;
-            }
-            b[i] = b[i] - l[i][k] * b[k];
-            c++;
-            a[i][k] = 0;
-        }
-    }
-
-    printf("After converting, A(%d*%d) and B(%d*1) can be:\n", n, n, n);
-    for (
-            i = 0;
-            i < n;
-            i++) {
-        for (
-                j = 0;
-                j < n;
-                j++) {
-            printf("%.2f  ", a[i][j]);
-        }
-        printf("%.2f\n", b[i]);
-    }
-
-    printf("The solution to x is: ");
-    x[n - 1] = b[n - 1] / a[n - 1][n - 1];
-    c++;
-    for (
-            i = n - 2;
-            i >= 0; i--) {
-        result = 0.0;
-        for (
-                j = i + 1;
-                j < n;
-                j++) {
-            result = result + a[i][j] * x[j];
-            c++;
-        }
-        x[i] = (b[i] - result) / a[i][i];
-        c++;
-    }
-
-    for (
-            i = 0;
-            i < n;
-            i++) {
-        printf("%.2f  ", x[i]);
-    }
-    printf("\nThe number of times in multiplication and division is: %d\n", c);
-
-
 
 */
 

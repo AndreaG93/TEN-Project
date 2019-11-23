@@ -24,15 +24,12 @@ typedef struct {
     ApplicationBuffer* applicationBuffer;
 
     __mpz_struct **indexMethodSecondPhaseOutput;
-
-    RandomIntegerGenerator* randomIntegerGenerator;
     __mpz_struct *maxRandomInteger;
 
     SecondPhaseOutput* secondPhaseOutput;
 
 } DLogProblemInstance;
 
-DLogProblemInstance* allocateDLogProblemInstance(char *moduloOfMultiplicativeGroup, char *dLogBase, char *dLogArgument);
+DLogProblemInstance* allocateDLogProblemInstance(char *moduloOfMultiplicativeGroup, char *dLogBase, char *dLogArgument, unsigned long long maxRandomInteger);
 
 void setSmoothnessBound(DLogProblemInstance *instance, char *smoothnessBoundAsString);
-void initializeRandIntegerGenerator(DLogProblemInstance *instance, unsigned long long maxRandomInteger);

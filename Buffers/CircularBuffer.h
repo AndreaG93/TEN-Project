@@ -21,3 +21,5 @@ void pushCircularBuffer(CircularBuffer *buffer, void *data);
 void *popCircularBuffer(CircularBuffer *buffer);
 
 void freeCircularBuffer(CircularBuffer *buffer);
+
+void clearCircularBuffer(CircularBuffer *buffer);

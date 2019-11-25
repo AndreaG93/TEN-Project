@@ -53,6 +53,9 @@ factorizeTrialDivision(OrderedFactorList *factorList, __mpz_struct *input, __mpz
 OrderedFactorList *factorizeCheckingBSmoothness(ApplicationBuffer *applicationBuffer, __mpz_struct *number,
                                                 __mpz_struct *smoothnessBound) {
 
+    if (mpz_cmp_ui(number, 1) == 0)
+        return NULL;
+
     OrderedFactorList *output = allocateOrderedFactorList();
     int trial = 0;
 
@@ -112,6 +115,12 @@ OrderedFactorList *factorizeCheckingBSmoothness(ApplicationBuffer *applicationBu
     }
 
     releaseAuxiliaryNumber(applicationBuffer, 8);
+
+    if (output != NULL)
+        if (output->head == NULL)
+            fprintf(stderr, "UN problema\n");
+
+
     return output;
 }
 

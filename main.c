@@ -6,6 +6,10 @@
 #include "DLogIndexMethod/FirstPhase.h"
 #include "DLogIndexMethod/SecondPhase.h"
 #include "Math/Common.h"
+#include "DLogIndexMethod/RelationsRetrieval.h"
+#include "ThreadsPool/ThreadsPool.h"
+#include "Math/Matrix.h"
+#include "Math/Factorization.h"
 
 #define MAX_RANDOM_INTEGER 20
 
@@ -15,19 +19,39 @@
 
 int main() {
 
+/*
+    ApplicationBuffer *applicationBuffer = allocateApplicationBuffer();
+
+  __mpz_struct *number = allocateAndSetNumberFromULL(1);
+    __mpz_struct *bound = allocateAndSetNumberFromULL(7);
+
+    OrderedFactorList *orderedFactorList = factorizeCheckingBSmoothness(applicationBuffer, number, bound);
+    OrderedFactorListNode *currentNode = orderedFactorList->head;
+
+    while (currentNode != NULL){
+        gmp_printf("%Zd^%Zd ", currentNode->factor->base, currentNode->factor->exponent);
+        currentNode = currentNode->next_node;
+    }
+
+*/
+
+
 
     DLogProblemInstance *instance = allocateDLogProblemInstance("179", "2", "13", MAX_RANDOM_INTEGER);
     setSmoothnessBound(instance, "7");
 
+
+    instance->threadsPoolData = allocateThreadsPoolData(instance);
+
+    startThreadsPool(1, &threadRoutineForRelationRetrieval, (void *) instance->threadsPoolData);
+
     startFirstPhase(instance);
     startSecondPhase(instance);
 
-    //todo to cancel
-    mpz_set_ui(*(instance->secondPhaseOutput->solution), 1);
-    mpz_set_ui(*(instance->secondPhaseOutput->solution + 1), 108);
-    mpz_set_ui(*(instance->secondPhaseOutput->solution + 2), 138);
-    mpz_set_ui(*(instance->secondPhaseOutput->solution + 3), 171);
-    //todo to cancel
+
+    for (unsigned long index = 0; index < instance->factorBase->length; index++) {
+        gmp_printf("-> %Zd \n", *(instance->secondPhaseOutput->solution + index));
+    }
 
     startThirdPhase(instance);
 
@@ -57,32 +81,27 @@ int main() {
 
     Matrix *matrix = allocateMatrix(3, 5);
 
-    setMatrixNumber(matrix, 0, 0, number1);
-    setMatrixNumber(matrix, 0, 1, number2);
-    setMatrixNumber(matrix, 0, 2, number3);
-    setMatrixNumber(matrix, 0, 3, number4);
-    setMatrixNumber(matrix, 1, 0, number5);
-    setMatrixNumber(matrix, 1, 1, number6);
-    setMatrixNumber(matrix, 1, 2, number7);
-    setMatrixNumber(matrix, 1, 3, number8);
-    setMatrixNumber(matrix, 2, 0, number9);
-    setMatrixNumber(matrix, 2, 1, number10);
-    setMatrixNumber(matrix, 2, 2, number11);
-    setMatrixNumber(matrix, 2, 3, number12);
+    setNumberIntoMatrixCell(matrix, 0, 0, number1);
+    setNumberIntoMatrixCell(matrix, 0, 1, number2);
+    setNumberIntoMatrixCell(matrix, 0, 2, number3);
+    setNumberIntoMatrixCell(matrix, 0, 3, number4);
+    setNumberIntoMatrixCell(matrix, 1, 0, number5);
+    setNumberIntoMatrixCell(matrix, 1, 1, number6);
+    setNumberIntoMatrixCell(matrix, 1, 2, number7);
+    setNumberIntoMatrixCell(matrix, 1, 3, number8);
+    setNumberIntoMatrixCell(matrix, 2, 0, number9);
+    setNumberIntoMatrixCell(matrix, 2, 1, number10);
+    setNumberIntoMatrixCell(matrix, 2, 2, number11);
+    setNumberIntoMatrixCell(matrix, 2, 3, number12);
 
-    setMatrixNumber(matrix, 0, 4, number13);
-    setMatrixNumber(matrix, 1, 4, number14);
-    setMatrixNumber(matrix, 2, 4, number15);
+    setNumberIntoMatrixCell(matrix, 0, 4, number13);
+    setNumberIntoMatrixCell(matrix, 1, 4, number14);
+    setNumberIntoMatrixCell(matrix, 2, 4, number15);
 
-
-    printMatrix(matrix);
-
-    gauss(matrix, instance->applicationBuffer, modulo);
-    //gauss(matrix, instance->applicationBuffer, modulo);
-
-    fprintf(stdout, "===\n");
 
     printMatrix(matrix);
+
+
 
 */
 
@@ -109,20 +128,7 @@ instance->smoothnessBound = allocateAndSetNumberFromULL(7);
 startThirdPhase(instance);
 */
 
-/*
-    Buffers *applicationBuffer = allocateApplicationBuffer();
 
-  __mpz_struct *number = allocateAndSetNumberFromULL(7242342342352);
-
-    OrderedFactorList *orderedFactorList = factorize(applicationBuffer, number);
-    OrderedFactorListNode *currentNode = orderedFactorList->head;
-
-    while (currentNode != NULL){
-        gmp_printf("%Zd^%Zd ", currentNode->factor->base, currentNode->factor->exponent);
-        currentNode = currentNode->next_node;
-    }
-
-*/
 
 /*
 #ifdef EXECUTE_TESTS

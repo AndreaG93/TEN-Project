@@ -14,7 +14,14 @@ ThreadsPoolData *allocateThreadsPoolData(void *threadData) {
     else {
         output->buffer = allocateCircularBuffer();
         output->stoppingCondition = false;
+        output->pauseCondition = true;
         output->threadData = threadData;
+
+        if (pthread_mutex_init(&(output->pthreadMutex), NULL) != 0)
+            exit(EXIT_FAILURE);
+
+        if (pthread_cond_init(&(output->pthreadCondition), NULL) != 0)
+            exit(EXIT_FAILURE);
     }
 
     return output;

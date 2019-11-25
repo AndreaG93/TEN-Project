@@ -3,6 +3,7 @@
 #include "DiscreteLogarithm.h"
 #include "../Math/RandomNumber.h"
 #include "FactorBase.h"
+#include "../ThreadsPool/ThreadsPool.h"
 
 typedef struct {
 
@@ -27,6 +28,10 @@ typedef struct {
     __mpz_struct *maxRandomInteger;
 
     SecondPhaseOutput* secondPhaseOutput;
+
+    unsigned char currentPhase;
+
+    ThreadsPoolData *threadsPoolData;
 
 } DLogProblemInstance;
 

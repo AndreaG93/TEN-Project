@@ -19,3 +19,5 @@ __mpz_struct *getNumberFromMatrixCell(Matrix *matrix, unsigned long long row, un
 void performGaussianElimination(Matrix *matrix, ApplicationBuffer *buffer, __mpz_struct *modulo);
 
 void printMatrix(Matrix *matrix);
+
+void printCell(Matrix *matrix, unsigned long long row, unsigned long long column);

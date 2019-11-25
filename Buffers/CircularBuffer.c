@@ -69,6 +69,17 @@ void *popCircularBuffer(CircularBuffer *buffer) {
     return output;
 }
 
+void clearCircularBuffer(CircularBuffer *buffer) {
+
+    while (buffer->head != buffer->tail) {
+
+        __mpz_struct* currentElement = *(buffer->buffer + buffer->tail);
+
+        free(currentElement);
+        buffer->tail = (buffer->tail + 1) % buffer->bufferSize;
+    }
+}
+
 void freeCircularBuffer(CircularBuffer *buffer) {
 
     while (buffer->head != buffer->tail) {

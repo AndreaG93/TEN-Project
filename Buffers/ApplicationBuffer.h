@@ -9,6 +9,8 @@
 typedef struct {
     __mpz_struct **auxiliaryNumbersBuffer;
     unsigned long long currentAvailableNumber;
+
+
 } ApplicationBuffer;
 
 ApplicationBuffer *allocateApplicationBuffer();

@@ -7,8 +7,12 @@ typedef struct {
 
     CircularBuffer *buffer;
     bool stoppingCondition;
+    bool pauseCondition;
 
     void *threadData;
+
+    pthread_cond_t pthreadCondition;
+    pthread_mutex_t pthreadMutex;
 
 } ThreadsPoolData;
 

@@ -115,6 +115,11 @@ void performGaussianElimination(Matrix *matrix, ApplicationBuffer *buffer, __mpz
     }
 }
 
+
+void printCell(Matrix *matrix, unsigned long long row, unsigned long long column) {
+    gmp_printf("(%d, %d) -> %Zd \n", row, column, *(*(matrix->structure + column) + row));
+}
+
 void printMatrix(Matrix *matrix) {
 
     for (unsigned long long rowIndex = 0; rowIndex < matrix->rowLength; rowIndex++) {

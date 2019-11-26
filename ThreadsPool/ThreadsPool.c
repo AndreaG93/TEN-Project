@@ -27,7 +27,7 @@ ThreadsPoolData *allocateThreadsPoolData(void *threadData) {
     return output;
 }
 
-pthread_t *startThreadsPool(unsigned long long poolSize, void *(*thread_routine)(void *), void *thread_argument) {
+pthread_t *startThreadPool(unsigned long long poolSize, void *(*thread_routine)(void *), void *thread_argument) {
 
     pthread_t *output = malloc(sizeof(pthread_t) * poolSize);
     if (output == NULL)
@@ -39,3 +39,4 @@ pthread_t *startThreadsPool(unsigned long long poolSize, void *(*thread_routine)
 
     return output;
 }
+

@@ -111,7 +111,7 @@ void *threadRoutineForRelationRetrieval(void *input) {
         while (threadsPoolData->pauseCondition != true) {
             __mpz_struct **relation = getNewRelation(threadAppBuffer, threadRandIntGen, instance);
 
-            pushCircularBuffer(threadsPoolData->buffer, relation);
+            pushIntoCircularBuffer(threadsPoolData->buffer, relation);
         }
 
         pthread_cond_wait(&threadsPoolData->pthreadCondition, &threadsPoolData->pthreadMutex);

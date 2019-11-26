@@ -7,7 +7,6 @@
 #include "SecondPhase.h"
 #include "../Math/Number.h"
 #include "../Math/Matrix.h"
-#include "../Buffers/CircularBuffer.h"
 
 SecondPhaseOutput *allocateSecondPhaseOutput(unsigned long long size) {
 
@@ -38,7 +37,7 @@ populateSecondPhaseOutput(Matrix *resolvedEquationSystem, FactorBase *factorBase
             rowIndex--;
             found = false;
         } else {
-            number = getNumberFromMatrixCell(resolvedEquationSystem, rowIndex, columnIndex);
+            number = getNumberMatrixCell(resolvedEquationSystem, rowIndex, columnIndex);
         }
 
         *(output->solution + outputIndex) = number;
@@ -68,6 +67,7 @@ unsigned long long found(FactorBase *factorBase, __mpz_struct *chosenBase) {
 }
 
 
+
 void startSecondPhase(DLogProblemInstance *instance) {
 
     instance->currentPhase = 2;
@@ -82,7 +82,7 @@ void startSecondPhase(DLogProblemInstance *instance) {
 
     while (currentRow != instance->factorBase->length + 15) {
 
-        __mpz_struct **relation = popCircularBuffer(instance->threadsPoolData->buffer);
+        __mpz_struct **relation = popFromCircularBuffer(instance->threadsPoolData->buffer);
 
         for (unsigned long long currentColumn = 0; currentColumn < instance->factorBase->length; currentColumn++) {
 
@@ -95,12 +95,12 @@ void startSecondPhase(DLogProblemInstance *instance) {
 
                 mpz_mul_si(currentNumber, currentNumber, -1);
 
-                setNumberIntoMatrixCell(equationSystem, currentRow, currentColumn, zero);
-                setNumberIntoMatrixCell(equationSystem, currentRow, instance->factorBase->length, currentNumber);
+                setNumberMatrixCell(equationSystem, currentRow, currentColumn, zero);
+                setNumberMatrixCell(equationSystem, currentRow, instance->factorBase->length, currentNumber);
 
             } else {
 
-                setNumberIntoMatrixCell(equationSystem, currentRow, currentColumn, currentNumber);
+                setNumberMatrixCell(equationSystem, currentRow, currentColumn, currentNumber);
             }
         }
 
@@ -109,16 +109,17 @@ void startSecondPhase(DLogProblemInstance *instance) {
 
     instance->threadsPoolData->pauseCondition = true;
 
+    pthread_t* cleanerThread = allocateAndStartThreadToClearCircular(instance->threadsPoolData->buffer);
+
     performGaussianElimination(equationSystem, instance->applicationBuffer,
                                instance->moduloOfMultiplicativeGroupMinusOne);
 
-    clearCircularBuffer(instance->threadsPoolData->buffer);
+
 
     instance->secondPhaseOutput = populateSecondPhaseOutput(equationSystem, instance->factorBase, indexFFF);
 
 
-    for (unsigned long index = 0; index < instance->factorBase->length; index++) {
-        gmp_printf("%Zd \n", *(instance->secondPhaseOutput->solution + index));
-    }
-
+    pthread_join(*cleanerThread, NULL);
+    free(cleanerThread);
 }
+

@@ -16,10 +16,12 @@ typedef struct {
 
 CircularBuffer *allocateCircularBuffer();
 
-void pushCircularBuffer(CircularBuffer *buffer, void *data);
+void deallocateCircularBuffer(CircularBuffer *buffer);
 
-void *popCircularBuffer(CircularBuffer *buffer);
+pthread_t *allocateAndStartThreadToClearCircular(CircularBuffer *input);
 
-void freeCircularBuffer(CircularBuffer *buffer);
+void pushIntoCircularBuffer(CircularBuffer *buffer, void *data);
+
+void *popFromCircularBuffer(CircularBuffer *buffer);
 
 void clearCircularBuffer(CircularBuffer *buffer);

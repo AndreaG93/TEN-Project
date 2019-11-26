@@ -7,6 +7,7 @@
 #include "Matrix.h"
 #include "Number.h"
 #include "Common.h"
+#include "../ThreadsPool/ThreadsPool.h"
 
 Matrix *allocateMatrix(unsigned long long numberOfRow, unsigned long long numberOfColumn) {
 
@@ -24,18 +25,47 @@ Matrix *allocateMatrix(unsigned long long numberOfRow, unsigned long long number
         else
             for (unsigned long long columnIndex = 0; columnIndex < output->columnLength; columnIndex++)
                 *(output->structure + columnIndex) = allocateNumbersArray(numberOfRow, false);
-
     }
 
     return output;
 }
 
-void setNumberIntoMatrixCell(Matrix *matrix, unsigned long long row, unsigned long long column, __mpz_struct *number) {
-    *(*(matrix->structure + column) + row) = number;
+void deallocateMatrix(Matrix *matrix) {
+
+    for (unsigned long long columnIndex = 0; columnIndex < matrix->columnLength; columnIndex++) {
+
+        __mpz_struct **currentColumn = *(matrix->structure + columnIndex);
+
+        for (unsigned long long rowIndex = 0; rowIndex < matrix->rowLength; rowIndex++) {
+
+            __mpz_struct *currentNumber = *(currentColumn + rowIndex);
+
+            mpz_clear(currentNumber);
+            free(currentNumber);
+        }
+
+        free(currentColumn);
+    }
+
+    free(matrix);
 }
 
-__mpz_struct *getNumberFromMatrixCell(Matrix *matrix, unsigned long long row, unsigned long long column) {
-    return *(*(matrix->structure + column) + row);
+void *threadRoutineForMatrixDeallocate(void *input) {
+
+    deallocateMatrix((Matrix *) input);
+    return NULL;
+}
+
+pthread_t *allocateAndStartThreadToDeallocateMatrix(Matrix *input) {
+    return startThreadPool(1, &threadRoutineForMatrixDeallocate, input);
+}
+
+void setNumberMatrixCell(Matrix *matrix, unsigned long long rowIndex, unsigned long long columnIndex, __mpz_struct *number) {
+    *(*(matrix->structure + columnIndex) + rowIndex) = number;
+}
+
+__mpz_struct *getNumberMatrixCell(Matrix *matrix, unsigned long long rowIndex, unsigned long long columnIndex) {
+    return *(*(matrix->structure + columnIndex) + rowIndex);
 }
 
 void swapRows(Matrix *matrix, unsigned long long row1, unsigned long long row2) {
@@ -115,10 +145,7 @@ void performGaussianElimination(Matrix *matrix, ApplicationBuffer *buffer, __mpz
     }
 }
 
-
-void printCell(Matrix *matrix, unsigned long long row, unsigned long long column) {
-    gmp_printf("(%d, %d) -> %Zd \n", row, column, *(*(matrix->structure + column) + row));
-}
+#ifdef DEBUG
 
 void printMatrix(Matrix *matrix) {
 
@@ -131,15 +158,4 @@ void printMatrix(Matrix *matrix) {
     }
 }
 
-void freeMatrix(Matrix *matrix){
-
-}
-
-
-
-
-
-
-
-
-
+#endif

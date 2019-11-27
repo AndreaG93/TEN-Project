@@ -37,7 +37,7 @@ void startThirdPhase(DLogProblemInstance *instance) {
     pthread_cond_signal(&instance->threadsPoolData->pthreadCondition);
 
     __mpz_struct **relation = popFromCircularBuffer(instance->threadsPoolData->buffer);
-    __mpz_struct *output = computeRequiredDiscreteLogarithmValue(relation, instance);
 
-    gmp_printf("%Zd", output);
+    instance->discreteLogarithmToCompute->value = computeRequiredDiscreteLogarithmValue(relation, instance);
+
 }

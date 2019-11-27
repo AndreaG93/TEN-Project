@@ -14,4 +14,4 @@ typedef struct {
 
 DiscreteLogarithm *allocateDiscreteLogarithm(char *base, char *argument, __mpz_struct* moduloOfMultiplicativeGroup);
 
-bool isCorrect(DiscreteLogarithm *dLog, ApplicationBuffer *appBuffer);
+bool isCorrect(DiscreteLogarithm *dLog);

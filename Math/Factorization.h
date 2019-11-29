@@ -5,3 +5,5 @@
 
 OrderedFactorList *factorizeCheckingBSmoothness(ApplicationBuffer *applicationBuffer, __mpz_struct *number,
                                                 __mpz_struct *smoothnessBound);
+
+void factorize(ApplicationBuffer *applicationBuffer, __mpz_struct *number, __mpz_struct *modulo);

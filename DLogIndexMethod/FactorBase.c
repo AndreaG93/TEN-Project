@@ -47,7 +47,7 @@ bool __isFactorBasePopulatedFromFileUntilSmoothnessBound(FactorBase *factorBase,
     if (stringBuffer == NULL)
         exit(EXIT_FAILURE);
 
-    FILE *primeNumberListFile = fopen("/home/andrea/PrimesList.txt", "r");
+    FILE *primeNumberListFile = fopen("../PrimesList.txt", "r");
     if (primeNumberListFile == NULL)
         exit(EXIT_FAILURE);
 

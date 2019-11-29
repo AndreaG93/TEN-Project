@@ -4,8 +4,10 @@
 #include "DLogIndexMethod/SecondPhase.h"
 #include "DLogIndexMethod/RelationsRetrieval.h"
 #include "ThreadsPool/ThreadsPool.h"
+#include "Math/Number.h"
+#include "Math/Factorization.h"
 
-#define MAX_RANDOM_INTEGER 25
+#define MAX_RANDOM_INTEGER 35
 
 //#define EXECUTE_TESTS // Comment to disable tests...
 #define AUDIT if(1)
@@ -25,10 +27,24 @@ int main2(int argc, char **argv) {
 
 int main() {
 
-    DLogProblemInstance *instance = allocateDLogProblemInstance("499", "5", "243255234", MAX_RANDOM_INTEGER);
+    DLogProblemInstance *instance = allocateDLogProblemInstance("103", "5", "27", MAX_RANDOM_INTEGER);
     DiscreteLogarithm *discreteLogarithm = instance->discreteLogarithmToCompute;
 
-    setSmoothnessBound(instance, "7");
+    __mpz_struct *input = allocateAndSetNumberFromString("1607");
+    __mpz_struct *modulo = allocateAndSetNumberFromString("100998");
+
+    factorize(instance->applicationBuffer, input, modulo );
+    return 0;
+
+
+
+
+
+
+
+
+
+    setSmoothnessBound(instance, "9");
 
     instance->threadsPoolData = allocateThreadsPoolData(instance);
 
@@ -42,11 +58,15 @@ int main() {
     startThirdPhase(instance);
 
     if (isCorrect(discreteLogarithm)) {
+        fprintf(stdout, "== SUCCESS ==\n");
         gmp_printf("--> In Z_(%Zd)\n", discreteLogarithm->moduloOfMultiplicativeGroup);
         gmp_printf("--> log_(%Zd) (%Zd) = %Zd\n", discreteLogarithm->base, discreteLogarithm->argument,
                    discreteLogarithm->value);
     } else {
-        fprintf(stdout, "Computation error...");
+        fprintf(stdout, "== FAILURE ==\n");
+        gmp_printf("--> In Z_(%Zd)\n", discreteLogarithm->moduloOfMultiplicativeGroup);
+        gmp_printf("--> log_(%Zd) (%Zd) != %Zd\n", discreteLogarithm->base, discreteLogarithm->argument,
+                   discreteLogarithm->value);
     }
 
     return 0;

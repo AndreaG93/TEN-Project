@@ -49,6 +49,7 @@ void insertNewFactor(OrderedFactorList *list, __mpz_struct *newBaseFactor) {
             if (comparison == 0) {
                 mpz_add_ui(currentNode->factor->exponent, currentNode->factor->exponent, 1);
                 mpz_clear(newBaseFactor);
+                free(newBaseFactor);
                 return;
 
             } else if (comparison < 0) {

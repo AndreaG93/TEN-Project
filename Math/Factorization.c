@@ -27,8 +27,55 @@ bool isBSmooth(OrderedFactorList *factorList, __mpz_struct *smoothnessBound) {
         return false;
 }
 
+void factorizeUsingTrialDivision(ApplicationBuffer *appBuffer, OrderedFactorList *factorList, __mpz_struct *input) {
+
+    __mpz_struct *possibleFactor = retrieveAuxiliaryNumber(appBuffer);
+    __mpz_struct *remainder = retrieveAuxiliaryNumber(appBuffer);
+
+    while(mpz_cmp_si(input, 1) > 0) {
+
+        mpz_mod_ui(remainder, input, 2);
+
+        if (mpz_cmp_si(remainder, 0) == 0) {
+
+            __mpz_struct *newFactor = allocateAndSetNumberFromULL(2);
+            insertNewFactor(factorList, newFactor);
+
+            mpz_div_ui(input, input, 2);
+
+        } else
+            break;
+    }
+
+    mpz_set_ui(possibleFactor, 3);
+
+    while(mpz_cmp_si(input, 1) > 0) {
+
+        mpz_mod(remainder, input, possibleFactor);
+        if (mpz_cmp_si(remainder, 0) == 0) {
+
+            __mpz_struct *newBase = allocateAndSetNumberFromNumber(possibleFactor);
+            insertNewFactor(factorList, newBase);
+
+            mpz_div(input, input, possibleFactor);
+
+        } else {
+
+            mpz_add_ui(possibleFactor, possibleFactor, 2);
+            if (mpz_cmp_si(input, 15) == 0)
+                break;
+        }
+    }
+
+    releaseAuxiliaryNumber(appBuffer, 2);
+}
+
+
+
+
 void
 factorizeTrialDivision(OrderedFactorList *factorList, __mpz_struct *input, __mpz_struct *aux1, __mpz_struct *aux2) {
+
 
     mpz_set_ui(aux1, 2);
 

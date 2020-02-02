@@ -22,19 +22,19 @@ typedef struct {
     FactorBase* factorBase;
     DiscreteLogarithm *discreteLogarithmToCompute;
 
-    ApplicationBuffer* applicationBuffer;
+    NumbersBuffer* numbersBuffer;
 
     __mpz_struct **indexMethodSecondPhaseOutput;
-    __mpz_struct *maxRandomInteger;
 
     SecondPhaseOutput* secondPhaseOutput;
 
     unsigned char currentPhase;
 
     ThreadsPoolData *threadsPoolData;
+    RandomIntegerGenerator *randomIntegerGenerator;
 
 } DLogProblemInstance;
 
-DLogProblemInstance* allocateDLogProblemInstance(char *moduloOfMultiplicativeGroup, char *dLogBase, char *dLogArgument, unsigned long long maxRandomInteger);
+DLogProblemInstance* allocateDLogProblemInstance();
 
 void setSmoothnessBound(DLogProblemInstance *instance, char *smoothnessBoundAsString);

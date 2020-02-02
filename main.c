@@ -7,7 +7,8 @@
 #include "Math/Number.h"
 #include "Math/Factorization.h"
 
-#define MAX_RANDOM_INTEGER 35
+#define MAX_RANDOM_INTEGER 100000000
+#define NUMBER_BUFFER_LENGTH 30
 
 //#define EXECUTE_TESTS // Comment to disable tests...
 #define AUDIT if(1)
@@ -24,23 +25,52 @@ int main2(int argc, char **argv) {
     return 0;
 }
 
+/*
+       output->applicationBuffer = allocateApplicationBuffer();
+
+       output->moduloOfMultiplicativeGroup = allocateAndSetNumberFromString(moduloOfMultiplicativeGroup);
+       output->moduloOfMultiplicativeGroupMinusOne = allocateNumber();
+       mpz_sub_ui(output->moduloOfMultiplicativeGroupMinusOne, output->moduloOfMultiplicativeGroup, 1);
+
+       output->discreteLogarithmToCompute = allocateDiscreteLogarithm(dLogBase, dLogArgument,
+                                                                      output->moduloOfMultiplicativeGroup);
+
+       output->maxRandomInteger = allocateAndSetNumberFromULL(maxRandomInteger);
+        */
+
+// "103", "5", "27", MAX_RANDOM_INTEGER
 
 int main() {
 
-    DLogProblemInstance *instance = allocateDLogProblemInstance("103", "5", "27", MAX_RANDOM_INTEGER);
-    DiscreteLogarithm *discreteLogarithm = instance->discreteLogarithmToCompute;
+    DLogProblemInstance *instance = allocateDLogProblemInstance();
 
-    __mpz_struct *input = allocateAndSetNumberFromString("1607");
-    __mpz_struct *modulo = allocateAndSetNumberFromString("100998");
+    instance->numbersBuffer = allocateNumbersBuffer(NUMBER_BUFFER_LENGTH);
+    instance->randomIntegerGenerator = allocateRandomIntegerGenerator(allocateAndSetNumberFromULL(MAX_RANDOM_INTEGER));
 
-    factorize(instance->applicationBuffer, input, modulo );
+
+
+
+    //DiscreteLogarithm *discreteLogarithm = instance->discreteLogarithmToCompute;
+
+    __mpz_struct *input = allocateAndSetNumberFromString("52345435");
+    __mpz_struct *modulo = allocateAndSetNumberFromString("543534543534543534543534543534543534543534543534543534543534543534543534543534543534543534");
+
+    OrderedFactorList *output = factorize(input, modulo, instance->numbersBuffer, instance->randomIntegerGenerator);
+
+    OrderedFactorListNode *currentLeftOrderFactorListNode = output->head;
+    while (currentLeftOrderFactorListNode != NULL) {
+        gmp_printf("%Zd ^ %Zd\n", currentLeftOrderFactorListNode->factor->base,
+                   currentLeftOrderFactorListNode->factor->exponent);
+        currentLeftOrderFactorListNode = currentLeftOrderFactorListNode->next_node;
+    }
+
     return 0;
 
+}
 
 
 
-
-
+/*
 
 
 
@@ -71,3 +101,4 @@ int main() {
 
     return 0;
 }
+ */

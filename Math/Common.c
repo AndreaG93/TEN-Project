@@ -8,8 +8,9 @@
 #include "Common.h"
 #include "Number.h"
 
-bool isInvertible(ApplicationBuffer *applicationBuffer, mpz_t input, mpz_t modulo) {
+bool isInvertible(NumbersBuffer *applicationBuffer, mpz_t input, mpz_t modulo) {
 
+    /*
     bool output;
     __mpz_struct *gcd = retrieveAuxiliaryNumber(applicationBuffer);
 
@@ -17,12 +18,13 @@ bool isInvertible(ApplicationBuffer *applicationBuffer, mpz_t input, mpz_t modul
     output = (mpz_cmp_ui(gcd, 1) == 0);
 
     releaseAuxiliaryNumber(applicationBuffer, 1);
+     */
 
-    return output;
+    return true;
 }
 
-__mpz_struct* getInverseMultiplicative(ApplicationBuffer *applicationBuffer, __mpz_struct *number, __mpz_struct *modulo) {
-
+__mpz_struct* getInverseMultiplicative(NumbersBuffer *applicationBuffer, __mpz_struct *number, __mpz_struct *modulo) {
+/*
     __mpz_struct *y_0 = allocateAndSetNumberFromULL(0);
 
     __mpz_struct *x_0 = retrieveAuxiliaryNumber(applicationBuffer);
@@ -70,4 +72,7 @@ __mpz_struct* getInverseMultiplicative(ApplicationBuffer *applicationBuffer, __m
     releaseAuxiliaryNumber(applicationBuffer, 10);
     mpz_mod(y_0, y_0, modulo);
     return y_0;
+
+    */
+    return NULL;
 }

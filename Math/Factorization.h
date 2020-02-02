@@ -1,9 +1,7 @@
 #pragma once
 
 #include "OrderedFactorList.h"
-#include "../Buffers/ApplicationBuffer.h"
+#include "../Buffers/NumbersBuffer.h"
+#include "RandomNumber.h"
 
-OrderedFactorList *factorizeCheckingBSmoothness(ApplicationBuffer *applicationBuffer, __mpz_struct *number,
-                                                __mpz_struct *smoothnessBound);
-
-void factorize(ApplicationBuffer *applicationBuffer, __mpz_struct *number, __mpz_struct *modulo);
+OrderedFactorList *factorize(__mpz_struct *input, __mpz_struct *modulo, NumbersBuffer *numbersBuffer, RandomIntegerGenerator *randomIntegerGenerator);

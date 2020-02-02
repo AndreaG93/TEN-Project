@@ -107,7 +107,7 @@ void sumRows(Matrix *matrix, unsigned long long sourceRow, unsigned long long ta
     }
 }
 
-void performGaussianElimination(Matrix *matrix, ApplicationBuffer *buffer, __mpz_struct *modulo) {
+void performGaussianElimination(Matrix *matrix, NumbersBuffer *buffer, __mpz_struct *modulo) {
 
     unsigned long long actualTargetRow = 0;
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <gmp.h>
-#include "../Buffers/ApplicationBuffer.h"
+#include "../Buffers/NumbersBuffer.h"
 #define DEBUG
 
 typedef struct {
@@ -22,7 +22,7 @@ setNumberMatrixCell(Matrix *matrix, unsigned long long rowIndex, unsigned long l
 
 __mpz_struct *getNumberMatrixCell(Matrix *matrix, unsigned long long rowIndex, unsigned long long columnIndex);
 
-void performGaussianElimination(Matrix *matrix, ApplicationBuffer *buffer, __mpz_struct *modulo);
+void performGaussianElimination(Matrix *matrix, NumbersBuffer *buffer, __mpz_struct *modulo);
 
 #ifdef DEBUG
 void printMatrix(Matrix *matrix);

@@ -2,7 +2,6 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include "RandomNumber.h"
-#include "Number.h"
 
 RandomIntegerGenerator *allocateRandomIntegerGenerator(__mpz_struct *maxRandomInteger) {
 
@@ -10,8 +9,14 @@ RandomIntegerGenerator *allocateRandomIntegerGenerator(__mpz_struct *maxRandomIn
     if (output == NULL)
         exit(EXIT_FAILURE);
 
+    unsigned long int seed;
+
+    int fd = open("/dev/urandom", O_RDONLY);
+    read(fd, &seed, sizeof(unsigned long int));
+    close(fd);
+
     gmp_randinit_mt(&output->state);
-    gmp_randseed_ui(&output->state, rand());
+    gmp_randseed_ui(&output->state, seed);
     output->maxRandomInteger = maxRandomInteger;
 
     return output;

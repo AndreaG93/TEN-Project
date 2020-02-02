@@ -13,7 +13,7 @@
 
 __mpz_struct *computeRequiredDiscreteLogarithmValue(__mpz_struct **relation, DLogProblemInstance* instance) {
 
-    __mpz_struct *aux = retrieveAuxiliaryNumber(instance->applicationBuffer);
+    __mpz_struct *aux = retrieveNumberFromBuffer(instance->numbersBuffer);
     __mpz_struct *output = allocateAndSetNumberFromULL(0);
 
     for (unsigned long long index = 0; index < instance->factorBase->length; index++) {
@@ -24,7 +24,7 @@ __mpz_struct *computeRequiredDiscreteLogarithmValue(__mpz_struct **relation, DLo
 
     mpz_mod(output, output, instance->moduloOfMultiplicativeGroupMinusOne);
 
-    releaseAuxiliaryNumber(instance->applicationBuffer, 1);
+    releaseNumber(instance->numbersBuffer);
     return output;
 }
 

@@ -111,7 +111,7 @@ void startSecondPhase(DLogProblemInstance *instance) {
 
     pthread_t* cleanerThread = allocateAndStartThreadToClearCircular(instance->threadsPoolData->buffer);
     printMatrix(equationSystem);
-    performGaussianElimination(equationSystem, instance->applicationBuffer,
+    performGaussianElimination(equationSystem, instance->numbersBuffer,
                                instance->moduloOfMultiplicativeGroupMinusOne);
 
 

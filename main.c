@@ -52,8 +52,8 @@ int main() {
 
     //DiscreteLogarithm *discreteLogarithm = instance->discreteLogarithmToCompute;
 
-    __mpz_struct *input = allocateAndSetNumberFromString("52345435");
-    __mpz_struct *modulo = allocateAndSetNumberFromString("543534543534543534543534543534543534543534543534543534543534543534543534543534543534543534");
+    __mpz_struct *input = allocateAndSetNumberFromString("523454355234543");
+    __mpz_struct *modulo = allocateAndSetNumberFromString("5435345435345435345435345435345435345435345435345435345435345435345435345");
 
     OrderedFactorList *output = factorize(input, modulo, instance->numbersBuffer, instance->randomIntegerGenerator);
 

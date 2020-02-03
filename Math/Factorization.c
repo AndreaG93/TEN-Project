@@ -25,65 +25,53 @@ bool isBSmooth(OrderedFactorList *factorList, __mpz_struct *smoothnessBound) {
         return false;
 }
 
-void
-factorizeUsingTrialDivision(__mpz_struct *input, OrderedFactorList *allocatedFactorList, NumbersBuffer *numbersBuffer) {
+void factorizeUsingTrialDivision(__mpz_struct *input, OrderedFactorList *allocatedFactorList, NumbersBuffer *numbersBuffer,
+                            unsigned int maxTrials, __mpz_struct *currentPossibleFactor, bool makeCurrentPossibleFactorUnchanged) {
 
     __mpz_struct **buffer = retrieveNumbersFromBuffer(numbersBuffer, 3);
 
-    __mpz_struct *possibleFactor = buffer[0];
-    __mpz_struct *squareOfPossibleFactor = buffer[1];
-    __mpz_struct *remainder = buffer[2];
+    __mpz_struct *squareOfPossibleFactor = buffer[0];
+    __mpz_struct *remainder = buffer[1];
+    __mpz_struct *backupOfCurrentPossibleFactor = buffer[3];
 
-    mpz_set_ui(possibleFactor, 3);
+    if (makeCurrentPossibleFactorUnchanged)
+        mpz_set(backupOfCurrentPossibleFactor, currentPossibleFactor);
+
+    unsigned int currentTrial = 0;
 
     while (mpz_cmp_si(input, 1) > 0) {
 
-        mpz_mod(remainder, input, possibleFactor);
+        mpz_mod(remainder, input, currentPossibleFactor);
 
         if (mpz_cmp_si(remainder, 0) == 0) {
 
-            __mpz_struct *newFactor = allocateAndSetNumberFromNumber(possibleFactor);
+            __mpz_struct *newFactor = allocateAndSetNumberFromNumber(currentPossibleFactor);
             insertNewFactor(allocatedFactorList, newFactor);
 
-            mpz_div(input, input, possibleFactor);
+            mpz_div(input, input, currentPossibleFactor);
 
         } else {
 
-            mpz_mul(squareOfPossibleFactor, possibleFactor, possibleFactor);
+            mpz_mul(squareOfPossibleFactor, currentPossibleFactor, currentPossibleFactor);
 
-            if (mpz_cmp(squareOfPossibleFactor, input) <= 0)
-                mpz_add_ui(possibleFactor, possibleFactor, 2);
-            else
-                break;
+            if (mpz_cmp(squareOfPossibleFactor, input) <= 0) {
+
+                if (currentTrial == maxTrials)
+                    break;
+
+                mpz_nextprime(currentPossibleFactor, currentPossibleFactor);
+                currentTrial++;
+
+            } else
+                mpz_set(currentPossibleFactor, input);
         }
     }
 
+    if (makeCurrentPossibleFactorUnchanged)
+        mpz_set(currentPossibleFactor, backupOfCurrentPossibleFactor);
+
     releaseNumbers(numbersBuffer, 3);
 }
-
-void factorizeUsingTrialDivisionWhenInputIsEven(__mpz_struct *input, OrderedFactorList *allocatedFactorList,
-                                                NumbersBuffer *numbersBuffer) {
-
-    __mpz_struct *remainder = retrieveNumberFromBuffer(numbersBuffer);
-
-    while (mpz_cmp_si(input, 1) > 0) {
-
-        mpz_mod_ui(remainder, input, 2);
-
-        if (mpz_cmp_si(remainder, 0) == 0) {
-
-            __mpz_struct *newFactor = allocateAndSetNumberFromULL(2);
-            insertNewFactor(allocatedFactorList, newFactor);
-
-            mpz_div_ui(input, input, 2);
-
-        } else
-            break;
-    }
-
-    releaseNumber(numbersBuffer);
-}
-
 
 __mpz_struct *getFactorUsingPollardRho(__mpz_struct *input, __mpz_struct *modulo, NumbersBuffer *numbersBuffer,
                                        RandomIntegerGenerator *randomIntegerGenerator) {
@@ -127,38 +115,44 @@ __mpz_struct *getFactorUsingPollardRho(__mpz_struct *input, __mpz_struct *modulo
 }
 
 
-OrderedFactorList *factorize(__mpz_struct *input, __mpz_struct *modulo, NumbersBuffer *numbersBuffer,
-                             RandomIntegerGenerator *randomIntegerGenerator) {
+OrderedFactorList *factorize(__mpz_struct *input, __mpz_struct *modulo, NumbersBuffer *numbersBuffer, RandomIntegerGenerator *randomIntegerGenerator) {
 
-    OrderedFactorList *output = NULL;
+    if (mpz_cmp_si(input, 1) == 0)
+        return NULL;
 
-    if (mpz_cmp_si(input, 1) > 0) {
+    OrderedFactorList *output = allocateOrderedFactorList();
+    __mpz_struct* firstPossibleFactor = allocateAndSetNumberFromULL(2);
 
-        output = allocateOrderedFactorList();
+    factorizeUsingTrialDivision(input, output, numbersBuffer, -1, firstPossibleFactor, false);
 
-        factorizeUsingTrialDivisionWhenInputIsEven(input, output, numbersBuffer);
+    fprintf(stderr, "...\n");
 
-        while (mpz_cmp_si(input, 1) > 0) {
+    /*
+    while (mpz_cmp_si(input, 1) > 0) {
 
-            if (mpz_probab_prime_p(input, 15) == 2) {
+        if (mpz_probab_prime_p(input, 50) != 0){
 
-                insertNewFactor(output, input);
-                break;
-
-            } else {
-
-                __mpz_struct *factor = getFactorUsingPollardRho(input, modulo, numbersBuffer, randomIntegerGenerator);
-                mpz_div(input, input, factor);
-
-                if (mpz_probab_prime_p(input, 15) == 2)
-                    insertNewFactor(output, factor);
-                else
-                    factorizeUsingTrialDivision(factor, output, numbersBuffer);
-            }
+            insertNewFactor(output, input);
+            break;
         }
+
+        fprintf(stderr, "Enter Pollard Rho...\n");
+        __mpz_struct *factor = getFactorUsingPollardRho(input, modulo, numbersBuffer, randomIntegerGenerator);
+        fprintf(stderr, "Exit Pollard Rho...\n");
+
+        mpz_div(input, input, factor);
+
+        if (mpz_probab_prime_p(factor, 50) != 0)
+            insertNewFactor(output, factor);
+        else
+            factorizeUsingTrialDivision(factor, output, numbersBuffer, -1, firstPossibleFactor, true);
     }
+     */
+
     return output;
 }
+
+
 
 
 OrderedFactorList *factorizeOptimized(__mpz_struct *input, __mpz_struct *modulo, NumbersBuffer *numbersBuffer,
@@ -223,6 +217,22 @@ OrderedFactorList *factorizeOptimized(__mpz_struct *input, __mpz_struct *modulo,
         zSize = mpz_sizeinbase(remainder_1, 10);
 
         if (xSize >= (inputNumberSize) / 2) {
+
+
+            OrderedFactorList *leftOrderFactorList = factorize(aux_5, modulo, numbersBuffer, randomIntegerGenerator);
+            OrderedFactorList *rightOrderFactorList = factorize(aux_5, modulo, numbersBuffer, randomIntegerGenerator);
+
+            OrderedFactorList *output = allocateOrderedFactorList();
+            
+            OrderedFactorListNode* currentLeftOrderFactorListNode = leftOrderFactorList->head;
+            OrderedFactorListNode* currentRightOrderFactorListNode = leftOrderFactorList->head;
+
+            while (currentLeftOrderFactorListNode != NULL && currentRightOrderFactorListNode != NULL) {
+
+                __mpz_struct* currentBase = allocateNumber();
+                mpz_sub(currentBase, currentLeftOrderFactorListNode->factor->base, )
+            }
+
 
 
         }

@@ -67,7 +67,6 @@ unsigned long long found(FactorBase *factorBase, __mpz_struct *chosenBase) {
 }
 
 
-
 void startSecondPhase(DLogProblemInstance *instance) {
 
     instance->currentPhase = 2;
@@ -75,12 +74,12 @@ void startSecondPhase(DLogProblemInstance *instance) {
 
     pthread_cond_signal(&instance->threadsPoolData->pthreadCondition);
 
-    Matrix *equationSystem = allocateMatrix(instance->factorBase->length + 15, instance->factorBase->length + 1);
+    Matrix *equationSystem = allocateMatrix(instance->factorBase->length + 16, instance->factorBase->length + 1);
 
-    unsigned long long indexFFF = found(instance->factorBase, instance->discreteLogarithmToCompute->base);
+    unsigned long long indexFFF = found(instance->factorBase, instance->discreteLogarithm->base);
     unsigned long long currentRow = 0;
 
-    while (currentRow != instance->factorBase->length + 15) {
+    while (currentRow != instance->factorBase->length + 16) {
 
         __mpz_struct **relation = popFromCircularBuffer(instance->threadsPoolData->buffer);
 
@@ -109,12 +108,10 @@ void startSecondPhase(DLogProblemInstance *instance) {
 
     instance->threadsPoolData->pauseCondition = true;
 
-    pthread_t* cleanerThread = allocateAndStartThreadToClearCircular(instance->threadsPoolData->buffer);
+    pthread_t *cleanerThread = allocateAndStartThreadToClearCircular(instance->threadsPoolData->buffer);
     printMatrix(equationSystem);
     performGaussianElimination(equationSystem, instance->numbersBuffer,
                                instance->moduloOfMultiplicativeGroupMinusOne);
-
-
 
     instance->secondPhaseOutput = populateSecondPhaseOutput(equationSystem, instance->factorBase, indexFFF);
 

@@ -12,3 +12,5 @@ __mpz_struct *allocateAndSetNumberFromString(char *number);
 __mpz_struct *allocateAndSetNumberFromULL(unsigned long long number);
 
 __mpz_struct *allocateAndSetNumberFromNumber(__mpz_struct *number);
+
+void deallocateNumber(__mpz_struct *input);

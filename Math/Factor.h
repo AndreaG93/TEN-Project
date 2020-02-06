@@ -7,4 +7,4 @@ typedef struct {
     __mpz_struct* exponent;
 } Factor;
 
-Factor *allocateFactor();
+Factor *allocateFactor(__mpz_struct *base, __mpz_struct *exponent);

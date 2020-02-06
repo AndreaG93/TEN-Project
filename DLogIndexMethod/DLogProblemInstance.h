@@ -20,7 +20,7 @@ typedef struct {
     __mpz_struct* smoothnessBound;
 
     FactorBase* factorBase;
-    DiscreteLogarithm *discreteLogarithmToCompute;
+    DiscreteLogarithm *discreteLogarithm;
 
     NumbersBuffer* numbersBuffer;
 
@@ -36,5 +36,3 @@ typedef struct {
 } DLogProblemInstance;
 
 DLogProblemInstance* allocateDLogProblemInstance();
-
-void setSmoothnessBound(DLogProblemInstance *instance, char *smoothnessBoundAsString);

@@ -16,6 +16,10 @@ __mpz_struct **allocateNumbersArray(unsigned long long size, bool isNumberAlloca
 
     return output;
 }
+void deallocateNumber(__mpz_struct *input) {
+    mpz_clear(input);
+    free(input);
+}
 
 void deallocateNumbersArray(__mpz_struct **input, unsigned long long size) {
 
@@ -24,7 +28,6 @@ void deallocateNumbersArray(__mpz_struct **input, unsigned long long size) {
     }
     free(input);
 }
-
 
 __mpz_struct *allocateNumber() {
     __mpz_struct *output = malloc(sizeof(__mpz_struct));

@@ -9,7 +9,3 @@ DLogProblemInstance *allocateDLogProblemInstance() {
     else
         return output;
 }
-
-void setSmoothnessBound(DLogProblemInstance *instance, char *smoothnessBoundAsString) {
-    instance->smoothnessBound = allocateAndSetNumberFromString(smoothnessBoundAsString);
-}

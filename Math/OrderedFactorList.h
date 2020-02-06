@@ -20,4 +20,8 @@ OrderedFactorList *allocateOrderedFactorList();
 
 void deallocateOrderedFactorList(OrderedFactorList *list);
 
-void insertNewFactor(OrderedFactorList *list, __mpz_struct *newBaseFactor);
+void insertFactor(OrderedFactorList *list, __mpz_struct *factorBase, __mpz_struct *factorExponent);
+
+void printOrderedFactorList(OrderedFactorList *list);
+
+OrderedFactorList * mergeOrderedFactorListUsingOptimization(OrderedFactorList *listA, OrderedFactorList *listB);

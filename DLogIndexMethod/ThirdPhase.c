@@ -38,6 +38,6 @@ void startThirdPhase(DLogProblemInstance *instance) {
 
     __mpz_struct **relation = popFromCircularBuffer(instance->threadsPoolData->buffer);
 
-    instance->discreteLogarithmToCompute->value = computeRequiredDiscreteLogarithmValue(relation, instance);
+    instance->discreteLogarithm->value = computeRequiredDiscreteLogarithmValue(relation, instance);
 
 }

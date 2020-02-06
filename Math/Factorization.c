@@ -25,8 +25,10 @@ bool isBSmooth(OrderedFactorList *factorList, __mpz_struct *smoothnessBound) {
         return false;
 }
 
-void factorizeUsingTrialDivision(__mpz_struct *input, OrderedFactorList *allocatedFactorList, NumbersBuffer *numbersBuffer,
-                            unsigned int maxTrials, __mpz_struct *currentPossibleFactor, bool makeCurrentPossibleFactorUnchanged) {
+void
+factorizeUsingTrialDivision(__mpz_struct *input, OrderedFactorList *allocatedFactorList, NumbersBuffer *numbersBuffer,
+                            unsigned int maxTrials, __mpz_struct *currentPossibleFactor,
+                            bool makeCurrentPossibleFactorUnchanged) {
 
     __mpz_struct **buffer = retrieveNumbersFromBuffer(numbersBuffer, 3);
 
@@ -46,7 +48,7 @@ void factorizeUsingTrialDivision(__mpz_struct *input, OrderedFactorList *allocat
         if (mpz_cmp_si(remainder, 0) == 0) {
 
             __mpz_struct *newFactor = allocateAndSetNumberFromNumber(currentPossibleFactor);
-            insertNewFactor(allocatedFactorList, newFactor);
+            insertFactor(allocatedFactorList, newFactor, allocateAndSetNumberFromULL(1));
 
             mpz_div(input, input, currentPossibleFactor);
 
@@ -115,13 +117,14 @@ __mpz_struct *getFactorUsingPollardRho(__mpz_struct *input, __mpz_struct *modulo
 }
 
 
-OrderedFactorList *factorize(__mpz_struct *input, __mpz_struct *modulo, NumbersBuffer *numbersBuffer, RandomIntegerGenerator *randomIntegerGenerator) {
+OrderedFactorList *factorize(__mpz_struct *input, __mpz_struct *modulo, NumbersBuffer *numbersBuffer,
+                             RandomIntegerGenerator *randomIntegerGenerator) {
 
     if (mpz_cmp_si(input, 1) == 0)
         return NULL;
 
     OrderedFactorList *output = allocateOrderedFactorList();
-    __mpz_struct* firstPossibleFactor = allocateAndSetNumberFromULL(2);
+    __mpz_struct *firstPossibleFactor = allocateAndSetNumberFromULL(2);
 
     factorizeUsingTrialDivision(input, output, numbersBuffer, -1, firstPossibleFactor, false);
 
@@ -153,43 +156,38 @@ OrderedFactorList *factorize(__mpz_struct *input, __mpz_struct *modulo, NumbersB
 }
 
 
-
-
 OrderedFactorList *factorizeOptimized(__mpz_struct *input, __mpz_struct *modulo, NumbersBuffer *numbersBuffer,
                                       RandomIntegerGenerator *randomIntegerGenerator) {
 
     size_t inputNumberSize = mpz_sizeinbase(input, 10);
     inputNumberSize = inputNumberSize / 2;
-    size_t zSize;
-    size_t xSize;
 
-    __mpz_struct **buffer = retrieveNumbersFromBuffer(numbersBuffer, 8);
-
+    __mpz_struct **buffer = retrieveNumbersFromBuffer(numbersBuffer, 13);
 
     __mpz_struct *remainder_0 = buffer[0];
-    __mpz_struct *remainder_1 = allocateNumber();
+    __mpz_struct *remainder_1 = buffer[1];
 
-    __mpz_struct *s_0 = buffer[1];
-    __mpz_struct *t_0 = buffer[2];
-    __mpz_struct *s_1 = buffer[3];
-    __mpz_struct *t_1 = allocateNumber();
-    __mpz_struct *quotient = buffer[4];
+    __mpz_struct *s_0 = buffer[2];
+    __mpz_struct *t_0 = buffer[3];
+    __mpz_struct *s_1 = buffer[4];
+    __mpz_struct *t_1 = buffer[5];
+    __mpz_struct *quotient = buffer[6];
 
-    __mpz_struct *aux_1 = buffer[5];
-    __mpz_struct *aux_2 = buffer[6];
-    __mpz_struct *aux_3 = buffer[7];
-    __mpz_struct *aux_4 = buffer[8];
-    __mpz_struct *aux_5 = buffer[9];
+    __mpz_struct *aux_1 = buffer[7];
+    __mpz_struct *aux_2 = buffer[8];
+    __mpz_struct *aux_3 = buffer[9];
+    __mpz_struct *aux_4 = buffer[10];
 
-    mpz_mod(input, input, modulo);
+    __mpz_struct *numerator = buffer[11];
+    __mpz_struct *denominator = buffer[12];
 
+    mpz_set(remainder_0, modulo);
     mpz_set_si(s_0, 1);
     mpz_set_si(t_0, 0);
-    mpz_set(remainder_0, modulo);
 
+    mpz_set(remainder_1, input);
     mpz_set_si(s_1, 0);
     mpz_set_si(t_1, 1);
-    mpz_set(remainder_1, input);
 
     while (mpz_cmp_ui(remainder_1, 0) != 0) {
         mpz_tdiv_q(quotient, remainder_0, remainder_1);
@@ -212,32 +210,30 @@ OrderedFactorList *factorizeOptimized(__mpz_struct *input, __mpz_struct *modulo,
         mpz_set(remainder_0, remainder_1);
         mpz_add(remainder_1, aux_1, aux_2);
 
-        mpz_mod(aux_5, t_1, modulo);
-        xSize = mpz_sizeinbase(aux_5, 10);
-        zSize = mpz_sizeinbase(remainder_1, 10);
+        mpz_mod(denominator, t_1, modulo);
+        mpz_mod(numerator, remainder_1, modulo);
 
-        if (xSize >= (inputNumberSize) / 2) {
-
-
-            OrderedFactorList *leftOrderFactorList = factorize(aux_5, modulo, numbersBuffer, randomIntegerGenerator);
-            OrderedFactorList *rightOrderFactorList = factorize(aux_5, modulo, numbersBuffer, randomIntegerGenerator);
-
-            OrderedFactorList *output = allocateOrderedFactorList();
-            
-            OrderedFactorListNode* currentLeftOrderFactorListNode = leftOrderFactorList->head;
-            OrderedFactorListNode* currentRightOrderFactorListNode = leftOrderFactorList->head;
-
-            while (currentLeftOrderFactorListNode != NULL && currentRightOrderFactorListNode != NULL) {
-
-                __mpz_struct* currentBase = allocateNumber();
-                mpz_sub(currentBase, currentLeftOrderFactorListNode->factor->base, )
-            }
+        if (mpz_sizeinbase(denominator, 10) <= inputNumberSize && mpz_sizeinbase(numerator, 10) <= inputNumberSize) {
 
 
+            OrderedFactorList *numeratorOrderFactorList = factorize(numerator, modulo, numbersBuffer,
+                                                                    randomIntegerGenerator);
+            OrderedFactorList *denominatorOrderFactorList = factorize(denominator, modulo, numbersBuffer,
+                                                                      randomIntegerGenerator);
 
+#define DEBUG
+#ifdef DEBUG
+            fprintf(stdout, "Factorization of numerator 'z': \n");
+            printOrderedFactorList(numeratorOrderFactorList);
+            fprintf(stdout, "Factorization of denominator 'x': \n");
+            printOrderedFactorList(denominatorOrderFactorList);
+#endif
+
+            releaseNumbers(numbersBuffer, 13);
+
+            return mergeOrderedFactorListUsingOptimization(numeratorOrderFactorList, denominatorOrderFactorList);
         }
     }
-
     return NULL;
 }
 

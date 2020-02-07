@@ -12,7 +12,7 @@ typedef struct {
 
 } NumbersBuffer;
 
-NumbersBuffer *allocateNumbersBuffer(unsigned char size);
+NumbersBuffer *allocateNumbersBuffer(size_t size);
 
 void freeNumbersBuffer(NumbersBuffer *numbersBuffer);
 

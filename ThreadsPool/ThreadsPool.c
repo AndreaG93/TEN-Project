@@ -1,31 +1,5 @@
-//
-// Created by andrea on 23/11/19.
-//
-
 #include <pthread.h>
 #include <stdlib.h>
-#include "ThreadsPool.h"
-
-ThreadsPoolData *allocateThreadsPoolData(void *threadData) {
-
-    ThreadsPoolData *output = malloc(sizeof(ThreadsPoolData));
-    if (output == NULL)
-        exit(EXIT_FAILURE);
-    else {
-        output->buffer = allocateCircularBuffer();
-        output->stoppingCondition = false;
-        output->pauseCondition = true;
-        output->threadData = threadData;
-
-        if (pthread_mutex_init(&(output->pthreadMutex), NULL) != 0)
-            exit(EXIT_FAILURE);
-
-        if (pthread_cond_init(&(output->pthreadCondition), NULL) != 0)
-            exit(EXIT_FAILURE);
-    }
-
-    return output;
-}
 
 pthread_t *startThreadPool(unsigned long long poolSize, void *(*thread_routine)(void *), void *thread_argument) {
 
@@ -39,4 +13,3 @@ pthread_t *startThreadPool(unsigned long long poolSize, void *(*thread_routine)(
 
     return output;
 }
-

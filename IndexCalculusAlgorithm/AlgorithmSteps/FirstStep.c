@@ -1,8 +1,7 @@
-#include "FirstPhase.h"
+#include "FirstStep.h"
 
-void startFirstPhase(DLogProblemInstance* instance){
+void startFirstStep(DLogProblemInstance *instance) {
 
     instance->factorBase = allocateFactorBase();
     populateFactorBase(instance->factorBase, instance->smoothnessBound);
 }
-

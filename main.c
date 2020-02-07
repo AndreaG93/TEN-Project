@@ -1,40 +1,26 @@
-#include "DLogIndexMethod/DLogProblemInstance.h"
-#include "DLogIndexMethod/ThirdPhase.h"
-#include "DLogIndexMethod/FirstPhase.h"
-#include "DLogIndexMethod/SecondPhase.h"
-#include "DLogIndexMethod/RelationsRetrieval.h"
+#include "IndexCalculusAlgorithm/DLogProblemInstance.h"
+#include "IndexCalculusAlgorithm/RelationsRetrieval.h"
+#include "IndexCalculusAlgorithm/AlgorithmSteps/ThirdStep.h"
+#include "IndexCalculusAlgorithm/AlgorithmSteps/SecondStep.h"
+#include "IndexCalculusAlgorithm/AlgorithmSteps/FirstStep.h"
 #include "ThreadsPool/ThreadsPool.h"
-#include "Math/Number.h"
-#include "Math/Factorization.h"
 
 #define MAX_RANDOM_INTEGER 100000000
 #define NUMBER_BUFFER_LENGTH 30
-
 #define DEBUG
-
-//#define EXECUTE_TESTS // Comment to disable tests...
-#define AUDIT if(1)
 
 int main() {
 
-    DLogProblemInstance *dLogProblemInstance = allocateDLogProblemInstance();
-
-    dLogProblemInstance->numbersBuffer = allocateNumbersBuffer(NUMBER_BUFFER_LENGTH);
-    dLogProblemInstance->randomIntegerGenerator = allocateRandomIntegerGenerator(allocateAndSetNumberFromULL(MAX_RANDOM_INTEGER));
-    dLogProblemInstance->smoothnessBound = allocateAndSetNumberFromString("7");
-    dLogProblemInstance->threadsPoolData = allocateThreadsPoolData(dLogProblemInstance);
-    dLogProblemInstance->moduloOfMultiplicativeGroup = allocateAndSetNumberFromString("179");
-    dLogProblemInstance->moduloOfMultiplicativeGroupMinusOne = allocateNumber();
-    dLogProblemInstance->discreteLogarithm = allocateDiscreteLogarithm("11", "13", dLogProblemInstance->moduloOfMultiplicativeGroup);
+    DLogProblemInstance *dLogProblemInstance = allocateAndInitializeDLogProblemInstance("179", "11", "13", "7", MAX_RANDOM_INTEGER, NUMBER_BUFFER_LENGTH);
 
     startThreadPool(4, &threadRoutineForRelationRetrieval, (void *) dLogProblemInstance->threadsPoolData);
 
-    fprintf(stderr, "Start 1° phase...\n");
-    startFirstPhase(dLogProblemInstance);
-    fprintf(stderr, "Start 2° phase...\n");
-    startSecondPhase(dLogProblemInstance);
-    fprintf(stderr, "Start 3° phase...\n");
-    startThirdPhase(dLogProblemInstance);
+    fprintf(stderr, "Start 1° algorithm step...\n");
+    startFirstStep(dLogProblemInstance);
+    fprintf(stderr, "Start 2° algorithm step...\n");
+    startSecondStep(dLogProblemInstance);
+    fprintf(stderr, "Start 3° algorithm step...\n");
+    startThirdStep(dLogProblemInstance);
 
     DiscreteLogarithm *output = dLogProblemInstance->discreteLogarithm;
 

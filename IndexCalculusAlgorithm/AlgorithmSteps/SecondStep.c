@@ -4,9 +4,9 @@
 
 #include <stdlib.h>
 #include <pthread.h>
-#include "SecondPhase.h"
-#include "../Math/Number.h"
-#include "../Math/Matrix.h"
+#include "SecondStep.h"
+#include "../../Math/Number.h"
+#include "../../Math/Matrix.h"
 
 SecondPhaseOutput *allocateSecondPhaseOutput(unsigned long long size) {
 
@@ -20,8 +20,7 @@ SecondPhaseOutput *allocateSecondPhaseOutput(unsigned long long size) {
     return output;
 }
 
-SecondPhaseOutput *
-populateSecondPhaseOutput(Matrix *resolvedEquationSystem, FactorBase *factorBase, unsigned long long special) {
+SecondPhaseOutput *populateSecondPhaseOutput(Matrix *resolvedEquationSystem, FactorBase *factorBase, unsigned long long special) {
 
     SecondPhaseOutput *output = allocateSecondPhaseOutput(factorBase->length);
 
@@ -67,12 +66,10 @@ unsigned long long found(FactorBase *factorBase, __mpz_struct *chosenBase) {
 }
 
 
-void startSecondPhase(DLogProblemInstance *instance) {
+void startSecondStep(DLogProblemInstance *instance) {
 
-    instance->currentPhase = 2;
-    instance->threadsPoolData->pauseCondition = false;
+    sendSignalToThreadsPoolToExecuteSpecifiedAlgorithmStep(instance, 2);
 
-    pthread_cond_signal(&instance->threadsPoolData->pthreadCondition);
 
     Matrix *equationSystem = allocateMatrix(instance->factorBase->length + 16, instance->factorBase->length + 1);
 
@@ -81,7 +78,7 @@ void startSecondPhase(DLogProblemInstance *instance) {
 
     while (currentRow != instance->factorBase->length + 16) {
 
-        __mpz_struct **relation = popFromCircularBuffer(instance->threadsPoolData->buffer);
+        __mpz_struct **relation = popFromCircularBuffer(instance->threadsPoolData->sharedBuffer);
 
         for (unsigned long long currentColumn = 0; currentColumn < instance->factorBase->length; currentColumn++) {
 
@@ -106,12 +103,12 @@ void startSecondPhase(DLogProblemInstance *instance) {
         currentRow++;
     }
 
-    instance->threadsPoolData->pauseCondition = true;
+    pauseThreadsPool(instance);
 
-    pthread_t *cleanerThread = allocateAndStartThreadToClearCircular(instance->threadsPoolData->buffer);
-    printMatrix(equationSystem);
-    performGaussianElimination(equationSystem, instance->numbersBuffer,
-                               instance->moduloOfMultiplicativeGroupMinusOne);
+    pthread_t *cleanerThread = allocateAndStartThreadToClearCircular(instance->threadsPoolData->sharedBuffer);
+
+
+    performGaussianElimination(equationSystem, instance->numbersBuffer, instance->moduloOfMultiplicativeGroupMinusOne);
 
     instance->secondPhaseOutput = populateSecondPhaseOutput(equationSystem, instance->factorBase, indexFFF);
 

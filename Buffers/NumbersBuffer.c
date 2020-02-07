@@ -1,8 +1,7 @@
 #include "NumbersBuffer.h"
 #include "../Math/Number.h"
 
-
-NumbersBuffer *allocateNumbersBuffer(unsigned char size) {
+NumbersBuffer *allocateNumbersBuffer(size_t size) {
 
     NumbersBuffer *output = malloc(sizeof(NumbersBuffer));
     if (output == NULL)

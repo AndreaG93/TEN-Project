@@ -23,26 +23,20 @@ ThreadsPoolData *allocateThreadsPoolData(DLogProblemInstance *dLogProblemInstanc
     return output;
 }
 
-void setModuloOfMultiplicativeGroup(DLogProblemInstance *instance, char *moduloOfMultiplicativeGroup) {
-    instance->moduloOfMultiplicativeGroup = allocateAndSetNumberFromString(moduloOfMultiplicativeGroup);
-    instance->moduloOfMultiplicativeGroupMinusOne = allocateNumber();
-    mpz_sub_ui(instance->moduloOfMultiplicativeGroupMinusOne, instance->moduloOfMultiplicativeGroup, 1);
-}
-
-DLogProblemInstance *allocateAndInitializeDLogProblemInstance(char *moduloOfMultiplicativeGroup, char *dLogBase, char *dLogArgument, char *smoothnessBound, unsigned long long maxRandomInteger, size_t numbersBufferSize) {
+DLogProblemInstance *allocateDLogProblemInstance(DLogProblemInstanceInput *input) {
 
     DLogProblemInstance *output = malloc(sizeof(DLogProblemInstance));
     if (output == NULL)
         exit(EXIT_FAILURE);
     else {
-        setModuloOfMultiplicativeGroup(output, moduloOfMultiplicativeGroup);
 
-        output->discreteLogarithm = allocateDiscreteLogarithm(dLogBase, dLogArgument, output->moduloOfMultiplicativeGroup);
-        output->smoothnessBound = allocateAndSetNumberFromString(smoothnessBound);
-        output->maxRandomInteger = allocateAndSetNumberFromULL(maxRandomInteger);
-        output->numbersBufferSize = numbersBufferSize;
-        output->numbersBuffer = allocateNumbersBuffer(output->numbersBufferSize);
+        output->discreteLogarithm = allocateDiscreteLogarithm(input->dLogBase, input->dLogArgument, input->multiplicativeGroup);
         output->threadsPoolData = allocateThreadsPoolData(output);
+
+        output->smoothnessBound = input->smoothnessBound;
+        output->maxRandomInteger = input->maxRandomInteger;
+        output->randomIntegerGenerator = input->randomIntegerGenerator;
+        output->numbersBuffer = input->numbersBuffer;
     }
 
     return output;

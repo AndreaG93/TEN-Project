@@ -17,7 +17,7 @@ __mpz_struct *computeRequiredDiscreteLogarithmValue(__mpz_struct **relation, DLo
         mpz_add(output, output, auxiliaryNumber);
     }
 
-    mpz_mod(output, output, instance->moduloOfMultiplicativeGroupMinusOne);
+    mpz_mod(output, output, instance->discreteLogarithm->multiplicativeGroupMinusOne);
 
     deallocateNumber(auxiliaryNumber);
     return output;

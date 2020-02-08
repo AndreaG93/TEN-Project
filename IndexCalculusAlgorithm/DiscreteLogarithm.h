@@ -8,10 +8,11 @@
 typedef struct {
     __mpz_struct *base;
     __mpz_struct *argument;
-    __mpz_struct *moduloOfMultiplicativeGroup;
+    __mpz_struct *multiplicativeGroup;
+    __mpz_struct *multiplicativeGroupMinusOne;
     __mpz_struct *value;
 } DiscreteLogarithm;
 
-DiscreteLogarithm *allocateDiscreteLogarithm(char *base, char *argument, __mpz_struct* moduloOfMultiplicativeGroup);
+DiscreteLogarithm *allocateDiscreteLogarithm(__mpz_struct *base, __mpz_struct *argument, __mpz_struct *moduloOfMultiplicativeGroup);
 
 bool isCorrect(DiscreteLogarithm *dLog);

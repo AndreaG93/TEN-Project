@@ -4,8 +4,6 @@
 #include "../Buffers/NumbersBuffer.h"
 #include "RandomNumber.h"
 
-OrderedFactorList *factorize(__mpz_struct *input, __mpz_struct *modulo, NumbersBuffer *numbersBuffer,
-                             RandomIntegerGenerator *randomIntegerGenerator);
+OrderedFactorList *factorize(__mpz_struct *input, NumbersBuffer *numbersBuffer, RandomIntegerGenerator *randomIntegerGenerator);
 
-OrderedFactorList *factorizeOptimized(__mpz_struct *input, __mpz_struct *modulo, NumbersBuffer *numbersBuffer,
-                                      RandomIntegerGenerator *randomIntegerGenerator);
+OrderedFactorList *factorizeOptimized(__mpz_struct *input, __mpz_struct *modulo, NumbersBuffer *numbersBuffer, RandomIntegerGenerator *randomIntegerGenerator);

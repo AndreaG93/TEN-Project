@@ -4,6 +4,7 @@
 #include "../Math/RandomNumber.h"
 #include "FactorBase.h"
 #include "../Buffers/CircularBuffer.h"
+#include "../UserInput.h"
 
 typedef struct {
 
@@ -29,27 +30,21 @@ typedef struct {
 
     unsigned char currentIndexCalculusAlgorithmStep;
 
-    __mpz_struct *primitiveRoot;
-    __mpz_struct *moduloOfMultiplicativeGroup;
-    __mpz_struct *moduloOfMultiplicativeGroupMinusOne;
-    __mpz_struct *smoothnessBound;
-
-    FactorBase *factorBase;
     DiscreteLogarithm *discreteLogarithm;
+    FactorBase *factorBase;
     ThreadsPoolData *threadsPoolData;
     NumbersBuffer *numbersBuffer;
+    RandomIntegerGenerator *randomIntegerGenerator;
 
+    __mpz_struct *maxRandomInteger;
+    __mpz_struct *smoothnessBound;
     __mpz_struct **indexMethodSecondPhaseOutput;
 
     SecondPhaseOutput *secondPhaseOutput;
 
-
-    size_t numbersBufferSize;
-    __mpz_struct *maxRandomInteger;
-
 } DLogProblemInstance;
 
-DLogProblemInstance *allocateAndInitializeDLogProblemInstance(char *moduloOfMultiplicativeGroup, char *dLogBase, char *dLogArgument, char *smoothnessBound, unsigned long long maxRandomInteger, size_t numbersBufferSize);
+DLogProblemInstance *allocateDLogProblemInstance(DLogProblemInstanceInput *input);
 
 void sendSignalToThreadsPoolToExecuteSpecifiedAlgorithmStep(DLogProblemInstance *instance, unsigned char algorithmStep);
 

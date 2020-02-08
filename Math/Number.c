@@ -16,6 +16,7 @@ __mpz_struct **allocateNumbersArray(unsigned long long size, bool isNumberAlloca
 
     return output;
 }
+
 void deallocateNumber(__mpz_struct *input) {
     mpz_clear(input);
     free(input);
@@ -55,8 +56,13 @@ __mpz_struct *allocateAndSetNumberFromString(char *number) {
     if (output == NULL)
         exit(EXIT_FAILURE);
 
-    mpz_init_set_str(output, number, 10);
-    return output;
+    if (mpz_init_set_str(output, number, 10) == 0)
+        return output;
+    else {
+        mpz_clear(output);
+        free(output);
+        return NULL;
+    }
 }
 
 __mpz_struct *allocateAndSetNumberFromNumber(__mpz_struct *number) {

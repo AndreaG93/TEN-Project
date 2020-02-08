@@ -8,7 +8,6 @@
 #include "../Math/Factorization.h"
 #include "../Math/Number.h"
 
-
 OrderedFactorList *getFactorListOfRandomBSmoothNumber(__mpz_struct **ancestorRelation, NumbersBuffer *numbersBuffer, RandomIntegerGenerator *randIntGen, DLogProblemInstance *instance) {
 
     OrderedFactorList *output = NULL;
@@ -35,14 +34,14 @@ OrderedFactorList *getFactorListOfRandomBSmoothNumber(__mpz_struct **ancestorRel
             currentFactor = currentFactorBaseNode->primeNumber;
 
             selectUniformlyDistributedRandomInteger(randIntGen, currentExponent);
-            mpz_powm(powerModuloP, currentFactor, currentExponent, instance->moduloOfMultiplicativeGroup);
+            mpz_powm(powerModuloP, currentFactor, currentExponent, instance->discreteLogarithm->multiplicativeGroup);
             mpz_mul(randomProduct, randomProduct, powerModuloP);
-            mpz_mod(randomProduct, randomProduct, instance->moduloOfMultiplicativeGroup);
+            mpz_mod(randomProduct, randomProduct, instance->discreteLogarithm->multiplicativeGroup);
 
             currentFactorBaseNode = currentFactorBaseNode->next_node;
         }
 
-        output = factorize(randomProduct, instance->smoothnessBound, numbersBuffer, randIntGen);
+        output = factorize(randomProduct, numbersBuffer, randIntGen);
     }
 
     releaseNumbers(numbersBuffer, 2);
@@ -51,8 +50,7 @@ OrderedFactorList *getFactorListOfRandomBSmoothNumber(__mpz_struct **ancestorRel
 }
 
 
-void populateRelation(__mpz_struct **ancestorRelation, OrderedFactorList *factorListOfBSmoothNumber,
-                      DLogProblemInstance *instance) {
+void populateRelation(__mpz_struct **ancestorRelation, OrderedFactorList *factorListOfBSmoothNumber, DLogProblemInstance *instance) {
 
     __mpz_struct *leftBaseValue;
     __mpz_struct *leftExponentValue;
@@ -79,19 +77,21 @@ void populateRelation(__mpz_struct **ancestorRelation, OrderedFactorList *factor
 
         if (instance->currentIndexCalculusAlgorithmStep == 3) {
             mpz_sub(*(ancestorRelation + index), RightExponentValue, leftExponentValue);
+            mpz_mod(*(ancestorRelation + index), *(ancestorRelation + index), instance->discreteLogarithm->multiplicativeGroupMinusOne);
         } else {
             mpz_sub(*(ancestorRelation + index), leftExponentValue, RightExponentValue);
+            mpz_mod(*(ancestorRelation + index), *(ancestorRelation + index), instance->discreteLogarithm->multiplicativeGroupMinusOne);
         }
 
         currentFactorNodeLeft = currentFactorNodeLeft->next_node;
     }
 }
 
-__mpz_struct **getNewRelation(NumbersBuffer *threadAppBuffer, RandomIntegerGenerator *threadRandIntGen, DLogProblemInstance *instance) {
+__mpz_struct **getRelation(DLogProblemInstance *instance, NumbersBuffer *numbersBuffer, RandomIntegerGenerator *randomIntegerGenerator) {
 
     __mpz_struct **outputRelation = allocateNumbersArray(instance->factorBase->length, true);
 
-    OrderedFactorList *factorListOfBSmoothNumber = getFactorListOfRandomBSmoothNumber(outputRelation, threadAppBuffer, threadRandIntGen, instance);
+    OrderedFactorList *factorListOfBSmoothNumber = getFactorListOfRandomBSmoothNumber(outputRelation, numbersBuffer, randomIntegerGenerator, instance);
     populateRelation(outputRelation, factorListOfBSmoothNumber, instance);
 
     return outputRelation;
@@ -103,14 +103,14 @@ void *threadRoutineForRelationRetrieval(void *input) {
     ThreadsPoolData *threadsPoolData = (ThreadsPoolData *) input;
     DLogProblemInstance *instance = (DLogProblemInstance *) threadsPoolData->dLogProblemInstance;
 
-    NumbersBuffer *numbersBuffer = allocateNumbersBuffer(instance->numbersBufferSize);
+    NumbersBuffer *numbersBuffer = allocateNumbersBuffer(instance->numbersBuffer->size);
     RandomIntegerGenerator *randomIntegerGenerator = allocateRandomIntegerGenerator(instance->maxRandomInteger);
 
     while (threadsPoolData->stoppingCondition != true) {
 
         while (threadsPoolData->pauseCondition != true) {
 
-            __mpz_struct **relation = getNewRelation(numbersBuffer, randomIntegerGenerator, instance);
+            __mpz_struct **relation = getRelation(instance, numbersBuffer, randomIntegerGenerator);
             pushIntoCircularBuffer(threadsPoolData->sharedBuffer, relation);
         }
 

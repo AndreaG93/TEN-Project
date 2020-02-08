@@ -70,20 +70,18 @@ void startSecondStep(DLogProblemInstance *instance) {
 
     sendSignalToThreadsPoolToExecuteSpecifiedAlgorithmStep(instance, 2);
 
-
-    Matrix *equationSystem = allocateMatrix(instance->factorBase->length + 16, instance->factorBase->length + 1);
+    Matrix *equationSystem = allocateMatrix(instance->factorBase->length + 4, instance->factorBase->length + 1);
 
     unsigned long long indexFFF = found(instance->factorBase, instance->discreteLogarithm->base);
     unsigned long long currentRow = 0;
 
-    while (currentRow != instance->factorBase->length + 16) {
+    while (currentRow != instance->factorBase->length + 17) {
 
         __mpz_struct **relation = popFromCircularBuffer(instance->threadsPoolData->sharedBuffer);
 
         for (unsigned long long currentColumn = 0; currentColumn < instance->factorBase->length; currentColumn++) {
 
             __mpz_struct *currentNumber = *(relation + currentColumn);
-
 
             if (indexFFF == currentColumn) {
 
@@ -95,7 +93,6 @@ void startSecondStep(DLogProblemInstance *instance) {
                 setNumberMatrixCell(equationSystem, currentRow, instance->factorBase->length, currentNumber);
 
             } else {
-
                 setNumberMatrixCell(equationSystem, currentRow, currentColumn, currentNumber);
             }
         }
@@ -104,14 +101,12 @@ void startSecondStep(DLogProblemInstance *instance) {
     }
 
     pauseThreadsPool(instance);
-
+    printMatrix(equationSystem);
     pthread_t *cleanerThread = allocateAndStartThreadToClearCircular(instance->threadsPoolData->sharedBuffer);
 
-
-    performGaussianElimination(equationSystem, instance->numbersBuffer, instance->moduloOfMultiplicativeGroupMinusOne);
-
+    performGaussianElimination(equationSystem, instance->numbersBuffer, instance->discreteLogarithm->multiplicativeGroupMinusOne);
+    printMatrix(equationSystem);
     instance->secondPhaseOutput = populateSecondPhaseOutput(equationSystem, instance->factorBase, indexFFF);
-
 
     pthread_join(*cleanerThread, NULL);
     free(cleanerThread);

@@ -5,4 +5,4 @@
 
 bool isInvertible(NumbersBuffer *applicationBuffer, mpz_t input, mpz_t modulo);
 
-__mpz_struct *getInverseMultiplicative(NumbersBuffer *applicationBuffer, __mpz_struct *input, __mpz_struct *modulo);
+__mpz_struct *getInverseMultiplicative(__mpz_struct *input, __mpz_struct *modulo, NumbersBuffer *numbersBuffer);

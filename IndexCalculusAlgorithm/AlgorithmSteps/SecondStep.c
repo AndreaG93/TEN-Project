@@ -8,8 +8,11 @@
 #include "../../Math/Number.h"
 #include "../../Math/Matrix.h"
 #include "../../Math/Common.h"
+#include "../RelationsRetrieval.h"
+#include "../../ThreadsPool/ThreadsPool.h"
 
-#define FURTHER_RELATIONS 25
+#define FURTHER_RELATIONS 6000
+#define POOL_SIZE 4
 
 SecondPhaseOutput *allocateSecondPhaseOutput(unsigned long long size) {
 
@@ -70,11 +73,12 @@ SecondPhaseOutput *getBaseToComputeKnownLogarithm(DLogProblemInstance *instance)
 
 void startSecondStep(DLogProblemInstance *instance) {
 
+    instance->currentIndexCalculusAlgorithmStep = 2;
     instance->secondPhaseOutput = getBaseToComputeKnownLogarithm(instance);
 
-    sendSignalToThreadsPoolToExecuteSpecifiedAlgorithmStep(instance, 2);
-
     Matrix *equationSystem = allocateMatrix(instance->factorBase->length + FURTHER_RELATIONS, instance->factorBase->length + 1);
+
+    pthread_t **pthreads = startThreadPool(POOL_SIZE, &threadRoutineForRelationRetrieval, (void *) instance->threadsPoolData);
 
     for (unsigned long long currentRow = 0; currentRow != instance->factorBase->length + FURTHER_RELATIONS; currentRow++) {
 
@@ -99,17 +103,16 @@ void startSecondStep(DLogProblemInstance *instance) {
         }
     }
 
-    pauseThreadsPool(instance);
-    pthread_t *cleanerThread = allocateAndStartThreadToClearCircular(instance->threadsPoolData->sharedBuffer);
+    stopThreadsPool(instance);
+
+    for (unsigned long long index = 0; index < POOL_SIZE; index++)
+        pthread_join(**(pthreads + index), NULL);
+
+    pthread_t **cleanerThread = allocateAndStartThreadToClearCircular(instance->threadsPoolData->sharedBuffer);
 
     performGaussianElimination(equationSystem, instance->numbersBuffer, instance->discreteLogarithm->multiplicativeGroupMinusOne);
-
     populateSecondPhaseOutput(equationSystem, instance->secondPhaseOutput);
 
-    pthread_join(*cleanerThread, NULL);
+    pthread_join(**cleanerThread, NULL);
     free(cleanerThread);
-
-
-    //printNumbersArray(instance->secondPhaseOutput->solution, instance->factorBase->length);
 }
-

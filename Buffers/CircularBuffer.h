@@ -18,7 +18,7 @@ CircularBuffer *allocateCircularBuffer();
 
 void deallocateCircularBuffer(CircularBuffer *buffer);
 
-pthread_t *allocateAndStartThreadToClearCircular(CircularBuffer *input);
+pthread_t **allocateAndStartThreadToClearCircular(CircularBuffer *input);
 
 void pushIntoCircularBuffer(CircularBuffer *buffer, void *data);
 

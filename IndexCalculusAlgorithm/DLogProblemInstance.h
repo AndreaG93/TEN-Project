@@ -20,7 +20,6 @@ typedef struct {
 
     CircularBuffer *sharedBuffer;
     bool stoppingCondition;
-    bool pauseCondition;
 
     pthread_cond_t pthreadCondition;
     pthread_mutex_t pthreadMutex;
@@ -47,6 +46,4 @@ typedef struct {
 
 DLogProblemInstance *allocateDLogProblemInstance(DLogProblemInstanceInput *input);
 
-void sendSignalToThreadsPoolToExecuteSpecifiedAlgorithmStep(DLogProblemInstance *instance, unsigned char algorithmStep);
-
-void pauseThreadsPool(DLogProblemInstance *instance);
+void stopThreadsPool(DLogProblemInstance *instance);

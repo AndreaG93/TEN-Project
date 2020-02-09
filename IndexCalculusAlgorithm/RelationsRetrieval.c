@@ -178,14 +178,8 @@ void *threadRoutineForRelationRetrieval(void *input) {
 
     while (threadsPoolData->stoppingCondition != true) {
 
-        while (threadsPoolData->pauseCondition != true) {
-
-            __mpz_struct **relation = getLogarithmRelation(instance, numbersBuffer, randomIntegerGenerator, NULL);
-
-            pushIntoCircularBuffer(threadsPoolData->sharedBuffer, relation);
-        }
-
-        pthread_cond_wait(&threadsPoolData->pthreadCondition, &threadsPoolData->pthreadMutex);
+        __mpz_struct **relation = getLogarithmRelation(instance, numbersBuffer, randomIntegerGenerator, NULL);
+        pushIntoCircularBuffer(threadsPoolData->sharedBuffer, relation);
     }
 
     freeNumbersBuffer(numbersBuffer);

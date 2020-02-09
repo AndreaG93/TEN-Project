@@ -10,7 +10,6 @@ ThreadsPoolData *allocateThreadsPoolData(DLogProblemInstance *dLogProblemInstanc
     else {
         output->sharedBuffer = allocateCircularBuffer();
         output->stoppingCondition = false;
-        output->pauseCondition = true;
         output->dLogProblemInstance = dLogProblemInstance;
 
         if (pthread_mutex_init(&(output->pthreadMutex), NULL) != 0)
@@ -42,14 +41,6 @@ DLogProblemInstance *allocateDLogProblemInstance(DLogProblemInstanceInput *input
     return output;
 }
 
-void sendSignalToThreadsPoolToExecuteSpecifiedAlgorithmStep(DLogProblemInstance *instance, unsigned char algorithmStep) {
-
-    instance->currentIndexCalculusAlgorithmStep = algorithmStep;
-    instance->threadsPoolData->pauseCondition = false;
-
-    pthread_cond_signal(&instance->threadsPoolData->pthreadCondition);
-}
-
-void pauseThreadsPool(DLogProblemInstance *instance) {
-    instance->threadsPoolData->pauseCondition = true;
+void stopThreadsPool(DLogProblemInstance *instance) {
+    instance->threadsPoolData->stoppingCondition = true;
 }

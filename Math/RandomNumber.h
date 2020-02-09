@@ -12,6 +12,6 @@ typedef struct {
 
 RandomIntegerGenerator *allocateRandomIntegerGenerator(__mpz_struct *maxRandomInteger);
 
-void selectUniformlyDistributedRandomInteger(RandomIntegerGenerator *input, __mpz_struct *output);
+__mpz_struct* selectUniformlyDistributedRandomInteger(RandomIntegerGenerator *input);
 
 void deallocateRandomIntegerGenerator(RandomIntegerGenerator *input);

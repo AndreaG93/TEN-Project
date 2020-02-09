@@ -5,8 +5,8 @@
 #include "Error.h"
 #include "Math/OrderedFactorList.h"
 #include "Math/Factorization.h"
+#include "Math/Common.h"
 
-#define DEFINITELY_NOT_PRIME 0
 
 DLogProblemInstanceInput *allocateDLogProblemInstanceInput() {
 
@@ -17,53 +17,7 @@ DLogProblemInstanceInput *allocateDLogProblemInstanceInput() {
         return output;
 }
 
-bool isPrime(__mpz_struct *input) {
 
-    switch (mpz_probab_prime_p(input, 1)) {
-        case DEFINITELY_NOT_PRIME:
-            return false;
-        default:
-            return true;
-    }
-}
-
-bool isGroupGenerator(__mpz_struct *input, __mpz_struct *multiplicativeGroup, NumbersBuffer *numbersBuffer,
-                      RandomIntegerGenerator *randomIntegerGenerator) {
-
-    bool output = true;
-
-    __mpz_struct **buffer = retrieveNumbersFromBuffer(numbersBuffer, 4);
-
-    __mpz_struct *possibleGenerator = buffer[0];
-    __mpz_struct *result = buffer[1];
-    __mpz_struct *exponent = buffer[2];
-    __mpz_struct *multiplicativeGroupMinusOne = buffer[3];
-
-    mpz_set(possibleGenerator, input);
-    mpz_sub_ui(multiplicativeGroupMinusOne, multiplicativeGroup, 1);
-
-    OrderedFactorList *list = factorize(multiplicativeGroupMinusOne, numbersBuffer, randomIntegerGenerator);
-    if (list == NULL)
-        exitPrintingFatalErrorMessage("isGroupGenerator", "Invalid 'dLogBase'!");
-
-    OrderedFactorListNode *currentNode = list->head;
-
-    while (currentNode != NULL) {
-        mpz_sub_ui(exponent, multiplicativeGroup, 1);
-        mpz_div(exponent, exponent, currentNode->factor->base);
-        mpz_powm(result, possibleGenerator, exponent, multiplicativeGroup);
-
-        if (mpz_cmp_ui(result, 1) == 0) {
-            output = false;
-            break;
-        } else
-            currentNode = currentNode->next_node;
-    }
-
-    releaseNumbers(numbersBuffer, 4);
-    deallocateOrderedFactorList(list);
-    return output;
-}
 
 DLogProblemInstanceInput *sanitizeRawUserInput(RawUserInput *input, unsigned long maxRandomInteger, unsigned long numbersBufferSize) {
 

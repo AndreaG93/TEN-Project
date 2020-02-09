@@ -2,6 +2,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include "RandomNumber.h"
+#include "Number.h"
 
 RandomIntegerGenerator *allocateRandomIntegerGenerator(__mpz_struct *maxRandomInteger) {
 
@@ -22,8 +23,12 @@ RandomIntegerGenerator *allocateRandomIntegerGenerator(__mpz_struct *maxRandomIn
     return output;
 }
 
-void selectUniformlyDistributedRandomInteger(RandomIntegerGenerator *input, __mpz_struct *output) {
+__mpz_struct* selectUniformlyDistributedRandomInteger(RandomIntegerGenerator *input) {
+
+    __mpz_struct* output = allocateNumber();
     mpz_urandomm(output, &input->state, input->maxRandomInteger);
+
+    return output;
 }
 
 void deallocateRandomIntegerGenerator(RandomIntegerGenerator *input) {

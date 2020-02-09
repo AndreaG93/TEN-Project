@@ -151,8 +151,11 @@ void printMatrix(Matrix *matrix) {
 
     for (unsigned long long rowIndex = 0; rowIndex < matrix->rowLength; rowIndex++) {
 
-        for (unsigned long long columnIndex = 0; columnIndex < matrix->columnLength; columnIndex++)
-            gmp_printf("%Zd ", *(*(matrix->structure + columnIndex) + rowIndex));
+        for (unsigned long long columnIndex = 0; columnIndex < matrix->columnLength; columnIndex++) {
+            __mpz_struct* number = *(*(matrix->structure + columnIndex) + rowIndex);
+            gmp_printf("%Zd ", number);
+        }
+
 
         fprintf(stdout, "\n");
     }

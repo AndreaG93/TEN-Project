@@ -4,12 +4,9 @@
 #include "IndexCalculusAlgorithm/AlgorithmSteps/SecondStep.h"
 #include "IndexCalculusAlgorithm/AlgorithmSteps/FirstStep.h"
 #include "ThreadsPool/ThreadsPool.h"
-#include "Math/OrderedFactorList.h"
-#include "Math/Factorization.h"
-#include "Math/Number.h"
 #include "UserInput.h"
 
-#define MAX_RANDOM_INTEGER 100000000
+#define MAX_RANDOM_INTEGER 100
 #define NUMBER_BUFFER_LENGTH 30
 #define DEBUG
 
@@ -22,7 +19,7 @@ int main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
 
-    rawUserInput.dLogBase = "11"; //argv[1];
+    rawUserInput.dLogBase = "2"; //argv[1];
     rawUserInput.dLogArgument = "13";// argv[2];
     rawUserInput.multiplicativeGroup = "179"; //argv[3];
     rawUserInput.smoothnessBound = "17"; //argv[4];
@@ -31,7 +28,7 @@ int main(int argc, char **argv) {
     DLogProblemInstance *dLogProblemInstance = allocateDLogProblemInstance(input);
     free(input);
 
-    startThreadPool(4, &threadRoutineForRelationRetrieval, (void *) dLogProblemInstance->threadsPoolData);
+    startThreadPool(1, &threadRoutineForRelationRetrieval, (void *) dLogProblemInstance->threadsPoolData);
 
     fprintf(stderr, "Start 1° algorithm step...\n");
     startFirstStep(dLogProblemInstance);

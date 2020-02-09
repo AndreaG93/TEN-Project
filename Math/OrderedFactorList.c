@@ -1,28 +1,29 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include "OrderedFactorList.h"
 #include "Number.h"
 
 OrderedFactorList *allocateOrderedFactorList() {
 
-    OrderedFactorList *output = malloc(sizeof(OrderedFactorList));
-
+    OrderedFactorList *output = calloc(1, sizeof(OrderedFactorList));
     if (output == NULL) {
         exit(EXIT_FAILURE);
     } else {
         output->head = NULL;
-
-        return output;
+        output->tail = NULL;
     }
+
+    return output;
 }
 
-OrderedFactorListNode *allocateOrderedFactorListNode(__mpz_struct *factorBase, __mpz_struct *factorExponent) {
+OrderedFactorListNode *allocateOrderedFactorListNode(__mpz_struct *primeNumber, __mpz_struct *primeNumberExponent) {
 
     OrderedFactorListNode *output = malloc(sizeof(OrderedFactorListNode));
     if (output == NULL) {
         exit(EXIT_FAILURE);
     } else {
 
-        Factor *newFactor = allocateFactor(factorBase, factorExponent);
+        Factor *newFactor = allocateFactor(primeNumber, primeNumberExponent);
 
         output->factor = newFactor;
         output->next_node = NULL;
@@ -31,30 +32,43 @@ OrderedFactorListNode *allocateOrderedFactorListNode(__mpz_struct *factorBase, _
     }
 }
 
-void insertFactor(OrderedFactorList *list, __mpz_struct *factorBase, __mpz_struct *factorExponent) {
+void appendFactor(OrderedFactorList *list, __mpz_struct *primeNumber, __mpz_struct *primeNumberExponent) {
+
+    OrderedFactorListNode* node = allocateOrderedFactorListNode(primeNumber, primeNumberExponent);
+
+    if (list->head == NULL) {
+        list->head = node;
+        list->tail = list->head;
+    } else {
+        list->tail->next_node = node;
+        list->tail = node;
+    }
+}
+
+void insertFactor(OrderedFactorList *list, __mpz_struct *primeNumber, __mpz_struct *primeNumberExponent) {
 
     OrderedFactorListNode *previousNode = list->head;
     OrderedFactorListNode *currentNode = list->head;
 
     if (list->head == NULL) {
-        list->head = allocateOrderedFactorListNode(factorBase, factorExponent);
+        list->head = allocateOrderedFactorListNode(primeNumber, primeNumberExponent);
         list->tail = list->head;
     } else {
         while (currentNode != NULL) {
 
-            int comparison = mpz_cmp(factorBase, currentNode->factor->base);
+            int comparison = mpz_cmp(primeNumber, currentNode->factor->base);
 
             if (comparison == 0) {
 
-                mpz_add(currentNode->factor->exponent, currentNode->factor->exponent, factorExponent);
-                deallocateNumber(factorBase);
-                deallocateNumber(factorExponent);
+                mpz_add(currentNode->factor->exponent, currentNode->factor->exponent, primeNumberExponent);
+                deallocateNumber(primeNumber);
+                deallocateNumber(primeNumberExponent);
 
                 return;
 
             } else if (comparison < 0) {
 
-                OrderedFactorListNode *newNode = allocateOrderedFactorListNode(factorBase, factorExponent);
+                OrderedFactorListNode *newNode = allocateOrderedFactorListNode(primeNumber, primeNumberExponent);
 
                 if (list->head == list->tail)
                     list->head = newNode;
@@ -70,10 +84,7 @@ void insertFactor(OrderedFactorList *list, __mpz_struct *factorBase, __mpz_struc
             }
         }
 
-        currentNode = allocateOrderedFactorListNode(factorBase, factorExponent);
-
-        previousNode->next_node = currentNode;
-        list->tail = currentNode;
+        appendFactor(list, primeNumber, primeNumberExponent);
     }
 }
 
@@ -104,9 +115,15 @@ void printOrderedFactorList(OrderedFactorList *list) {
 
     OrderedFactorListNode *currentNode = list->head;
 
-    while (currentNode != NULL) {
-        gmp_printf("[ %Zd ^ %Zd ]\n", currentNode->factor->base, currentNode->factor->exponent);
-        currentNode = currentNode->next_node;
+    while (true) {
+
+        if (currentNode->next_node != NULL) {
+            gmp_fprintf(stderr, "[ %Zd ^ %Zd ] * ", currentNode->factor->base, currentNode->factor->exponent);
+            currentNode = currentNode->next_node;
+        } else {
+            gmp_fprintf(stderr, "[ %Zd ^ %Zd ]", currentNode->factor->base, currentNode->factor->exponent);
+            break;
+        }
     }
 }
 

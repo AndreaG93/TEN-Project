@@ -8,95 +8,170 @@
 #include "../Math/Factorization.h"
 #include "../Math/Number.h"
 
-OrderedFactorList *getFactorListOfRandomBSmoothNumber(__mpz_struct **ancestorRelation, NumbersBuffer *numbersBuffer, RandomIntegerGenerator *randIntGen, DLogProblemInstance *instance) {
+typedef struct {
 
-    OrderedFactorList *output = NULL;
+    OrderedFactorList *relationLeftSide;
+    OrderedFactorList *relationRightSide;
 
-    __mpz_struct **buffer = retrieveNumbersFromBuffer(numbersBuffer, 2);
-    __mpz_struct *randomProduct = buffer[0];
-    __mpz_struct *powerModuloP = buffer[1];
+} Relation;
 
-    while (output == NULL) {
-        __mpz_struct *currentExponent;
-        __mpz_struct *currentFactor;
+Relation *allocateRelation() {
 
-        if (instance->currentIndexCalculusAlgorithmStep == 3) {
-            mpz_set(randomProduct, instance->discreteLogarithm->argument);
-        } else {
-            mpz_set_ui(randomProduct, 1);
-        }
+    Relation *output = malloc(sizeof(Relation));
 
-        FactorBaseNode *currentFactorBaseNode = instance->factorBase->head;
-
-        for (unsigned long long index = 0; index < instance->factorBase->length; index++) {
-
-            currentExponent = *(ancestorRelation + index);
-            currentFactor = currentFactorBaseNode->primeNumber;
-
-            selectUniformlyDistributedRandomInteger(randIntGen, currentExponent);
-            mpz_powm(powerModuloP, currentFactor, currentExponent, instance->discreteLogarithm->multiplicativeGroup);
-            mpz_mul(randomProduct, randomProduct, powerModuloP);
-            mpz_mod(randomProduct, randomProduct, instance->discreteLogarithm->multiplicativeGroup);
-
-            currentFactorBaseNode = currentFactorBaseNode->next_node;
-        }
-
-        output = factorize(randomProduct, numbersBuffer, randIntGen);
+    if (output == NULL) {
+        exit(EXIT_FAILURE);
+    } else {
+        output->relationLeftSide = NULL;
+        output->relationRightSide = NULL;
     }
-
-    releaseNumbers(numbersBuffer, 2);
 
     return output;
 }
 
+void deallocateRelation(Relation *input) {
 
-void populateRelation(__mpz_struct **ancestorRelation, OrderedFactorList *factorListOfBSmoothNumber, DLogProblemInstance *instance) {
+    deallocateOrderedFactorList(input->relationLeftSide);
+    deallocateOrderedFactorList(input->relationRightSide);
+    free(input);
+}
 
-    __mpz_struct *leftBaseValue;
-    __mpz_struct *leftExponentValue;
-    __mpz_struct *RightBaseValue;
-    __mpz_struct *RightExponentValue;
+Relation *getRelation(DLogProblemInstance *instance, NumbersBuffer *numbersBuffer, RandomIntegerGenerator *randomIntegerGenerator) {
 
-    OrderedFactorListNode *currentFactorNodeRight = factorListOfBSmoothNumber->head;
-    FactorBaseNode *currentFactorNodeLeft = instance->factorBase->head;
+    Relation *output = allocateRelation();
 
-    for (unsigned long long index = 0; index < instance->factorBase->length; index++) {
+    __mpz_struct **buffer = retrieveNumbersFromBuffer(numbersBuffer, 2);
 
-        leftBaseValue = currentFactorNodeLeft->primeNumber;
-        leftExponentValue = *(ancestorRelation + index);
+    __mpz_struct *randomNumber = buffer[0];
+    __mpz_struct *power = buffer[1];
 
-        RightBaseValue = currentFactorNodeRight->factor->base;
-        RightExponentValue = currentFactorNodeRight->factor->exponent;
+    do {
 
-        if (mpz_cmp(leftBaseValue, RightBaseValue) != 0) {
-            RightExponentValue = allocateAndSetNumberFromULL(0);
+        if (output->relationLeftSide != NULL)
+            deallocateOrderedFactorList(output->relationLeftSide);
+
+        if (instance->currentIndexCalculusAlgorithmStep == 3) {
+            mpz_set(randomNumber, instance->discreteLogarithm->argument);
         } else {
-            if (currentFactorNodeRight->next_node != NULL)
-                currentFactorNodeRight = currentFactorNodeRight->next_node;
+            mpz_set_ui(randomNumber, 1);
+        }
+
+        output->relationLeftSide = allocateOrderedFactorList();
+
+        for (FactorBaseNode *currentFactorBaseNode = instance->factorBase->head; currentFactorBaseNode != NULL; currentFactorBaseNode = currentFactorBaseNode->next_node) {
+
+            __mpz_struct *currentPrimeNumber = allocateAndSetNumberFromNumber(currentFactorBaseNode->primeNumber);
+            __mpz_struct *currentPrimeNumberExponent = selectUniformlyDistributedRandomInteger(randomIntegerGenerator);
+
+            appendFactor(output->relationLeftSide, currentPrimeNumber, currentPrimeNumberExponent);
+
+            mpz_pow_ui(power, currentPrimeNumber, mpz_get_ui(currentPrimeNumberExponent));
+            mpz_mul(randomNumber, randomNumber, power);
+
+            if (mpz_cmp(randomNumber, instance->discreteLogarithm->multiplicativeGroup) > 0)
+                break;
+        }
+
+        mpz_mod(randomNumber, randomNumber, instance->discreteLogarithm->multiplicativeGroup);
+        output->relationRightSide = factorizeCheckingBSmoothness(randomNumber, instance->smoothnessBound, numbersBuffer, randomIntegerGenerator);
+    } while (output->relationRightSide == NULL);
+
+    releaseNumbers(numbersBuffer, 2);
+    return output;
+}
+
+__mpz_struct **getLogarithmRelation(Relation *relation, DLogProblemInstance *instance, NumbersBuffer *numbersBuffer) {
+
+    __mpz_struct **output = allocateNumbersArray(instance->factorBase->length + 1, true);
+
+    __mpz_struct *zero = retrieveNumberFromBuffer(numbersBuffer);
+    mpz_set_ui(zero, 0);
+
+    __mpz_struct *currentLeftRelationPrime;
+    __mpz_struct *currentLeftRelationPrimeExponent;
+
+    __mpz_struct *currentRightRelationPrime;
+    __mpz_struct *currentRightRelationPrimeExponent;
+
+    OrderedFactorListNode *currentLeftSideRelationNodeList = relation->relationLeftSide->head;
+    OrderedFactorListNode *currentRightSideRelationNodeList = relation->relationRightSide->head;
+
+    int index = 0;
+
+    for (FactorBaseNode *currentFactorBaseNode = instance->factorBase->head; currentFactorBaseNode != NULL; currentFactorBaseNode = currentFactorBaseNode->next_node) {
+
+        if (currentLeftSideRelationNodeList != NULL) {
+            currentLeftRelationPrime = currentLeftSideRelationNodeList->factor->base;
+            currentLeftRelationPrimeExponent = currentLeftSideRelationNodeList->factor->exponent;
+        } else
+            currentLeftRelationPrime = zero;
+
+        if (currentRightSideRelationNodeList != NULL) {
+            currentRightRelationPrime = currentRightSideRelationNodeList->factor->base;
+            currentRightRelationPrimeExponent = currentRightSideRelationNodeList->factor->exponent;
+        } else
+            currentRightRelationPrime = zero;
+
+        if (instance->currentIndexCalculusAlgorithmStep == 2) {
+            if (mpz_cmp(currentLeftRelationPrime, currentFactorBaseNode->primeNumber) != 0 && mpz_cmp(currentRightRelationPrime, currentFactorBaseNode->primeNumber) != 0)
+                mpz_set(*(output + index), zero);
+            else if (mpz_cmp(currentLeftRelationPrime, currentRightRelationPrime) == 0) {
+
+                mpz_sub(*(output + index), currentLeftRelationPrimeExponent, currentRightRelationPrimeExponent);
+
+                currentLeftSideRelationNodeList = currentLeftSideRelationNodeList->next_node;
+                currentRightSideRelationNodeList = currentRightSideRelationNodeList->next_node;
+
+            } else if (mpz_cmp(currentLeftRelationPrime, currentFactorBaseNode->primeNumber) == 0) {
+
+                mpz_set(*(output + index), currentLeftRelationPrimeExponent);
+                currentLeftSideRelationNodeList = currentLeftSideRelationNodeList->next_node;
+
+            } else {
+
+                mpz_mul_si(*(output + index), currentRightRelationPrimeExponent, -1);
+                currentRightSideRelationNodeList = currentRightSideRelationNodeList->next_node;
+            }
         }
 
         if (instance->currentIndexCalculusAlgorithmStep == 3) {
-            mpz_sub(*(ancestorRelation + index), RightExponentValue, leftExponentValue);
-            mpz_mod(*(ancestorRelation + index), *(ancestorRelation + index), instance->discreteLogarithm->multiplicativeGroupMinusOne);
-        } else {
-            mpz_sub(*(ancestorRelation + index), leftExponentValue, RightExponentValue);
-            mpz_mod(*(ancestorRelation + index), *(ancestorRelation + index), instance->discreteLogarithm->multiplicativeGroupMinusOne);
+
+            if (mpz_cmp(currentLeftRelationPrime, currentFactorBaseNode->primeNumber) != 0 && mpz_cmp(currentRightRelationPrime, currentFactorBaseNode->primeNumber) != 0)
+                mpz_set(*(output + index), zero);
+            else if (mpz_cmp(currentLeftRelationPrime, currentRightRelationPrime) == 0) {
+
+                mpz_sub(*(output + index), currentRightRelationPrimeExponent, currentLeftRelationPrimeExponent);
+
+                currentLeftSideRelationNodeList = currentLeftSideRelationNodeList->next_node;
+                currentRightSideRelationNodeList = currentRightSideRelationNodeList->next_node;
+
+            } else if (mpz_cmp(currentRightRelationPrime, currentFactorBaseNode->primeNumber) == 0) {
+
+                mpz_set(*(output + index), currentRightRelationPrimeExponent);
+                currentLeftSideRelationNodeList = currentRightSideRelationNodeList->next_node;
+
+            } else {
+
+                mpz_mul_si(*(output + index), currentLeftRelationPrimeExponent, -1);
+                currentRightSideRelationNodeList = currentLeftSideRelationNodeList->next_node;
+            }
         }
 
-        currentFactorNodeLeft = currentFactorNodeLeft->next_node;
+        index++;
     }
+
+    deallocateRelation(relation);
+    releaseNumber(numbersBuffer);
+
+    return output;
 }
 
-__mpz_struct **getRelation(DLogProblemInstance *instance, NumbersBuffer *numbersBuffer, RandomIntegerGenerator *randomIntegerGenerator) {
+void printRelation(__mpz_struct **relation, DLogProblemInstance *instance) {
 
-    __mpz_struct **outputRelation = allocateNumbersArray(instance->factorBase->length, true);
-
-    OrderedFactorList *factorListOfBSmoothNumber = getFactorListOfRandomBSmoothNumber(outputRelation, numbersBuffer, randomIntegerGenerator, instance);
-    populateRelation(outputRelation, factorListOfBSmoothNumber, instance);
-
-    return outputRelation;
+    for (int index = 0; index < instance->factorBase->length; index++)
+        gmp_fprintf(stderr, " %Zd + ", *(relation + index));
+    fprintf(stderr, "\n");
 }
-
 
 void *threadRoutineForRelationRetrieval(void *input) {
 
@@ -110,7 +185,19 @@ void *threadRoutineForRelationRetrieval(void *input) {
 
         while (threadsPoolData->pauseCondition != true) {
 
-            __mpz_struct **relation = getRelation(instance, numbersBuffer, randomIntegerGenerator);
+            Relation *rawRelation = getRelation(instance, numbersBuffer, randomIntegerGenerator);
+
+            /*
+            fprintf(stderr, "From relation:\n");
+            printOrderedFactorList(rawRelation->relationLeftSide);
+            fprintf(stderr, " = ");
+            printOrderedFactorList(rawRelation->relationRightSide);
+            fprintf(stderr, "\n");
+*/
+            __mpz_struct **relation = getLogarithmRelation(rawRelation, instance, numbersBuffer);
+
+            //printRelation(relation, instance);
+
             pushIntoCircularBuffer(threadsPoolData->sharedBuffer, relation);
         }
 

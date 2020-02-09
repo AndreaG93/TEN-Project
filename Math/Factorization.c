@@ -29,7 +29,7 @@ bool isBSmooth(OrderedFactorList *factorList, __mpz_struct *smoothnessBound) {
 
 void factorizeUsingTrialDivision(__mpz_struct *numberToFactorize, OrderedFactorList *allocatedFactorList, NumbersBuffer *numbersBuffer, unsigned int maxTrials) {
 
-    __mpz_struct **buffer = retrieveNumbersFromBuffer(numbersBuffer, 4);
+    __mpz_struct **buffer = retrieveNumbersFromBuffer(numbersBuffer, 3);
 
     __mpz_struct *currentPossibleFactor = buffer[0];
     __mpz_struct *squareOfCurrentPossibleFactor = buffer[1];
@@ -84,21 +84,21 @@ void factorizeUsingTrialDivision(__mpz_struct *numberToFactorize, OrderedFactorL
         }
     }
 
-    releaseNumbers(numbersBuffer, 4);
+    releaseNumbers(numbersBuffer, 3);
 }
 
 __mpz_struct *getFactorUsingPollardRho(__mpz_struct *numberToFactorize, NumbersBuffer *numbersBuffer, RandomIntegerGenerator *randomIntegerGenerator) {
 
     __mpz_struct *output = NULL;
 
-    __mpz_struct **buffer = retrieveNumbersFromBuffer(numbersBuffer, 4);
+    __mpz_struct **buffer = retrieveNumbersFromBuffer(numbersBuffer, 3);
 
-    __mpz_struct *x = buffer[0];
-    __mpz_struct *y = buffer[1];
-    __mpz_struct *XMinusY = buffer[2];
-    __mpz_struct *possibleFactor = buffer[3];
+    __mpz_struct *x;
+    __mpz_struct *y = buffer[0];
+    __mpz_struct *XMinusY = buffer[1];
+    __mpz_struct *possibleFactor = buffer[2];
 
-    selectUniformlyDistributedRandomInteger(randomIntegerGenerator, x);
+    x = selectUniformlyDistributedRandomInteger(randomIntegerGenerator);
     mpz_set(y, x);
     mpz_set_si(possibleFactor, 1);
 
@@ -123,11 +123,12 @@ __mpz_struct *getFactorUsingPollardRho(__mpz_struct *numberToFactorize, NumbersB
         }
     }
 
-    releaseNumbers(numbersBuffer, 4);
+    deallocateNumber(x);
+    releaseNumbers(numbersBuffer, 3);
     return output;
 }
 
-OrderedFactorList *factorize(__mpz_struct *input, NumbersBuffer *numbersBuffer, RandomIntegerGenerator *randomIntegerGenerator) {
+OrderedFactorList *factorizeCheckingBSmoothness(__mpz_struct *input, __mpz_struct *smoothnessBound, NumbersBuffer *numbersBuffer, RandomIntegerGenerator *randomIntegerGenerator) {
 
     if (mpz_cmp_si(input, 1) == 0)
         return NULL;
@@ -135,14 +136,18 @@ OrderedFactorList *factorize(__mpz_struct *input, NumbersBuffer *numbersBuffer, 
     OrderedFactorList *output = allocateOrderedFactorList();
     __mpz_struct *numberToFactorize = allocateAndSetNumberFromNumber(input);
 
-    factorizeUsingTrialDivision(numberToFactorize, output, numbersBuffer, 125);
+    factorizeUsingTrialDivision(numberToFactorize, output, numbersBuffer, INFINITY_TRIALS);
 
+    if (smoothnessBound != NULL)
+        if (isBSmooth(output, smoothnessBound) == false) {
+            deallocateOrderedFactorList(output);
+            output = NULL;
+        }
+
+    /*
     while (mpz_cmp_si(numberToFactorize, 1) > 0) {
 
-        fprintf(stderr, "Enter Pollard Rho...\n");
         __mpz_struct *factor = getFactorUsingPollardRho(numberToFactorize, numbersBuffer, randomIntegerGenerator);
-        fprintf(stderr, "Exit Pollard Rho...\n");
-
         mpz_div(numberToFactorize, numberToFactorize, factor);
 
         if (mpz_probab_prime_p(factor, 50) != 0) {
@@ -150,8 +155,15 @@ OrderedFactorList *factorize(__mpz_struct *input, NumbersBuffer *numbersBuffer, 
             insertFactor(output, factor, exponent);
         } else
             factorizeUsingTrialDivision(factor, output, numbersBuffer, INFINITY_TRIALS);
-    }
 
+        if (smoothnessBound != NULL)
+            if (isBSmooth(output, smoothnessBound) == false) {
+                deallocateOrderedFactorList(output);
+                output = NULL;
+                break;
+            }
+    }
+*/
     deallocateNumber(numberToFactorize);
 
     return output;
@@ -218,8 +230,8 @@ OrderedFactorList *factorizeOptimized(__mpz_struct *input, __mpz_struct *modulo,
         if (mpz_sizeinbase(denominator, 10) <= inputNumberSize && mpz_sizeinbase(numerator, 10) <= inputNumberSize) {
 
 
-            OrderedFactorList *numeratorOrderFactorList = factorize(numerator, numbersBuffer, randomIntegerGenerator);
-            OrderedFactorList *denominatorOrderFactorList = factorize(denominator, numbersBuffer, randomIntegerGenerator);
+            OrderedFactorList *numeratorOrderFactorList = factorizeCheckingBSmoothness(numerator, NULL, numbersBuffer, randomIntegerGenerator);
+            OrderedFactorList *denominatorOrderFactorList = factorizeCheckingBSmoothness(denominator, NULL, numbersBuffer, randomIntegerGenerator);
 
 #define DEBUG
 #ifdef DEBUG

@@ -20,7 +20,9 @@ OrderedFactorList *allocateOrderedFactorList();
 
 void deallocateOrderedFactorList(OrderedFactorList *list);
 
-void insertFactor(OrderedFactorList *list, __mpz_struct *factorBase, __mpz_struct *factorExponent);
+void appendFactor(OrderedFactorList *list, __mpz_struct *primeNumber, __mpz_struct *primeNumberExponent);
+
+void insertFactor(OrderedFactorList *list, __mpz_struct *primeNumber, __mpz_struct *primeNumberExponent);
 
 void printOrderedFactorList(OrderedFactorList *list);
 

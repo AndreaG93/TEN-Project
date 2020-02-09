@@ -1,5 +1,6 @@
 #include <gmp.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "Number.h"
 
@@ -15,6 +16,13 @@ __mpz_struct **allocateNumbersArray(unsigned long long size, bool isNumberAlloca
     }
 
     return output;
+}
+
+void printNumbersArray(__mpz_struct **relation, unsigned long size) {
+
+    for (int index = 0; index < size; index++)
+        gmp_fprintf(stderr, " %Zd + ", *(relation + index));
+    fprintf(stderr, "\n");
 }
 
 void deallocateNumber(__mpz_struct *input) {

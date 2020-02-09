@@ -14,3 +14,5 @@ __mpz_struct *allocateAndSetNumberFromULL(unsigned long long number);
 __mpz_struct *allocateAndSetNumberFromNumber(__mpz_struct *number);
 
 void deallocateNumber(__mpz_struct *input);
+
+void printNumbersArray(__mpz_struct **relation, unsigned long size);

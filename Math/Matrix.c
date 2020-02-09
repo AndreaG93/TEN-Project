@@ -119,7 +119,8 @@ void performGaussianElimination(Matrix *matrix, NumbersBuffer *buffer, __mpz_str
             if (mpz_cmp_ui(currentElement, 0) != 0 && isInvertible(buffer, currentElement, modulo)) {
                 swapRows(matrix, row, actualTargetRow);
 
-                __mpz_struct *inverseOfCurrentElement = getInverseMultiplicative(currentElement, modulo, buffer);
+                __mpz_struct *inverseOfCurrentElement = allocateNumber();
+                mpz_invert(inverseOfCurrentElement, currentElement, modulo);
                 multiplyRowByScalar(matrix, actualTargetRow, inverseOfCurrentElement, modulo);
 
                 mpz_clear(inverseOfCurrentElement);

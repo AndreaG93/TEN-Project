@@ -19,10 +19,10 @@ int main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
 
-    rawUserInput.dLogBase = "2"; //argv[1];
-    rawUserInput.dLogArgument = "13";// argv[2];
-    rawUserInput.multiplicativeGroup = "179"; //argv[3];
-    rawUserInput.smoothnessBound = "17"; //argv[4];
+    rawUserInput.dLogBase = "3453647"; //argv[1];
+    rawUserInput.dLogArgument = "3535817";// argv[2];
+    rawUserInput.multiplicativeGroup = "15485863"; //argv[3];
+    rawUserInput.smoothnessBound = "100"; //argv[4];
 
     DLogProblemInstanceInput *input = sanitizeRawUserInput(&rawUserInput, MAX_RANDOM_INTEGER, NUMBER_BUFFER_LENGTH);
     DLogProblemInstance *dLogProblemInstance = allocateDLogProblemInstance(input);

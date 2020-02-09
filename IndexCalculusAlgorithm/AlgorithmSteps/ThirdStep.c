@@ -5,10 +5,11 @@
 #include "../DLogProblemInstance.h"
 #include "../../Math/Number.h"
 #include "../../Math/OrderedFactorList.h"
+#include "../RelationsRetrieval.h"
 
 __mpz_struct *computeRequiredDiscreteLogarithmValue(__mpz_struct **relation, DLogProblemInstance *instance) {
 
-    __mpz_struct *auxiliaryNumber = allocateNumber();
+    __mpz_struct *auxiliaryNumber = retrieveNumberFromBuffer(instance->numbersBuffer);
     __mpz_struct *output = allocateAndSetNumberFromULL(0);
 
     for (unsigned long long index = 0; index < instance->factorBase->length; index++) {
@@ -19,16 +20,35 @@ __mpz_struct *computeRequiredDiscreteLogarithmValue(__mpz_struct **relation, DLo
 
     mpz_mod(output, output, instance->discreteLogarithm->multiplicativeGroupMinusOne);
 
-    deallocateNumber(auxiliaryNumber);
+    releaseNumber(instance->numbersBuffer);
     return output;
 }
 
 
 void startThirdStep(DLogProblemInstance *instance) {
 
-    sendSignalToThreadsPoolToExecuteSpecifiedAlgorithmStep(instance, 3);
+    instance->currentIndexCalculusAlgorithmStep = 3;
+    __mpz_struct **relation;
+    __mpz_struct *finalOutput;
 
-    __mpz_struct **relation = popFromCircularBuffer(instance->threadsPoolData->sharedBuffer);
+    relation = getLogarithmRelation(instance, instance->numbersBuffer, instance->randomIntegerGenerator, instance->discreteLogarithm->argument);
+    finalOutput = computeRequiredDiscreteLogarithmValue(relation, instance);
 
-    instance->discreteLogarithm->value = computeRequiredDiscreteLogarithmValue(relation, instance);
+    if (mpz_cmp(instance->secondPhaseOutput->base, instance->discreteLogarithm->base) == 0) {
+        instance->discreteLogarithm->value = finalOutput;
+    } else {
+
+        deallocateNumbersArray(relation, instance->factorBase->length);
+
+        __mpz_struct *numerator = finalOutput;
+        __mpz_struct *denominator;
+
+
+        relation = getLogarithmRelation(instance, instance->numbersBuffer, instance->randomIntegerGenerator, instance->discreteLogarithm->base);
+        denominator = computeRequiredDiscreteLogarithmValue(relation, instance);
+
+        mpz_invert(denominator, denominator, instance->discreteLogarithm->multiplicativeGroupMinusOne);
+        mpz_mul(instance->discreteLogarithm->value, numerator, denominator);
+        mpz_mod(instance->discreteLogarithm->value, instance->discreteLogarithm->value, instance->discreteLogarithm->multiplicativeGroupMinusOne);
+    }
 }

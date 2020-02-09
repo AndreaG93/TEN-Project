@@ -9,7 +9,7 @@
 #include "../../Math/Matrix.h"
 #include "../../Math/Common.h"
 
-#define FURTHER_RELATIONS 17
+#define FURTHER_RELATIONS 25
 
 SecondPhaseOutput *allocateSecondPhaseOutput(unsigned long long size) {
 
@@ -25,9 +25,8 @@ SecondPhaseOutput *allocateSecondPhaseOutput(unsigned long long size) {
     return output;
 }
 
-SecondPhaseOutput *populateSecondPhaseOutput(Matrix *resolvedEquationSystem, FactorBase *factorBase, unsigned long long special) {
+void populateSecondPhaseOutput(Matrix *resolvedEquationSystem, SecondPhaseOutput *allocatedSecondPhaseOutput) {
 
-    SecondPhaseOutput *output = allocateSecondPhaseOutput(factorBase->length);
 
     bool found = true;
     unsigned long long columnIndex = resolvedEquationSystem->columnLength - 1;
@@ -36,101 +35,32 @@ SecondPhaseOutput *populateSecondPhaseOutput(Matrix *resolvedEquationSystem, Fac
 
         __mpz_struct *number;
 
-        if (special == rowIndex && found) {
-            number = allocateAndSetNumberFromULL(1);
+        if (allocatedSecondPhaseOutput->indexOfBaseRespectToFactorBase == rowIndex && found) {
             rowIndex--;
             found = false;
         } else {
             number = getNumberMatrixCell(resolvedEquationSystem, rowIndex, columnIndex);
+            mpz_set(*(allocatedSecondPhaseOutput->solution + outputIndex), number);
         }
 
-        *(output->solution + outputIndex) = number;
         outputIndex++;
+        if (outputIndex == columnIndex)
+            break;
     }
-
-    return output;
 }
 
-__mpz_struct **extractSolutionWithDelta(DLogProblemInstance *instance, Matrix *matrix) {
-
-    __mpz_struct **output = allocateNumbersArray(instance->factorBase->length, true);
-    int currentIndex = 0;
-
-    bool oneDominantFound = false;
-    bool isNumberSet = false;
-
-    for (unsigned long long currentRow = 0; currentRow < instance->factorBase->length; currentRow++) {
-        for (unsigned long long currentColumn = 0; currentColumn < instance->factorBase->length; currentColumn++) {
-
-            __mpz_struct *currentNumber = getNumberMatrixCell(matrix, currentRow, currentColumn);
-
-            if (mpz_cmp_ui(currentNumber, 0) == 0)
-                continue;
-            else if (mpz_cmp_ui(currentNumber, 1) == 0 && !oneDominantFound)
-                oneDominantFound = true;
-            else if ((mpz_cmp_ui(currentNumber, 1) == 0 && oneDominantFound) || mpz_cmp_ui(currentNumber, 1) != 0) {
-                mpz_set(*(output + currentIndex), currentNumber);
-                isNumberSet = true;
-                break;
-            }
-        }
-
-        if (!isNumberSet) {
-            mpz_set_ui(*(output + currentIndex), 0);
-        }
-        currentIndex++;
-
-        oneDominantFound = false;
-        isNumberSet = false;
-    }
-
-    for (int index = 0; index < instance->factorBase->length; index++)
-        gmp_fprintf(stderr, " %Zd + ", *(output + index));
-    fprintf(stderr, "\n");
-
-    return output;
-}
-
-SecondPhaseOutput *extractSolution(__mpz_struct** solutionWithDelta, DLogProblemInstance *instance) {
-
-    SecondPhaseOutput *output = allocateSecondPhaseOutput(instance->factorBase->length);
-
-    __mpz_struct* delta = retrieveNumberFromBuffer(instance->numbersBuffer);
-
-
-
-
-
-
-
-
-
-    releaseNumber(instance->numbersBuffer);
-
-    return output;
-}
-
-SecondPhaseOutput* getBaseToComputeKnownLogarithm(DLogProblemInstance *instance) {
+SecondPhaseOutput *getBaseToComputeKnownLogarithm(DLogProblemInstance *instance) {
 
     SecondPhaseOutput *output = allocateSecondPhaseOutput(instance->factorBase->length);
 
     unsigned long index = 0;
 
-    for (FactorBaseNode *currentNode = instance->factorBase->head; currentNode != NULL; currentNode = currentNode->next_node, output++) {
-
-        if (mpz_cmp(currentNode->primeNumber, instance->discreteLogarithm->base) == 0) {
-
+    for (FactorBaseNode *currentNode = instance->factorBase->head; currentNode != NULL; currentNode = currentNode->next_node, index++) {
+        if (isGroupGenerator(currentNode->primeNumber, instance->discreteLogarithm->multiplicativeGroup, instance->numbersBuffer, instance->randomIntegerGenerator)) {
             mpz_set(output->base, currentNode->primeNumber);
             output->indexOfBaseRespectToFactorBase = index;
+            mpz_set_ui(*(output->solution + index), 1);
             break;
-
-        } else {
-
-            if(isGroupGenerator(currentNode->primeNumber, instance->discreteLogarithm->multiplicativeGroup, instance->numbersBuffer, instance->randomIntegerGenerator)){
-                mpz_set(output->base, currentNode->primeNumber);
-                output->indexOfBaseRespectToFactorBase = index;
-                break;
-            }
         }
     }
 
@@ -140,35 +70,46 @@ SecondPhaseOutput* getBaseToComputeKnownLogarithm(DLogProblemInstance *instance)
 
 void startSecondStep(DLogProblemInstance *instance) {
 
-    SecondPhaseOutput* output = getBaseToComputeKnownLogarithm(instance);
+    instance->secondPhaseOutput = getBaseToComputeKnownLogarithm(instance);
 
     sendSignalToThreadsPoolToExecuteSpecifiedAlgorithmStep(instance, 2);
 
     Matrix *equationSystem = allocateMatrix(instance->factorBase->length + FURTHER_RELATIONS, instance->factorBase->length + 1);
 
-    for (unsigned long long currentRow = 0; currentRow < instance->factorBase->length + FURTHER_RELATIONS; currentRow++) {
+    for (unsigned long long currentRow = 0; currentRow != instance->factorBase->length + FURTHER_RELATIONS; currentRow++) {
 
         __mpz_struct **relation = popFromCircularBuffer(instance->threadsPoolData->sharedBuffer);
 
         for (unsigned long long currentColumn = 0; currentColumn < instance->factorBase->length; currentColumn++) {
 
             __mpz_struct *currentNumber = *(relation + currentColumn);
-            setNumberMatrixCell(equationSystem, currentRow, currentColumn, currentNumber);
-        }
 
-        setNumberMatrixCell(equationSystem, currentRow, instance->factorBase->length, allocateAndSetNumberFromULL(0));
+            if (instance->secondPhaseOutput->indexOfBaseRespectToFactorBase == currentColumn) {
+
+                __mpz_struct *zero = allocateAndSetNumberFromULL(0);
+
+                mpz_mul_si(currentNumber, currentNumber, -1);
+
+                setNumberMatrixCell(equationSystem, currentRow, currentColumn, zero);
+                setNumberMatrixCell(equationSystem, currentRow, instance->factorBase->length, currentNumber);
+
+            } else {
+                setNumberMatrixCell(equationSystem, currentRow, currentColumn, currentNumber);
+            }
+        }
     }
 
     pauseThreadsPool(instance);
     pthread_t *cleanerThread = allocateAndStartThreadToClearCircular(instance->threadsPoolData->sharedBuffer);
 
     performGaussianElimination(equationSystem, instance->numbersBuffer, instance->discreteLogarithm->multiplicativeGroupMinusOne);
-    printMatrix(equationSystem);
-    //__mpz_struct** solutionWithDelta = extractSolutionWithDelta(instance, equationSystem);
 
-    instance->secondPhaseOutput = populateSecondPhaseOutput(equationSystem, instance->factorBase, 1);
+    populateSecondPhaseOutput(equationSystem, instance->secondPhaseOutput);
 
     pthread_join(*cleanerThread, NULL);
     free(cleanerThread);
+
+
+    //printNumbersArray(instance->secondPhaseOutput->solution, instance->factorBase->length);
 }
 

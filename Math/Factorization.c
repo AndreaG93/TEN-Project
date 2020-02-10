@@ -27,7 +27,9 @@ bool isBSmooth(OrderedFactorList *factorList, __mpz_struct *smoothnessBound) {
         return false;
 }
 
-void factorizeUsingTrialDivision(__mpz_struct *numberToFactorize, OrderedFactorList *allocatedFactorList, NumbersBuffer *numbersBuffer, unsigned int maxTrials) {
+bool factorizeUsingTrialDivisionCheckingBSmoothness(__mpz_struct *numberToFactorize, __mpz_struct *smoothnessBound, OrderedFactorList *allocatedFactorList, NumbersBuffer *numbersBuffer, unsigned int maxTrials) {
+
+    bool isNumberToFactorizeBSmooth = true;
 
     __mpz_struct **buffer = retrieveNumbersFromBuffer(numbersBuffer, 3);
 
@@ -50,22 +52,11 @@ void factorizeUsingTrialDivision(__mpz_struct *numberToFactorize, OrderedFactorL
 
             mpz_div(numberToFactorize, numberToFactorize, currentPossibleFactor);
 
-        } else {
-            mpz_set_ui(currentPossibleFactor, 3);
-            break;
-        }
-    }
-
-    while (mpz_cmp_si(numberToFactorize, 1) > 0) {
-
-        mpz_mod(remainder, numberToFactorize, currentPossibleFactor);
-
-        if (mpz_cmp_si(remainder, 0) == 0) {
-
-            __mpz_struct *newFactor = allocateAndSetNumberFromNumber(currentPossibleFactor);
-            insertFactor(allocatedFactorList, newFactor, allocateAndSetNumberFromULL(1));
-
-            mpz_div(numberToFactorize, numberToFactorize, currentPossibleFactor);
+            if (smoothnessBound != NULL)
+                if (isBSmooth(allocatedFactorList, smoothnessBound) == false) {
+                    isNumberToFactorizeBSmooth = false;
+                    break;
+                }
 
         } else {
 
@@ -76,7 +67,7 @@ void factorizeUsingTrialDivision(__mpz_struct *numberToFactorize, OrderedFactorL
                 if (currentTrial == maxTrials)
                     break;
 
-                mpz_add_ui(currentPossibleFactor, currentPossibleFactor, 2);
+                mpz_nextprime(currentPossibleFactor, currentPossibleFactor);
                 currentTrial++;
 
             } else
@@ -85,18 +76,24 @@ void factorizeUsingTrialDivision(__mpz_struct *numberToFactorize, OrderedFactorL
     }
 
     releaseNumbers(numbersBuffer, 3);
+    return isNumberToFactorizeBSmooth;
 }
 
 __mpz_struct *getFactorUsingPollardRho(__mpz_struct *numberToFactorize, NumbersBuffer *numbersBuffer, RandomIntegerGenerator *randomIntegerGenerator) {
 
     __mpz_struct *output = NULL;
 
-    __mpz_struct **buffer = retrieveNumbersFromBuffer(numbersBuffer, 3);
+    __mpz_struct **buffer = retrieveNumbersFromBuffer(numbersBuffer, 5);
 
     __mpz_struct *x;
     __mpz_struct *y = buffer[0];
     __mpz_struct *XMinusY = buffer[1];
     __mpz_struct *possibleFactor = buffer[2];
+    __mpz_struct *inputSize = buffer[3];
+    __mpz_struct *trials = buffer[4];
+
+    mpz_set_ui(inputSize, mpz_sizeinbase(numberToFactorize, 10));
+    mpz_sqrt(trials, inputSize);
 
     x = selectUniformlyDistributedRandomInteger(randomIntegerGenerator);
     mpz_set(y, x);
@@ -113,7 +110,10 @@ __mpz_struct *getFactorUsingPollardRho(__mpz_struct *numberToFactorize, NumbersB
         mpz_gcd(possibleFactor, XMinusY, numberToFactorize);
 
         if (mpz_cmp(possibleFactor, numberToFactorize) == 0) {
-            break;
+
+            output = allocateNumber();
+            mpz_set(output, numberToFactorize);
+
         } else if (mpz_cmp_si(possibleFactor, 1) > 0) {
 
             output = allocateNumber();
@@ -121,14 +121,20 @@ __mpz_struct *getFactorUsingPollardRho(__mpz_struct *numberToFactorize, NumbersB
 
             break;
         }
+
+        mpz_sub_ui(trials, trials, 1);
+        if (mpz_cmp_ui(trials, 0) == 0)
+            break;
     }
 
     deallocateNumber(x);
-    releaseNumbers(numbersBuffer, 3);
+    releaseNumbers(numbersBuffer, 5);
     return output;
 }
 
 OrderedFactorList *factorizeCheckingBSmoothness(__mpz_struct *input, __mpz_struct *smoothnessBound, NumbersBuffer *numbersBuffer, RandomIntegerGenerator *randomIntegerGenerator) {
+
+    bool isNumberToFactorizeBSmooth = true;
 
     if (mpz_cmp_si(input, 1) == 0)
         return NULL;
@@ -136,42 +142,47 @@ OrderedFactorList *factorizeCheckingBSmoothness(__mpz_struct *input, __mpz_struc
     OrderedFactorList *output = allocateOrderedFactorList();
     __mpz_struct *numberToFactorize = allocateAndSetNumberFromNumber(input);
 
-    factorizeUsingTrialDivision(numberToFactorize, output, numbersBuffer, INFINITY_TRIALS);
+    isNumberToFactorizeBSmooth = factorizeUsingTrialDivisionCheckingBSmoothness(numberToFactorize, smoothnessBound, output, numbersBuffer, 50);
 
     if (smoothnessBound != NULL)
-        if (isBSmooth(output, smoothnessBound) == false) {
+        if (isNumberToFactorizeBSmooth == false) {
             deallocateOrderedFactorList(output);
             output = NULL;
         }
 
-    /*
     while (mpz_cmp_si(numberToFactorize, 1) > 0) {
 
         __mpz_struct *factor = getFactorUsingPollardRho(numberToFactorize, numbersBuffer, randomIntegerGenerator);
-        mpz_div(numberToFactorize, numberToFactorize, factor);
+        if (factor == NULL)
+            isNumberToFactorizeBSmooth = false;
+        else {
+            mpz_div(numberToFactorize, numberToFactorize, factor);
 
-        if (mpz_probab_prime_p(factor, 50) != 0) {
-            __mpz_struct *exponent = allocateAndSetNumberFromULL(1);
-            insertFactor(output, factor, exponent);
-        } else
-            factorizeUsingTrialDivision(factor, output, numbersBuffer, INFINITY_TRIALS);
+            if (mpz_probab_prime_p(factor, 15) != 0) {
+                __mpz_struct *exponent = allocateAndSetNumberFromULL(1);
+                insertFactor(output, factor, exponent);
+
+                isNumberToFactorizeBSmooth = isBSmooth(output, smoothnessBound);
+
+            } else
+                isNumberToFactorizeBSmooth = factorizeUsingTrialDivisionCheckingBSmoothness(factor, smoothnessBound, output, numbersBuffer, INFINITY_TRIALS);
+        }
 
         if (smoothnessBound != NULL)
-            if (isBSmooth(output, smoothnessBound) == false) {
+            if (isNumberToFactorizeBSmooth == false) {
                 deallocateOrderedFactorList(output);
                 output = NULL;
                 break;
             }
     }
-*/
+
     deallocateNumber(numberToFactorize);
 
     return output;
 }
 
 
-OrderedFactorList *factorizeOptimized(__mpz_struct *input, __mpz_struct *modulo, NumbersBuffer *numbersBuffer,
-                                      RandomIntegerGenerator *randomIntegerGenerator) {
+OrderedFactorList *factorizeOptimized(__mpz_struct *input, __mpz_struct *modulo, NumbersBuffer *numbersBuffer, RandomIntegerGenerator *randomIntegerGenerator) {
 
     size_t inputNumberSize = mpz_sizeinbase(input, 10);
     inputNumberSize = inputNumberSize / 2;

@@ -11,7 +11,7 @@
 #include "../RelationsRetrieval.h"
 #include "../../ThreadsPool/ThreadsPool.h"
 
-#define FURTHER_RELATIONS 6000
+#define FURTHER_RELATIONS 100000
 #define POOL_SIZE 4
 
 SecondPhaseOutput *allocateSecondPhaseOutput(unsigned long long size) {

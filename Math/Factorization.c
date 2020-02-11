@@ -175,7 +175,7 @@ factorizeCheckingBSmoothness(__mpz_struct *input, __mpz_struct *smoothnessBound,
 
 
         if (isNumberToFactorizeBSmooth == false) {
-            deallocateOrderedFactorList(output);
+            freeOrderedFactorList(output);
             output = NULL;
             break;
         }
@@ -261,10 +261,10 @@ factorizeOptimizedCheckingBSmoothness(__mpz_struct *input, __mpz_struct *modulo,
                 output = mergeOrderedFactorListUsingOptimization(numeratorOrderFactorList, denominatorOrderFactorList);
 
             if (numeratorOrderFactorList != NULL)
-                deallocateOrderedFactorList(numeratorOrderFactorList);
+                freeOrderedFactorList(numeratorOrderFactorList);
 
             if (denominatorOrderFactorList != NULL)
-                deallocateOrderedFactorList(denominatorOrderFactorList);
+                freeOrderedFactorList(denominatorOrderFactorList);
 
             break;
         }

@@ -58,7 +58,7 @@ bool isGroupGenerator(__mpz_struct *input, __mpz_struct *multiplicativeGroup, Nu
     }
 
     releaseNumbers(numbersBuffer, 4);
-    deallocateOrderedFactorList(list);
+    freeOrderedFactorList(list);
     return output;
 }
 

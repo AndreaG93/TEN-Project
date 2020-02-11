@@ -6,8 +6,7 @@
 #include "Test/PollardRhoTest.h"
 
 #define MAX_RANDOM_INTEGER 100
-#define NUMBER_BUFFER_LENGTH 30
-//#define DEBUG
+#define NUMBER_BUFFER_LENGTH 25
 
 RawUserInput rawUserInput;
 
@@ -18,7 +17,7 @@ int main(int argc, char **argv) {
     //FactorizationTest();
     //FactorizationCheckingBSmoothnessTest();
     //RelationGenerationTest();
-    //NumberAllocationDeAllocation();
+    NumberAllocationDeAllocation();
     return 0;
 #endif
 
@@ -27,10 +26,10 @@ int main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
 
-    rawUserInput.dLogBase = "2"; //argv[1];
-    rawUserInput.dLogArgument = "500";// argv[2];
-    rawUserInput.multiplicativeGroup = "104723"; //argv[3];
-    rawUserInput.smoothnessBound = "300"; //argv[4];
+    rawUserInput.dLogBase = "11"; //argv[1];  //2
+    rawUserInput.dLogArgument = "13";// argv[2];  //500
+    rawUserInput.multiplicativeGroup = "179"; //argv[3];  //104723
+    rawUserInput.smoothnessBound = "7"; //argv[4];  //300
 
     DLogProblemInstanceInput *input = sanitizeRawUserInput(&rawUserInput, MAX_RANDOM_INTEGER, NUMBER_BUFFER_LENGTH);
     DLogProblemInstance *dLogProblemInstance = allocateDLogProblemInstance(input);
@@ -40,10 +39,6 @@ int main(int argc, char **argv) {
     startFirstStep(dLogProblemInstance);
     fprintf(stderr, "Start 2° algorithm step...\n");
     startSecondStep(dLogProblemInstance);
-
-    freeDLogProblemInstance(dLogProblemInstance);
-    return 0;
-
     fprintf(stderr, "Start 3° algorithm step...\n");
     startThirdStep(dLogProblemInstance);
 
@@ -58,6 +53,8 @@ int main(int argc, char **argv) {
         gmp_printf("--> In Z_(%Zd)\n", output->multiplicativeGroup);
         gmp_printf("--> log_(%Zd) (%Zd) != %Zd\n", output->base, output->argument, output->value);
     }
+
+    freeDLogProblemInstance(dLogProblemInstance);
 
     return 0;
 }

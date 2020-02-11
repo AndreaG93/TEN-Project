@@ -30,7 +30,7 @@ Matrix *allocateMatrix(unsigned long long numberOfRow, unsigned long long number
     return output;
 }
 
-void deallocateMatrix(Matrix *matrix) {
+void freeMatrix(Matrix *matrix) {
 
     for (unsigned long long columnIndex = 0; columnIndex < matrix->columnLength; columnIndex++) {
 
@@ -40,19 +40,20 @@ void deallocateMatrix(Matrix *matrix) {
 
             __mpz_struct *currentNumber = *(currentColumn + rowIndex);
 
-            mpz_clear(currentNumber);
-            free(currentNumber);
+            if (currentNumber != NULL)
+                freeNumber(currentNumber);
         }
 
         free(currentColumn);
     }
 
+    free(matrix->structure);
     free(matrix);
 }
 
 void *threadRoutineForMatrixDeallocate(void *input) {
 
-    deallocateMatrix((Matrix *) input);
+    freeMatrix((Matrix *) input);
     return NULL;
 }
 

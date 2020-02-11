@@ -69,7 +69,6 @@ SecondPhaseOutput *getBaseToComputeKnownLogarithm(DLogProblemInstance *instance)
 
 void startSecondStep(DLogProblemInstance *instance) {
 
-    instance->currentIndexCalculusAlgorithmStep = 2;
     instance->secondPhaseOutput = getBaseToComputeKnownLogarithm(instance);
 
     Matrix *equationSystem = allocateMatrix(instance->factorBase->length + FURTHER_RELATIONS, instance->factorBase->length + 1);

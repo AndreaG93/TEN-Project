@@ -29,6 +29,8 @@ DLogProblemInstance *allocateDLogProblemInstance(DLogProblemInstanceInput *input
         exit(EXIT_FAILURE);
     else {
 
+        output->currentIndexCalculusAlgorithmStep = 2;
+
         output->discreteLogarithm = allocateDiscreteLogarithm(input->dLogBase, input->dLogArgument, input->multiplicativeGroup);
         output->threadsPoolData = allocateThreadsPoolData(output);
 

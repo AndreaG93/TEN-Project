@@ -13,6 +13,9 @@ __mpz_struct **allocateNumbersArray(unsigned long long size, bool isNumberAlloca
         if (isNumberAllocated)
             for (unsigned long long i = 0; i < size; i++)
                 *(output + i) = allocateNumber();
+        else
+            for (unsigned long long i = 0; i < size; i++)
+                *(output + i) = NULL;
     }
 
     return output;

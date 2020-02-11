@@ -13,7 +13,7 @@ typedef struct {
 
 Matrix *allocateMatrix(unsigned long long numberOfRow, unsigned long long numberOfColumn);
 
-void deallocateMatrix(Matrix *matrix);
+void freeMatrix(Matrix *matrix);
 
 pthread_t *allocateAndStartThreadToDeallocateMatrix(Matrix *input);
 

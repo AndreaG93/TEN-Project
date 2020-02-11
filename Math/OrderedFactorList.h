@@ -18,7 +18,7 @@ typedef struct {
 
 OrderedFactorList *allocateOrderedFactorList();
 
-void deallocateOrderedFactorList(OrderedFactorList *list);
+void freeOrderedFactorList(OrderedFactorList *list);
 
 void appendFactor(OrderedFactorList *list, __mpz_struct *primeNumber, __mpz_struct *primeNumberExponent);
 

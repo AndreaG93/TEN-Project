@@ -88,7 +88,7 @@ void insertFactor(OrderedFactorList *list, __mpz_struct *primeNumber, __mpz_stru
     }
 }
 
-void deallocateOrderedFactorList(OrderedFactorList *list) {
+void freeOrderedFactorList(OrderedFactorList *list) {
 
     OrderedFactorListNode *nextNode;
     Factor *currentFactor;

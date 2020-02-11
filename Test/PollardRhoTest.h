@@ -6,6 +6,7 @@
 #include "../Math/RandomNumber.h"
 #include "../Math/Factorization.h"
 #include "../IndexCalculusAlgorithm/RelationsRetrieval.h"
+#include "../Math/Matrix.h"
 
 void pollardRhoTest() {
 
@@ -25,7 +26,7 @@ void FactorizationTest() {
 
     NumbersBuffer* numbersBuffer = allocateNumbersBuffer(30);
     RandomIntegerGenerator *randomIntegerGenerator = allocateRandomIntegerGenerator(allocateAndSetNumberFromULL(1000));
-    __mpz_struct* numberToFactorize = allocateAndSetNumberFromString("395235645645654643123123123123678123890000678");
+    __mpz_struct* numberToFactorize = allocateAndSetNumberFromString("39523564564");
 
     OrderedFactorList *output = factorizeCheckingBSmoothness(numberToFactorize, NULL, numbersBuffer, randomIntegerGenerator);
 
@@ -33,6 +34,11 @@ void FactorizationTest() {
         fprintf(stderr, "Factorization failed...");
     else
         printOrderedFactorList(output);
+
+    freeOrderedFactorList(output);
+    freeNumber(numberToFactorize);
+    freeNumbersBuffer(numbersBuffer);
+    freeRandomIntegerGenerator(randomIntegerGenerator);
 }
 
 void FactorizationCheckingBSmoothnessTest() {
@@ -66,13 +72,13 @@ void RelationGenerationTest() {
 
     __mpz_struct **relation = getLogarithmRelation(instance, instance->numbersBuffer, instance->randomIntegerGenerator, NULL);
 
-    printNumbersArray(relation, instance->factorBase->length);
-
     freeNumbersArray(relation, instance->factorBase->length);
+    freeDLogProblemInstance(instance);
+    free(input);
 }
 
 void NumberAllocationDeAllocation() {
-
+    
     __mpz_struct* number = allocateAndSetNumberFromString("1000");
     freeNumber(number);
 
@@ -80,5 +86,8 @@ void NumberAllocationDeAllocation() {
     freeNumbersArray(numberArray, 10);
 
     __mpz_struct* numberAllocatedButNotInitialized = allocateNumber();
-    freeNumber(number);
+    freeNumber(numberAllocatedButNotInitialized);
+
+    Matrix *matrix = allocateMatrix(10, 10);
+    freeMatrix(matrix);
 }

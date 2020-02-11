@@ -14,4 +14,4 @@ RandomIntegerGenerator *allocateRandomIntegerGenerator(__mpz_struct *maxRandomIn
 
 __mpz_struct* selectUniformlyDistributedRandomInteger(RandomIntegerGenerator *input);
 
-void deallocateRandomIntegerGenerator(RandomIntegerGenerator *input);
+void freeRandomIntegerGenerator(RandomIntegerGenerator *input);

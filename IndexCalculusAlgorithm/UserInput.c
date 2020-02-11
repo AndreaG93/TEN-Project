@@ -1,11 +1,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "UserInput.h"
-#include "Math/Number.h"
-#include "Error.h"
-#include "Math/OrderedFactorList.h"
-#include "Math/Factorization.h"
-#include "Math/Common.h"
+#include "../Math/Number.h"
+#include "../Error.h"
+#include "../Math/OrderedFactorList.h"
+#include "../Math/Factorization.h"
+#include "../Math/Common.h"
 
 
 DLogProblemInstanceInput *allocateDLogProblemInstanceInput() {

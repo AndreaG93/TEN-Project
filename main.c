@@ -2,15 +2,25 @@
 #include "IndexCalculusAlgorithm/AlgorithmSteps/ThirdStep.h"
 #include "IndexCalculusAlgorithm/AlgorithmSteps/SecondStep.h"
 #include "IndexCalculusAlgorithm/AlgorithmSteps/FirstStep.h"
-#include "UserInput.h"
+#include "IndexCalculusAlgorithm/UserInput.h"
+#include "Test/PollardRhoTest.h"
 
 #define MAX_RANDOM_INTEGER 100
 #define NUMBER_BUFFER_LENGTH 30
-#define DEBUG
+//#define DEBUG
 
 RawUserInput rawUserInput;
 
 int main(int argc, char **argv) {
+
+#ifdef DEBUG
+    //pollardRhoTest();
+    //FactorizationTest();
+    //FactorizationCheckingBSmoothnessTest();
+    //RelationGenerationTest();
+    //NumberAllocationDeAllocation();
+    return 0;
+#endif
 
     if (argc == 4) { //TODO set to != 4 --> MOREOVER SEE BELOW
         fprintf(stderr, "USAGE: %s [dLogBase] [dLogArgument] [multiplicativeGroup] [smoothnessBound]\n", argv[0]);
@@ -19,7 +29,7 @@ int main(int argc, char **argv) {
 
     rawUserInput.dLogBase = "2"; //argv[1];
     rawUserInput.dLogArgument = "500";// argv[2];
-    rawUserInput.multiplicativeGroup = "541"; //argv[3];
+    rawUserInput.multiplicativeGroup = "104723"; //argv[3];
     rawUserInput.smoothnessBound = "300"; //argv[4];
 
     DLogProblemInstanceInput *input = sanitizeRawUserInput(&rawUserInput, MAX_RANDOM_INTEGER, NUMBER_BUFFER_LENGTH);
@@ -30,6 +40,10 @@ int main(int argc, char **argv) {
     startFirstStep(dLogProblemInstance);
     fprintf(stderr, "Start 2° algorithm step...\n");
     startSecondStep(dLogProblemInstance);
+
+    freeDLogProblemInstance(dLogProblemInstance);
+    return 0;
+
     fprintf(stderr, "Start 3° algorithm step...\n");
     startThirdStep(dLogProblemInstance);
 

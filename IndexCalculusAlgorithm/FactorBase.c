@@ -90,6 +90,23 @@ FactorBase *allocateFactorBase() {
     return output;
 }
 
+void freeFactorBase(FactorBase* input) {
+
+    FactorBaseNode *nextNode;
+
+    for (FactorBaseNode *currentNode = input->head; currentNode != NULL; ) {
+
+        nextNode = currentNode->next_node;
+
+        freeNumber(currentNode->primeNumber);
+        free(currentNode);
+
+        currentNode = nextNode;
+    }
+
+    free(input);
+}
+
 void populateFactorBase(FactorBase *factorBase, __mpz_struct *smoothnessBound) {
 
     bool isSmoothnessBoundReached = __isFactorBasePopulatedFromFileUntilSmoothnessBound(factorBase, smoothnessBound);

@@ -18,4 +18,6 @@ typedef struct {
 
 FactorBase *allocateFactorBase();
 
+void freeFactorBase(FactorBase* input);
+
 void populateFactorBase(FactorBase *factorBase, __mpz_struct *smoothnessBound);

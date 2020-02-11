@@ -1,8 +1,8 @@
 #pragma once
 
 #include <gmp.h>
-#include "Buffers/NumbersBuffer.h"
-#include "Math/RandomNumber.h"
+#include "../Buffers/NumbersBuffer.h"
+#include "../Math/RandomNumber.h"
 
 typedef struct {
     char *dLogBase;

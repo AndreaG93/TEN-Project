@@ -16,7 +16,7 @@ NumbersBuffer *allocateNumbersBuffer(size_t size) {
 }
 
 void freeNumbersBuffer(NumbersBuffer *numbersBuffer) {
-    deallocateNumbersArray(numbersBuffer->buffer, numbersBuffer->size);
+    freeNumbersArray(numbersBuffer->buffer, numbersBuffer->size);
     free(numbersBuffer);
 }
 

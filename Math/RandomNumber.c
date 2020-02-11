@@ -31,7 +31,7 @@ __mpz_struct* selectUniformlyDistributedRandomInteger(RandomIntegerGenerator *in
     return output;
 }
 
-void deallocateRandomIntegerGenerator(RandomIntegerGenerator *input) {
+void freeRandomIntegerGenerator(RandomIntegerGenerator *input) {
 
     gmp_randclear(&input->state);
     free(input);

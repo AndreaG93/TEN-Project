@@ -16,3 +16,5 @@ typedef struct {
 DiscreteLogarithm *allocateDiscreteLogarithm(__mpz_struct *base, __mpz_struct *argument, __mpz_struct *moduloOfMultiplicativeGroup);
 
 bool isCorrect(DiscreteLogarithm *dLog);
+
+void freeDiscreteLogarithm(DiscreteLogarithm *input);

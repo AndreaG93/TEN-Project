@@ -25,12 +25,12 @@ void printNumbersArray(__mpz_struct **relation, unsigned long size) {
     fprintf(stderr, "\n");
 }
 
-void deallocateNumber(__mpz_struct *input) {
+void freeNumber(__mpz_struct *input) {
     mpz_clear(input);
     free(input);
 }
 
-void deallocateNumbersArray(__mpz_struct **input, unsigned long long size) {
+void freeNumbersArray(__mpz_struct **input, unsigned long long size) {
 
     for (unsigned long long i = 0; i < size; i++) {
         mpz_clear(*(input + i));

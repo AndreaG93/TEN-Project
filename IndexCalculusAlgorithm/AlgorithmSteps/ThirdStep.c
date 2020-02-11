@@ -38,7 +38,7 @@ void startThirdStep(DLogProblemInstance *instance) {
         instance->discreteLogarithm->value = finalOutput;
     } else {
 
-        deallocateNumbersArray(relation, instance->factorBase->length);
+        freeNumbersArray(relation, instance->factorBase->length);
 
         __mpz_struct *numerator = finalOutput;
         __mpz_struct *denominator;

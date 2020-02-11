@@ -34,7 +34,7 @@ OrderedFactorListNode *allocateOrderedFactorListNode(__mpz_struct *primeNumber, 
 
 void appendFactor(OrderedFactorList *list, __mpz_struct *primeNumber, __mpz_struct *primeNumberExponent) {
 
-    OrderedFactorListNode* node = allocateOrderedFactorListNode(primeNumber, primeNumberExponent);
+    OrderedFactorListNode *node = allocateOrderedFactorListNode(primeNumber, primeNumberExponent);
 
     if (list->head == NULL) {
         list->head = node;
@@ -61,8 +61,8 @@ void insertFactor(OrderedFactorList *list, __mpz_struct *primeNumber, __mpz_stru
             if (comparison == 0) {
 
                 mpz_add(currentNode->factor->exponent, currentNode->factor->exponent, primeNumberExponent);
-                deallocateNumber(primeNumber);
-                deallocateNumber(primeNumberExponent);
+                freeNumber(primeNumber);
+                freeNumber(primeNumberExponent);
 
                 return;
 
@@ -90,20 +90,16 @@ void insertFactor(OrderedFactorList *list, __mpz_struct *primeNumber, __mpz_stru
 
 void deallocateOrderedFactorList(OrderedFactorList *list) {
 
-    OrderedFactorListNode *currentNode = list->head;
     OrderedFactorListNode *nextNode;
     Factor *currentFactor;
 
-    while (currentNode != NULL) {
+    for (OrderedFactorListNode *currentNode = list->head; currentNode != NULL; ) {
 
         nextNode = currentNode->next_node;
         currentFactor = currentNode->factor;
 
-        mpz_clear(currentFactor->base);
-        mpz_clear(currentFactor->exponent);
-
-        free(currentFactor);
-        free(currentNode);
+        freeNumber(currentFactor->base);
+        freeNumber(currentFactor->exponent);
 
         currentNode = nextNode;
     }
@@ -125,6 +121,8 @@ void printOrderedFactorList(OrderedFactorList *list) {
             break;
         }
     }
+
+    fprintf(stderr, "\n");
 }
 
 OrderedFactorList *mergeOrderedFactorListUsingOptimization(OrderedFactorList *listA, OrderedFactorList *listB) {

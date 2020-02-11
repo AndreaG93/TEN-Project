@@ -1,10 +1,11 @@
 #pragma once
+
 #include <gmp.h>
 #include "DiscreteLogarithm.h"
 #include "../Math/RandomNumber.h"
 #include "FactorBase.h"
 #include "../Buffers/CircularBuffer.h"
-#include "../UserInput.h"
+#include "UserInput.h"
 
 typedef struct {
 
@@ -47,3 +48,7 @@ typedef struct {
 DLogProblemInstance *allocateDLogProblemInstance(DLogProblemInstanceInput *input);
 
 void stopThreadsPool(DLogProblemInstance *instance);
+
+void freeDLogProblemInstance(DLogProblemInstance *input);
+
+void freeThreadsPoolData(ThreadsPoolData *input);

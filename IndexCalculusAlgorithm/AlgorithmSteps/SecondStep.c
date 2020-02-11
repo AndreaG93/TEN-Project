@@ -1,7 +1,3 @@
-//
-// Created by andrea on 20/11/19.
-//
-
 #include <stdlib.h>
 #include <pthread.h>
 #include "SecondStep.h"
@@ -11,7 +7,7 @@
 #include "../RelationsRetrieval.h"
 #include "../../ThreadsPool/ThreadsPool.h"
 
-#define FURTHER_RELATIONS 100000
+#define FURTHER_RELATIONS 10000
 #define POOL_SIZE 4
 
 SecondPhaseOutput *allocateSecondPhaseOutput(unsigned long long size) {

@@ -41,6 +41,22 @@ DLogProblemInstance *allocateDLogProblemInstance(DLogProblemInstanceInput *input
     return output;
 }
 
+void freeDLogProblemInstance(DLogProblemInstance *input) {
+
+    freeNumbersBuffer(input->numbersBuffer);
+    freeRandomIntegerGenerator(input->randomIntegerGenerator);
+    freeDiscreteLogarithm(input->discreteLogarithm);
+    freeFactorBase(input->factorBase);
+    freeThreadsPoolData(input->threadsPoolData);
+
+    freeNumber(input->maxRandomInteger);
+    freeNumber(input->smoothnessBound);
+}
+
+void freeThreadsPoolData(ThreadsPoolData *input) {
+    deallocateCircularBuffer(input->sharedBuffer);
+}
+
 void stopThreadsPool(DLogProblemInstance *instance) {
     instance->threadsPoolData->stoppingCondition = true;
 }

@@ -13,12 +13,13 @@ RawUserInput rawUserInput;
 int main(int argc, char **argv) {
 
 #ifdef DEBUG
+    computeOptimalSmoothnessBound();
     //pollardRhoTest();
     //FactorizationTest();
     //FactorizationCheckingBSmoothnessTest();
     //RelationGenerationTest();
     //NumberAllocationDeAllocation();
-    //return 0;
+    return 0;
 #endif
 
     if (argc == 4) { //TODO set to != 4 --> MOREOVER SEE BELOW
@@ -28,8 +29,8 @@ int main(int argc, char **argv) {
 
     rawUserInput.dLogBase = "2";
     rawUserInput.dLogArgument = "500";
-    rawUserInput.multiplicativeGroup = "104723";
-    rawUserInput.smoothnessBound = "300";
+    rawUserInput.multiplicativeGroup = "1066173339601";
+    rawUserInput.smoothnessBound = "350";
 
     DLogProblemInstanceInput *input = sanitizeRawUserInput(&rawUserInput, MAX_RANDOM_INTEGER, NUMBER_BUFFER_LENGTH);
     DLogProblemInstance *dLogProblemInstance = allocateDLogProblemInstance(input);

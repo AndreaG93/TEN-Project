@@ -7,8 +7,8 @@
 typedef struct {
     char *dLogBase;
     char *dLogArgument;
-    char *smoothnessBound;
     char *multiplicativeGroup;
+    char *smoothnessBound;
 } RawUserInput;
 
 typedef struct {
@@ -25,3 +25,4 @@ typedef struct {
 
 DLogProblemInstanceInput *sanitizeRawUserInput(RawUserInput *input, unsigned long maxRandomInteger, unsigned long numbersBufferSize);
 
+unsigned long long computeOptimalSmoothnessBound();

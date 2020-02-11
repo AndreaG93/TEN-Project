@@ -4,8 +4,8 @@
 #include "../Math/Number.h"
 #include "../Error.h"
 #include "../Math/OrderedFactorList.h"
-#include "../Math/Factorization.h"
 #include "../Math/Common.h"
+#include <math.h>
 
 
 DLogProblemInstanceInput *allocateDLogProblemInstanceInput() {
@@ -17,7 +17,15 @@ DLogProblemInstanceInput *allocateDLogProblemInstanceInput() {
         return output;
 }
 
+unsigned long long computeOptimalSmoothnessBound() {
 
+    double prime = 555555;
+    double output = exp(sqrt(((log(prime)*log(log(prime)))/3)));
+
+    return 8;
+
+
+}
 
 DLogProblemInstanceInput *sanitizeRawUserInput(RawUserInput *input, unsigned long maxRandomInteger, unsigned long numbersBufferSize) {
 

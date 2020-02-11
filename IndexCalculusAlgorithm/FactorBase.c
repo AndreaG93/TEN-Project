@@ -59,6 +59,7 @@ bool __isFactorBasePopulatedFromFileUntilSmoothnessBound(FactorBase *factorBase,
             currentPrime = allocateAndSetNumberFromString(stringBuffer);
 
             if (mpz_cmp(currentPrime, smoothnessBound) > 0) {
+                freeNumber(currentPrime);
                 output = true;
                 break;
             } else

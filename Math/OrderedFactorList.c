@@ -38,7 +38,7 @@ void appendFactor(OrderedFactorList *list, __mpz_struct *primeNumber, __mpz_stru
 
     if (list->head == NULL) {
         list->head = node;
-        list->tail = list->head;
+        list->tail = node;
     } else {
         list->tail->next_node = node;
         list->tail = node;
@@ -70,12 +70,15 @@ void insertFactor(OrderedFactorList *list, __mpz_struct *primeNumber, __mpz_stru
 
                 OrderedFactorListNode *newNode = allocateOrderedFactorListNode(primeNumber, primeNumberExponent);
 
-                if (list->head == list->tail)
+                if (list->head == currentNode) {
+                    newNode->next_node = list->head;
                     list->head = newNode;
-                else
+                }
+                else {
+                    newNode->next_node = currentNode;
                     previousNode->next_node = newNode;
+                }
 
-                newNode->next_node = currentNode;
                 return;
 
             } else {
@@ -96,10 +99,13 @@ void freeOrderedFactorList(OrderedFactorList *list) {
     for (OrderedFactorListNode *currentNode = list->head; currentNode != NULL; ) {
 
         nextNode = currentNode->next_node;
+
         currentFactor = currentNode->factor;
 
         freeNumber(currentFactor->base);
         freeNumber(currentFactor->exponent);
+        free(currentFactor);
+        free(currentNode);
 
         currentNode = nextNode;
     }

@@ -70,7 +70,7 @@ void *threadRoutineForCircularBufferCleaning(void *input) {
     return NULL;
 }
 
-pthread_t **allocateAndStartThreadToClearCircular(CircularBuffer *input) {
+pthread_t *allocateAndStartThreadToClearCircular(CircularBuffer *input) {
     return startThreadPool(1, &threadRoutineForCircularBufferCleaning, input);
 }
 

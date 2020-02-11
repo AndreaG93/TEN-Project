@@ -73,8 +73,7 @@ Relation *getRelation(DLogProblemInstance *instance, NumbersBuffer *numbersBuffe
         }
 
         mpz_mod(randomNumber, randomNumber, instance->discreteLogarithm->multiplicativeGroup);
-        output->relationRightSide = factorizeCheckingBSmoothness(randomNumber, instance->smoothnessBound, numbersBuffer, randomIntegerGenerator);
-        //output->relationRightSide = factorizeOptimizedCheckingBSmoothness(randomNumber, instance->discreteLogarithm->multiplicativeGroup, instance->smoothnessBound, numbersBuffer, randomIntegerGenerator);
+        output->relationRightSide = factorizeOptimizedCheckingBSmoothness(randomNumber, instance->discreteLogarithm->multiplicativeGroup, instance->smoothnessBound, numbersBuffer, randomIntegerGenerator);
 
     } while (output->relationRightSide == NULL);
 

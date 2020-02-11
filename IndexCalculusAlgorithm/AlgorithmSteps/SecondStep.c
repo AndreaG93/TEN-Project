@@ -8,7 +8,7 @@
 #include "../../ThreadsPool/ThreadsPool.h"
 
 #define FURTHER_RELATIONS 10000
-#define POOL_SIZE 4
+#define POOL_SIZE 1
 
 SecondPhaseOutput *allocateSecondPhaseOutput(unsigned long long size) {
 
@@ -73,7 +73,7 @@ void startSecondStep(DLogProblemInstance *instance) {
 
     Matrix *equationSystem = allocateMatrix(instance->factorBase->length + FURTHER_RELATIONS, instance->factorBase->length + 1);
 
-    pthread_t **pthreads = startThreadPool(POOL_SIZE, &threadRoutineForRelationRetrieval, (void *) instance->threadsPoolData);
+    pthread_t *pthreads = startThreadPool(POOL_SIZE, &threadRoutineForRelationRetrieval, (void *) instance->threadsPoolData);
 
     for (unsigned long long currentRow = 0; currentRow != instance->factorBase->length + FURTHER_RELATIONS; currentRow++) {
 
@@ -96,18 +96,19 @@ void startSecondStep(DLogProblemInstance *instance) {
                 setNumberMatrixCell(equationSystem, currentRow, currentColumn, currentNumber);
             }
         }
+
+        free(relation);
     }
 
     stopThreadsPool(instance);
+    joinAndFreeThreadsPool(pthreads, POOL_SIZE);
 
-    for (unsigned long long index = 0; index < POOL_SIZE; index++)
-        pthread_join(**(pthreads + index), NULL);
-
-    pthread_t **cleanerThread = allocateAndStartThreadToClearCircular(instance->threadsPoolData->sharedBuffer);
+    pthread_t *cleanerThread = allocateAndStartThreadToClearCircular(instance->threadsPoolData->sharedBuffer);
 
     performGaussianElimination(equationSystem, instance->numbersBuffer, instance->discreteLogarithm->multiplicativeGroupMinusOne);
     populateSecondPhaseOutput(equationSystem, instance->secondPhaseOutput);
 
-    pthread_join(**cleanerThread, NULL);
-    free(cleanerThread);
+    freeMatrix(equationSystem);
+
+    joinAndFreeThreadsPool(cleanerThread, 1);
 }

@@ -4,14 +4,10 @@
 
 #include <gmp.h>
 #include <stdbool.h>
-#include <time.h>
-#include "Factorization.h"
 #include "OrderedFactorList.h"
 #include "Number.h"
 #include "RandomNumber.h"
 #include "Common.h"
-
-#define INFINITY_TRIALS -1
 
 void pollardRhoFunction(__mpz_struct *output, __mpz_struct *input, __mpz_struct *modulo) {
 
@@ -131,9 +127,7 @@ __mpz_struct *getFactorUsingPollardRho(__mpz_struct *numberToFactorize, NumbersB
             break;
         else if (mpz_cmp_si(possibleFactor, 1) > 0) {
 
-            output = allocateNumber();
-            mpz_set(output, possibleFactor);
-
+            output = allocateAndSetNumberFromNumber(possibleFactor);
             break;
         }
     }
@@ -169,9 +163,10 @@ factorizeCheckingBSmoothness(__mpz_struct *input, __mpz_struct *smoothnessBound,
             if (smoothnessBound != NULL)
                 isNumberToFactorizeBSmooth = isBSmooth(output, smoothnessBound);
 
-        } else
-            isNumberToFactorizeBSmooth = factorizeUsingTrialDivisionCheckingBSmoothness(factor, smoothnessBound, output,
-                                                                                        numbersBuffer);
+        } else {
+            isNumberToFactorizeBSmooth = factorizeUsingTrialDivisionCheckingBSmoothness(factor, smoothnessBound, output, numbersBuffer);
+            freeNumber(factor);
+        }
 
 
         if (isNumberToFactorizeBSmooth == false) {

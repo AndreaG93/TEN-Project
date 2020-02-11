@@ -53,6 +53,8 @@ void freeDLogProblemInstance(DLogProblemInstance *input) {
 
     freeNumber(input->maxRandomInteger);
     freeNumber(input->smoothnessBound);
+
+    free(input);
 }
 
 void freeThreadsPoolData(ThreadsPoolData *input) {

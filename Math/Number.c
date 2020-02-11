@@ -36,7 +36,7 @@ void freeNumber(__mpz_struct *input) {
 void freeNumbersArray(__mpz_struct **input, unsigned long long size) {
 
     for (unsigned long long i = 0; i < size; i++) {
-        mpz_clear(*(input + i));
+        freeNumber(*(input + i));
     }
     free(input);
 }

@@ -17,8 +17,8 @@ int main(int argc, char **argv) {
     //FactorizationTest();
     //FactorizationCheckingBSmoothnessTest();
     //RelationGenerationTest();
-    NumberAllocationDeAllocation();
-    return 0;
+    //NumberAllocationDeAllocation();
+    //return 0;
 #endif
 
     if (argc == 4) { //TODO set to != 4 --> MOREOVER SEE BELOW
@@ -26,10 +26,10 @@ int main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
 
-    rawUserInput.dLogBase = "11"; //argv[1];  //2
-    rawUserInput.dLogArgument = "13";// argv[2];  //500
-    rawUserInput.multiplicativeGroup = "179"; //argv[3];  //104723
-    rawUserInput.smoothnessBound = "7"; //argv[4];  //300
+    rawUserInput.dLogBase = "2";
+    rawUserInput.dLogArgument = "500";
+    rawUserInput.multiplicativeGroup = "104723";
+    rawUserInput.smoothnessBound = "300";
 
     DLogProblemInstanceInput *input = sanitizeRawUserInput(&rawUserInput, MAX_RANDOM_INTEGER, NUMBER_BUFFER_LENGTH);
     DLogProblemInstance *dLogProblemInstance = allocateDLogProblemInstance(input);

@@ -1,13 +1,8 @@
-//
-// Created by andrea on 22/11/19.
-//
-
 #include <stdio.h>
 #include <stdlib.h>
 #include "Matrix.h"
 #include "Number.h"
 #include "Common.h"
-#include "../ThreadsPool/ThreadsPool.h"
 
 Matrix *allocateMatrix(unsigned long long numberOfRow, unsigned long long numberOfColumn) {
 
@@ -51,16 +46,6 @@ void freeMatrix(Matrix *matrix) {
     free(matrix);
 }
 
-void *threadRoutineForMatrixDeallocate(void *input) {
-
-    freeMatrix((Matrix *) input);
-    return NULL;
-}
-
-pthread_t *allocateAndStartThreadToDeallocateMatrix(Matrix *input) {
-    return startThreadPool(1, &threadRoutineForMatrixDeallocate, input);
-}
-
 void setNumberMatrixCell(Matrix *matrix, unsigned long long rowIndex, unsigned long long columnIndex, __mpz_struct *number) {
     *(*(matrix->structure + columnIndex) + rowIndex) = number;
 }
@@ -93,9 +78,9 @@ void multiplyRowByScalar(Matrix *matrix, unsigned long long rowIndex, __mpz_stru
 }
 
 void sumRows(Matrix *matrix, unsigned long long sourceRow, unsigned long long targetRow, __mpz_struct *multiplier,
-             __mpz_struct *modulo) {
+             __mpz_struct *modulo, NumbersBuffer *numbersBuffer) {
 
-    __mpz_struct *aux = allocateNumber();
+    __mpz_struct *aux = retrieveNumberFromBuffer(numbersBuffer);
 
     for (unsigned long long column = 0; column < matrix->columnLength; column++) {
 
@@ -106,9 +91,11 @@ void sumRows(Matrix *matrix, unsigned long long sourceRow, unsigned long long ta
         mpz_add(targetElement, targetElement, aux);
         mpz_mod(targetElement, targetElement, modulo);
     }
+
+    releaseNumber(numbersBuffer);
 }
 
-void performGaussianElimination(Matrix *matrix, NumbersBuffer *buffer, __mpz_struct *modulo) {
+void performGaussianElimination(Matrix *matrix, NumbersBuffer *numberBuffer, __mpz_struct *modulo) {
 
     unsigned long long actualTargetRow = 0;
 
@@ -117,7 +104,7 @@ void performGaussianElimination(Matrix *matrix, NumbersBuffer *buffer, __mpz_str
 
             __mpz_struct *currentElement = *(*(matrix->structure + column) + row);
 
-            if (mpz_cmp_ui(currentElement, 0) != 0 && isInvertible(buffer, currentElement, modulo)) {
+            if (mpz_cmp_ui(currentElement, 0) != 0 && isInvertible(numberBuffer, currentElement, modulo)) {
                 swapRows(matrix, row, actualTargetRow);
 
                 __mpz_struct *inverseOfCurrentElement = allocateNumber();
@@ -135,7 +122,7 @@ void performGaussianElimination(Matrix *matrix, NumbersBuffer *buffer, __mpz_str
                         mpz_set(multiplier, *(*(matrix->structure + column) + subRow));
                         mpz_mul_si(multiplier, multiplier, -1);
 
-                        sumRows(matrix, actualTargetRow, subRow, multiplier, modulo);
+                        sumRows(matrix, actualTargetRow, subRow, multiplier, modulo, numberBuffer);
 
                         mpz_clear(multiplier);
                         free(multiplier);

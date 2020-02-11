@@ -25,8 +25,11 @@ void pollardRhoTest() {
 void FactorizationTest() {
 
     NumbersBuffer* numbersBuffer = allocateNumbersBuffer(30);
-    RandomIntegerGenerator *randomIntegerGenerator = allocateRandomIntegerGenerator(allocateAndSetNumberFromULL(1000));
     __mpz_struct* numberToFactorize = allocateAndSetNumberFromString("39523564564");
+    __mpz_struct* maxRandomInteger = allocateAndSetNumberFromULL(1000);
+
+    RandomIntegerGenerator *randomIntegerGenerator = allocateRandomIntegerGenerator(maxRandomInteger);
+
 
     OrderedFactorList *output = factorizeCheckingBSmoothness(numberToFactorize, NULL, numbersBuffer, randomIntegerGenerator);
 
@@ -37,6 +40,7 @@ void FactorizationTest() {
 
     freeOrderedFactorList(output);
     freeNumber(numberToFactorize);
+    freeNumber(maxRandomInteger);
     freeNumbersBuffer(numbersBuffer);
     freeRandomIntegerGenerator(randomIntegerGenerator);
 }
@@ -78,7 +82,7 @@ void RelationGenerationTest() {
 }
 
 void NumberAllocationDeAllocation() {
-    
+
     __mpz_struct* number = allocateAndSetNumberFromString("1000");
     freeNumber(number);
 

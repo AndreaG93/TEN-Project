@@ -70,7 +70,7 @@ void RelationGenerationTest() {
     rawUserInput.smoothnessBound = "300";
 
     DLogProblemInstanceInput *input = sanitizeRawUserInput(&rawUserInput, 1000, 40);
-    DLogProblemInstance *instance = allocateDLogProblemInstance(input);
+    DLogProblemInstance *instance = allocateDLogProblemInstance(input, 1);
 
     startFirstStep(instance);
 

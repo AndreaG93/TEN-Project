@@ -19,7 +19,7 @@ typedef struct {
 
     void *dLogProblemInstance;
 
-    CircularBuffer *sharedBuffer;
+    CircularBuffer **arrayOfCircularBuffer;
     bool stoppingCondition;
 
     pthread_cond_t pthreadCondition;
@@ -29,7 +29,9 @@ typedef struct {
 
 typedef struct {
 
-    unsigned char currentIndexCalculusAlgorithmStep;
+    unsigned int currentIndexCalculusAlgorithmStep;
+    unsigned int threadsPoolSize;
+    unsigned int currentThreadIDFromWhichExtractData;
 
     DiscreteLogarithm *discreteLogarithm;
     FactorBase *factorBase;
@@ -45,10 +47,12 @@ typedef struct {
 
 } DLogProblemInstance;
 
-DLogProblemInstance *allocateDLogProblemInstance(DLogProblemInstanceInput *input);
+DLogProblemInstance *allocateDLogProblemInstance(DLogProblemInstanceInput *input, unsigned int threadsPoolSize);
 
 void stopThreadsPool(DLogProblemInstance *instance);
 
 void freeDLogProblemInstance(DLogProblemInstance *input);
 
 void freeThreadsPoolData(ThreadsPoolData *input);
+
+void *popFromArrayOfCircularBufferRoundRobinManner(DLogProblemInstance* instance);

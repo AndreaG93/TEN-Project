@@ -7,6 +7,7 @@
 #include "../Math/OrderedFactorList.h"
 #include "../Math/Factorization.h"
 #include "../Math/Number.h"
+#include "../ThreadsPool/ThreadsPool.h"
 
 typedef struct {
 
@@ -191,21 +192,25 @@ __mpz_struct **getLogarithmRelation(DLogProblemInstance *instance, NumbersBuffer
     return output;
 }
 
-
 void *threadRoutineForRelationRetrieval(void *input) {
 
-    ThreadsPoolData *threadsPoolData = (ThreadsPoolData *) input;
+    ThreadArgument* threadArgument = (ThreadArgument* ) input;
+    unsigned int threadID = threadArgument->threadID;
+    ThreadsPoolData *threadsPoolData = (ThreadsPoolData *) threadArgument->threadArgument;
     DLogProblemInstance *instance = (DLogProblemInstance *) threadsPoolData->dLogProblemInstance;
 
     NumbersBuffer *numbersBuffer = allocateNumbersBuffer(instance->numbersBuffer->size);
     RandomIntegerGenerator *randomIntegerGenerator = allocateRandomIntegerGenerator(instance->maxRandomInteger);
+    CircularBuffer* circularBuffer = threadsPoolData->arrayOfCircularBuffer[threadID];
 
     while (threadsPoolData->stoppingCondition != true) {
 
         __mpz_struct **relation = getLogarithmRelation(instance, numbersBuffer, randomIntegerGenerator, NULL);
-        pushIntoCircularBuffer(threadsPoolData->sharedBuffer, relation);
+        pushIntoCircularBuffer(circularBuffer, relation);
     }
 
+    free(threadArgument);
+    freeCircularBuffer(circularBuffer);
     freeNumbersBuffer(numbersBuffer);
     freeRandomIntegerGenerator(randomIntegerGenerator);
 

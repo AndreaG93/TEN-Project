@@ -95,6 +95,11 @@ void sumRows(Matrix *matrix, unsigned long long sourceRow, unsigned long long ta
     releaseNumber(numbersBuffer);
 }
 
+void *threadRoutineSubRowManagement() {
+    return NULL;
+}
+
+
 void performGaussianElimination(Matrix *matrix, NumbersBuffer *numberBuffer, __mpz_struct *modulo) {
 
     unsigned long long actualTargetRow = 0;

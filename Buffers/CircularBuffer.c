@@ -35,7 +35,18 @@ CircularBuffer *allocateCircularBuffer() {
     }
 }
 
-void deallocateCircularBuffer(CircularBuffer *input) {
+void freeAllDataInsideCircularBuffer(CircularBuffer *buffer) {
+
+    while (buffer->head != buffer->tail) {
+
+        free(*(buffer->buffer + buffer->tail));
+        buffer->tail = (buffer->tail + 1) % buffer->bufferSize;
+    }
+}
+
+void freeCircularBuffer(CircularBuffer *input) {
+
+    freeAllDataInsideCircularBuffer(input);
 
     while (input->head != input->tail) {
 
@@ -53,25 +64,6 @@ void deallocateCircularBuffer(CircularBuffer *input) {
 
     free(input->buffer);
     free(input);
-}
-
-void clearCircularBuffer(CircularBuffer *buffer) {
-
-    while (buffer->head != buffer->tail) {
-
-        free(*(buffer->buffer + buffer->tail));
-        buffer->tail = (buffer->tail + 1) % buffer->bufferSize;
-    }
-}
-
-void *threadRoutineForCircularBufferCleaning(void *input) {
-
-    clearCircularBuffer((CircularBuffer *) input);
-    return NULL;
-}
-
-pthread_t *allocateAndStartThreadToClearCircular(CircularBuffer *input) {
-    return startThreadPool(1, &threadRoutineForCircularBufferCleaning, input);
 }
 
 void pushIntoCircularBuffer(CircularBuffer *buffer, void *data) {

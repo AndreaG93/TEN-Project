@@ -5,7 +5,7 @@
 #include "IndexCalculusAlgorithm/UserInput.h"
 #include "Test/Tests.h"
 
-#define MAX_RANDOM_INTEGER 10000
+#define MAX_RANDOM_INTEGER 58
 #define NUMBER_BUFFER_LENGTH 25
 #define POOL_SIZE 1
 
@@ -42,10 +42,10 @@ int main(int argc, char **argv) {
 #endif
 #ifndef RELEASE
 
-    rawUserInput.dLogBase = "3";
+    rawUserInput.dLogBase = "11";
     rawUserInput.dLogArgument = "150";
-    rawUserInput.multiplicativeGroup = "48112959837082048697";
-    rawUserInput.smoothnessBound = NULL;
+    rawUserInput.multiplicativeGroup = "179";
+    rawUserInput.smoothnessBound = "7";
 
 #endif
 

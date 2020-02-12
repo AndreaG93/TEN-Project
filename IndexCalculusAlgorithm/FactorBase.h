@@ -10,6 +10,7 @@ typedef struct {
 
 typedef struct {
 
+    __mpz_struct** arrayOfPrime;
     unsigned long length;
     FactorBaseNode *head;
     FactorBaseNode *tail;
@@ -21,3 +22,5 @@ FactorBase *allocateFactorBase();
 void freeFactorBase(FactorBase* input);
 
 void populateFactorBase(FactorBase *factorBase, __mpz_struct *smoothnessBound);
+
+__mpz_struct* getPrimeNumber(FactorBase *factorBase, unsigned int index);

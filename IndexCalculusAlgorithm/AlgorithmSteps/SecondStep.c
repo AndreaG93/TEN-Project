@@ -80,8 +80,7 @@ void startSecondStep(DLogProblemInstance *instance) {
 
     instance->secondPhaseOutput = getBaseToComputeKnownLogarithm(instance);
 
-    unsigned long moreRows = 75*instance->factorBase->length;
-    unsigned long totalRow = instance->factorBase->length;
+    unsigned long totalRow = 75*instance->factorBase->length;
 
     Matrix *equationSystem = allocateMatrix(totalRow, instance->factorBase->length + 1);
 

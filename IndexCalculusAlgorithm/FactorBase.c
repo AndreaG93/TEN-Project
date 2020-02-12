@@ -91,6 +91,17 @@ FactorBase *allocateFactorBase() {
     return output;
 }
 
+void completeFactorBasePopulation(FactorBase* input) {
+
+    input->arrayOfPrime = allocateNumbersArray(input->length, false);
+    if (input->arrayOfPrime == NULL)
+        exit(EXIT_FAILURE);
+
+    unsigned int index = 0;
+    for (FactorBaseNode *currentNode = input->head; currentNode != NULL; currentNode = currentNode->next_node, index++)
+        *(input->arrayOfPrime + index) = currentNode->primeNumber;
+}
+
 void freeFactorBase(FactorBase* input) {
 
     FactorBaseNode *nextNode;
@@ -105,16 +116,19 @@ void freeFactorBase(FactorBase* input) {
         currentNode = nextNode;
     }
 
+    free(input->arrayOfPrime);
     free(input);
+}
+
+__mpz_struct* getPrimeNumber(FactorBase *factorBase, unsigned int index) {
+    return *(factorBase->arrayOfPrime + index);
 }
 
 void populateFactorBase(FactorBase *factorBase, __mpz_struct *smoothnessBound) {
 
     bool isSmoothnessBoundReached = __isFactorBasePopulatedFromFileUntilSmoothnessBound(factorBase, smoothnessBound);
 
-    if (isSmoothnessBoundReached)
-        return;
-    else {
+    if (!isSmoothnessBoundReached) {
 
         __mpz_struct *lastInsertedPrime = factorBase->tail->primeNumber;
 
@@ -125,11 +139,13 @@ void populateFactorBase(FactorBase *factorBase, __mpz_struct *smoothnessBound) {
             mpz_nextprime(currentPrime, lastInsertedPrime);
 
             if (mpz_cmp(currentPrime, smoothnessBound) > 0) {
-                return;
+                break;
             } else {
                 __insertIntoFactorBase(factorBase, currentPrime);
                 lastInsertedPrime = currentPrime;
             }
         }
     }
+
+    completeFactorBasePopulation(factorBase);
 }

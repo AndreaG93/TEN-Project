@@ -3,6 +3,7 @@
 #include "../Math/Factorization.h"
 #include "../Math/Number.h"
 #include "../ThreadsPool/ThreadsPool.h"
+#include <math.h>
 
 typedef struct {
 
@@ -42,7 +43,7 @@ Relation *getRelation(DLogProblemInstance *instance, NumbersBuffer *numbersBuffe
     __mpz_struct *power = buffer[1];
 
     do {
-        restart:
+
         if (output->relationLeftSide != NULL)
             freeOrderedFactorList(output->relationLeftSide);
 
@@ -64,16 +65,11 @@ Relation *getRelation(DLogProblemInstance *instance, NumbersBuffer *numbersBuffe
             mpz_pow_ui(power, currentPrimeNumber, mpz_get_ui(currentPrimeNumberExponent));
             mpz_mul(randomNumber, randomNumber, power);
 
-            if (mpz_cmp(randomNumber, instance->discreteLogarithm->multiplicativeGroup) > 0 && mpz_cmp(randomNumber, instance->discreteLogarithm->multiplicativeGroupDouble) < 0)
+            if (mpz_cmp(randomNumber, instance->discreteLogarithm->multiplicativeGroup) > 0)
                 break;
-            else if (mpz_cmp(randomNumber, instance->discreteLogarithm->multiplicativeGroupDouble) > 0)
-                goto restart;
         }
-        gmp_fprintf(stderr, "[INFO] %Zd\n", instance->discreteLogarithm->multiplicativeGroupDouble);
-        gmp_fprintf(stderr, "[INFO] %Zd\n", randomNumber);
-        gmp_fprintf(stderr, "[INFO] %Zd\n", instance->discreteLogarithm->multiplicativeGroup);
+
         mpz_mod(randomNumber, randomNumber, instance->discreteLogarithm->multiplicativeGroup);
-        gmp_fprintf(stderr, "[INFO] %Zd\n", randomNumber);
 
         output->relationRightSide = factorizeOptimizedCheckingBSmoothness(randomNumber, instance->discreteLogarithm->multiplicativeGroup, instance->smoothnessBound, numbersBuffer, randomIntegerGenerator);
 

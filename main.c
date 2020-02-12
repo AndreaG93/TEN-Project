@@ -3,7 +3,7 @@
 #include "IndexCalculusAlgorithm/AlgorithmSteps/SecondStep.h"
 #include "IndexCalculusAlgorithm/AlgorithmSteps/FirstStep.h"
 #include "IndexCalculusAlgorithm/UserInput.h"
-#include "Test/PollardRhoTest.h"
+#include "Test/Tests.h"
 
 #define MAX_RANDOM_INTEGER 100
 #define NUMBER_BUFFER_LENGTH 25
@@ -16,22 +16,27 @@ int main(int argc, char **argv) {
 #ifdef DEBUG
     //computeOptimalSmoothnessBound();
     //pollardRhoTest();
-    //FactorizationTest();
-    //FactorizationCheckingBSmoothnessTest();
-    //RelationGenerationTest();
-    //NumberAllocationDeAllocation();
+    //factorizationTest();
+    //factorizationCheckingBSmoothnessTest();
+    //relationGenerationTest();
+    //numberAllocationDeAllocation();
+    //foundGenerator();
     //return 0;
 #endif
 
-    if (argc == 4) { //TODO set to != 4 --> MOREOVER SEE BELOW
-        fprintf(stderr, "USAGE: %s [dLogBase] [dLogArgument] [multiplicativeGroup] [smoothnessBound]\n", argv[0]);
+    if (argc == 3) { //TODO set to != 4 --> MOREOVER SEE BELOW
+        fprintf(stderr, "USAGE: %s [dLogBase] [dLogArgument] [multiplicativeGroup] [ (OPTIONAL) smoothnessBound]\n", argv[0]);
         exit(EXIT_FAILURE);
     }
 
     rawUserInput.dLogBase = "11";
     rawUserInput.dLogArgument = "13";
     rawUserInput.multiplicativeGroup = "179";
-    rawUserInput.smoothnessBound = "7";
+
+    if (argc == 5)
+        rawUserInput.smoothnessBound = argv[4];
+    else
+        rawUserInput.smoothnessBound = "7"; // todo
 
     DLogProblemInstanceInput *input = sanitizeRawUserInput(&rawUserInput, MAX_RANDOM_INTEGER, NUMBER_BUFFER_LENGTH);
     DLogProblemInstance *dLogProblemInstance = allocateDLogProblemInstance(input, POOL_SIZE);

@@ -25,4 +25,4 @@ typedef struct {
 
 DLogProblemInstanceInput *sanitizeRawUserInput(RawUserInput *input, unsigned long maxRandomInteger, unsigned long numbersBufferSize);
 
-unsigned long long computeOptimalSmoothnessBound();
+__mpz_struct* computeOptimalSmoothnessBound(unsigned long primeNumber);

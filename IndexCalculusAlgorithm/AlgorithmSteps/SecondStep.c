@@ -7,8 +7,7 @@
 #include "../RelationsRetrieval.h"
 #include "../../ThreadsPool/ThreadsPool.h"
 
-#define FURTHER_RELATIONS 10000
-
+#define FURTHER_RELATIONS 100000
 
 SecondPhaseOutput *allocateSecondPhaseOutput(unsigned long long size) {
 
@@ -51,16 +50,28 @@ void populateSecondPhaseOutput(Matrix *resolvedEquationSystem, SecondPhaseOutput
 SecondPhaseOutput *getBaseToComputeKnownLogarithm(DLogProblemInstance *instance) {
 
     SecondPhaseOutput *output = allocateSecondPhaseOutput(instance->factorBase->length);
+    FactorBaseNode *currentNode;
 
     unsigned long index = 0;
 
-    for (FactorBaseNode *currentNode = instance->factorBase->head; currentNode != NULL; currentNode = currentNode->next_node, index++) {
-        if (isGroupGenerator(currentNode->primeNumber, instance->discreteLogarithm->multiplicativeGroup, instance->numbersBuffer, instance->randomIntegerGenerator)) {
-            mpz_set(output->base, currentNode->primeNumber);
-            output->indexOfBaseRespectToFactorBase = index;
-            mpz_set_ui(*(output->solution + index), 1);
-            break;
-        }
+    if (mpz_cmp(instance->discreteLogarithm->base, instance->factorBase->tail->primeNumber) <= 0 && isPrime(instance->discreteLogarithm->base)) {
+
+        for (currentNode = instance->factorBase->head; currentNode != NULL; currentNode = currentNode->next_node, index++)
+            if (mpz_cmp(instance->discreteLogarithm->base, currentNode->primeNumber) == 0)
+                break;
+
+
+    } else
+        for (currentNode = instance->factorBase->head; currentNode != NULL; currentNode = currentNode->next_node, index++)
+            if (isGroupGenerator(currentNode->primeNumber, instance->discreteLogarithm->multiplicativeGroup, instance->numbersBuffer, instance->randomIntegerGenerator, true))
+                break;
+
+    if (currentNode == NULL)
+        exit(2);
+    else {
+        mpz_set(output->base, currentNode->primeNumber);
+        output->indexOfBaseRespectToFactorBase = index;
+        mpz_set_ui(*(output->solution + index), 1);
     }
 
     return output;
@@ -74,6 +85,8 @@ void startSecondStep(DLogProblemInstance *instance) {
     Matrix *equationSystem = allocateMatrix(instance->factorBase->length + FURTHER_RELATIONS, instance->factorBase->length + 1);
 
     pthread_t *pthreads = startThreadPool(instance->threadsPoolSize, &threadRoutineForRelationRetrieval, (void *) instance->threadsPoolData);
+
+    fprintf(stderr, "--> Producing relations...\n");
 
     for (unsigned long long currentRow = 0; currentRow != instance->factorBase->length + FURTHER_RELATIONS; currentRow++) {
 
@@ -103,7 +116,8 @@ void startSecondStep(DLogProblemInstance *instance) {
     stopThreadsPool(instance);
     joinAndFreeThreadsPool(pthreads, instance->threadsPoolSize);
 
-    performGaussianElimination(equationSystem, instance->numbersBuffer, instance->discreteLogarithm->multiplicativeGroupMinusOne);
+    fprintf(stderr, "--> Resolving equation system...\n");
+    performGaussianElimination(equationSystem, instance->numbersBuffer, instance->discreteLogarithm->multiplicativeGroupMinusOne, instance->threadsPoolSize);
 
     populateSecondPhaseOutput(equationSystem, instance->secondPhaseOutput);
 

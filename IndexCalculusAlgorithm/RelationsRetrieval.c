@@ -1,8 +1,3 @@
-//
-// Created by andrea on 25/11/19.
-//
-
-#include <pthread.h>
 #include "DLogProblemInstance.h"
 #include "../Math/OrderedFactorList.h"
 #include "../Math/Factorization.h"

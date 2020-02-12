@@ -20,7 +20,7 @@ void setNumberMatrixCell(Matrix *matrix, unsigned long long rowIndex, unsigned l
 
 __mpz_struct *getNumberMatrixCell(Matrix *matrix, unsigned long long rowIndex, unsigned long long columnIndex);
 
-void performGaussianElimination(Matrix *matrix, NumbersBuffer *numberBuffer, __mpz_struct *modulo);
+void performGaussianElimination(Matrix *matrix, NumbersBuffer *numbersBuffer, __mpz_struct *modulo, unsigned int poolThreadSize);
 
 #ifdef DEBUG
 

@@ -24,8 +24,7 @@ bool isPrime(__mpz_struct *input) {
     }
 }
 
-bool isGroupGenerator(__mpz_struct *input, __mpz_struct *multiplicativeGroup, NumbersBuffer *numbersBuffer,
-                      RandomIntegerGenerator *randomIntegerGenerator) {
+bool isGroupGenerator(__mpz_struct *input, __mpz_struct *multiplicativeGroup, NumbersBuffer *numbersBuffer, RandomIntegerGenerator *randomIntegerGenerator, bool suppressOutput) {
 
     bool output = true;
 
@@ -41,27 +40,30 @@ bool isGroupGenerator(__mpz_struct *input, __mpz_struct *multiplicativeGroup, Nu
 
     OrderedFactorList *list = factorizeCheckingBSmoothness(multiplicativeGroupMinusOne, NULL, numbersBuffer, randomIntegerGenerator);
     if (list == NULL)
-        exitPrintingFatalErrorMessage("isGroupGenerator", "Invalid 'dLogBase'!");
+        exitPrintingFatalErrorMessage("isGroupGenerator", "Error while searching prime divisors of 'multiplicativeGroupMinusOne'.");
+    else {
+        OrderedFactorListNode *currentNode = list->head;
 
-    OrderedFactorListNode *currentNode = list->head;
+        while (currentNode != NULL) {
+            mpz_sub_ui(exponent, multiplicativeGroup, 1);
+            mpz_div(exponent, exponent, currentNode->factor->base);
+            mpz_powm(result, possibleGenerator, exponent, multiplicativeGroup);
 
-    while (currentNode != NULL) {
-        mpz_sub_ui(exponent, multiplicativeGroup, 1);
-        mpz_div(exponent, exponent, currentNode->factor->base);
-        mpz_powm(result, possibleGenerator, exponent, multiplicativeGroup);
+            if (mpz_cmp_ui(result, 1) == 0) {
 
-        if (mpz_cmp_ui(result, 1) == 0) {
-            output = false;
-            break;
-        } else
-            currentNode = currentNode->next_node;
+                if (suppressOutput == false)
+                    gmp_printf("[WARNING] In Z_(%Zd): %Zd^(%Zd-1/%Zd) = %Zd\n", multiplicativeGroup, possibleGenerator, multiplicativeGroup, currentNode->factor->base, result);
+
+                output = false;
+                break;
+            } else
+                currentNode = currentNode->next_node;
+        }
     }
-
     releaseNumbers(numbersBuffer, 4);
     freeOrderedFactorList(list);
     return output;
 }
-
 
 
 bool isInvertible(NumbersBuffer *numbersBuffer, mpz_t input, mpz_t modulo) {

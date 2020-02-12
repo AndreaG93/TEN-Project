@@ -78,9 +78,12 @@ void *popFromArrayOfCircularBufferRoundRobinManner(DLogProblemInstance* instance
 
     CircularBuffer **buffers = instance->threadsPoolData->arrayOfCircularBuffer;
 
-    void *output = popFromCircularBuffer(buffers[instance->currentThreadIDFromWhichExtractData]);
+    void *output = NULL;
 
-    instance->currentThreadIDFromWhichExtractData = (instance->currentThreadIDFromWhichExtractData + 1) % instance->threadsPoolSize;
+    while (output == NULL) {
+        output = popFromCircularBuffer(buffers[instance->currentThreadIDFromWhichExtractData]);
+        instance->currentThreadIDFromWhichExtractData = (instance->currentThreadIDFromWhichExtractData + 1) % instance->threadsPoolSize;
+    }
 
     return output;
 }

@@ -17,14 +17,12 @@ DLogProblemInstanceInput *allocateDLogProblemInstanceInput() {
         return output;
 }
 
-unsigned long long computeOptimalSmoothnessBound() {
+__mpz_struct* computeOptimalSmoothnessBound(unsigned long primeNumber) {
 
-    double prime = 555555;
-    double output = exp(sqrt(((log(prime)*log(log(prime)))/3)));
+    unsigned long smoothnessBound = (unsigned long) exp(sqrt(((log( (double) primeNumber)*log(log( (double) primeNumber)))/3)));
+    __mpz_struct* output = allocateAndSetNumberFromULL(smoothnessBound);
 
-    return 8;
-
-
+    return output;
 }
 
 DLogProblemInstanceInput *sanitizeRawUserInput(RawUserInput *input, unsigned long maxRandomInteger, unsigned long numbersBufferSize) {
@@ -43,19 +41,35 @@ DLogProblemInstanceInput *sanitizeRawUserInput(RawUserInput *input, unsigned lon
     if (output->dLogArgument == NULL)
         exitPrintingFatalErrorMessage("getVerifiedDLogProblemInstanceInput", "Invalid 'dLogArgument'!");
 
-    output->smoothnessBound = allocateAndSetNumberFromString(input->smoothnessBound);
-    if (output->smoothnessBound == NULL)
-        exitPrintingFatalErrorMessage("getVerifiedDLogProblemInstanceInput", "Invalid 'smoothnessBound'!");
-
     output->multiplicativeGroup = allocateAndSetNumberFromString(input->multiplicativeGroup);
     if (output->multiplicativeGroup == NULL)
         exitPrintingFatalErrorMessage("getVerifiedDLogProblemInstanceInput", "Invalid 'multiplicativeGroup'!");
+
+    if (input->smoothnessBound == NULL) {
+
+        __mpz_struct* maxRepresentable = allocateAndSetNumberFromULL(ULONG_MAX);
+
+        if (mpz_cmp(maxRepresentable, output->multiplicativeGroup) <= 0)
+            output->smoothnessBound = computeOptimalSmoothnessBound(ULONG_MAX);
+        else
+            output->smoothnessBound = computeOptimalSmoothnessBound(mpz_get_ui(output->multiplicativeGroup));
+
+        gmp_fprintf(stderr, "[INFO] Using optimal theoretical value of smoothness bound: B = %Zd\n", output->smoothnessBound);
+
+    } else {
+
+        output->smoothnessBound = allocateAndSetNumberFromString(input->smoothnessBound);
+        if (output->smoothnessBound == NULL)
+            exitPrintingFatalErrorMessage("getVerifiedDLogProblemInstanceInput", "Invalid 'smoothnessBound'!");
+    }
+
+
 
 
     if (isPrime(output->multiplicativeGroup) == false)
         exitPrintingFatalErrorMessage("getVerifiedDLogProblemInstanceInput", "Invalid 'multiplicativeGroup' is NOT prime!");
 
-    if (isGroupGenerator(output->dLogBase, output->multiplicativeGroup, output->numbersBuffer, output->randomIntegerGenerator) == false) {
+    if (isGroupGenerator(output->dLogBase, output->multiplicativeGroup, output->numbersBuffer, output->randomIntegerGenerator, false) == false) {
         gmp_fprintf(stderr, "[WARNING] Specified logarithm's base (%Zd) is NOT a generator in Z_(%Zd)\n", output->dLogBase, output->multiplicativeGroup);
         exitPrintingFatalErrorMessage("getVerifiedDLogProblemInstanceInput", "Invalid 'dLogBase'");
     }

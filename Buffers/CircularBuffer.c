@@ -77,18 +77,17 @@ void pushIntoCircularBuffer(CircularBuffer *buffer, void *data) {
     *(buffer->buffer + buffer->head) = data;
     buffer->head = (buffer->head + 1) % buffer->bufferSize;
 
-    pthread_cond_signal(&buffer->pthreadCondition);
     pthread_mutex_unlock(&buffer->pthreadMutex);
-
-
 }
 
 void *popFromCircularBuffer(CircularBuffer *buffer) {
 
     pthread_mutex_lock(&buffer->pthreadMutex);
 
-    if (buffer->head == buffer->tail)
-        pthread_cond_wait(&buffer->pthreadCondition, &buffer->pthreadMutex);
+    if (buffer->head == buffer->tail) {
+        pthread_mutex_unlock(&buffer->pthreadMutex);
+        return NULL;
+    }
 
 
     __mpz_struct *output = *(buffer->buffer + buffer->tail);

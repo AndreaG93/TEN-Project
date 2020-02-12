@@ -100,7 +100,7 @@ void numberAllocationDeAllocation() {
 void foundGenerator() {
 
     NumbersBuffer* numbersBuffer = allocateNumbersBuffer(30);
-    __mpz_struct* multiplicativeGroup = allocateAndSetNumberFromString("20854027");
+    __mpz_struct* multiplicativeGroup = allocateAndSetNumberFromString("97011687217");
     __mpz_struct* maxRandomInteger = allocateAndSetNumberFromULL(1000);
     __mpz_struct* possibleGenerator = allocateAndSetNumberFromULL(1);
 

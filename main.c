@@ -14,33 +14,37 @@ RawUserInput rawUserInput;
 int main(int argc, char **argv) {
 
 #ifdef DEBUG
-    //computeOptimalSmoothnessBound();
-    //pollardRhoTest();
-    //factorizationTest();
-    //factorizationCheckingBSmoothnessTest();
-    //relationGenerationTest();
-    //numberAllocationDeAllocation();
-    //foundGenerator();
-    //return 0;
+    computeOptimalSmoothnessBound();
+    pollardRhoTest();
+    factorizationTest();
+    factorizationCheckingBSmoothnessTest();
+    relationGenerationTest();
+    numberAllocationDeAllocation();
+    foundGenerator();
+    return 0;
 #endif
 
-    if (argc == 3) { //TODO set to != 4 --> MOREOVER SEE BELOW
+    if (argc < 3) {
         fprintf(stderr, "USAGE: %s [dLogBase] [dLogArgument] [multiplicativeGroup] [ (OPTIONAL) smoothnessBound]\n", argv[0]);
         exit(EXIT_FAILURE);
     }
 
-    rawUserInput.dLogBase = "11";
-    rawUserInput.dLogArgument = "13";
-    rawUserInput.multiplicativeGroup = "179";
+    rawUserInput.dLogBase = argv[1];
+    rawUserInput.dLogArgument = argv[2];
+    rawUserInput.multiplicativeGroup = argv[3];
 
     if (argc == 5)
         rawUserInput.smoothnessBound = argv[4];
     else
-        rawUserInput.smoothnessBound = "7"; // todo
+        rawUserInput.smoothnessBound = NULL;
 
     DLogProblemInstanceInput *input = sanitizeRawUserInput(&rawUserInput, MAX_RANDOM_INTEGER, NUMBER_BUFFER_LENGTH);
     DLogProblemInstance *dLogProblemInstance = allocateDLogProblemInstance(input, POOL_SIZE);
     free(input);
+
+    gmp_fprintf(stderr, "[INFO] Start computing log_(%Zd) (%Zd) in Z*_(%Zd)\n", dLogProblemInstance->discreteLogarithm->base, dLogProblemInstance->discreteLogarithm->argument, dLogProblemInstance->discreteLogarithm->multiplicativeGroup);
+    gmp_fprintf(stderr, "[INFO] Smoothness Bound set to %Zd\n", dLogProblemInstance->smoothnessBound);
+
 
     fprintf(stderr, "Start 1° algorithm step...\n");
     startFirstStep(dLogProblemInstance);
@@ -65,3 +69,10 @@ int main(int argc, char **argv) {
 
     return 0;
 }
+
+// SOME PRIME USED FOR TESTS
+// ================================================
+// Prime                    | Smallest Generator
+// ================================================
+// 97011687217              | 10
+// 48112959837082048697     | 3

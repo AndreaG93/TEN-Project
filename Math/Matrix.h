@@ -3,8 +3,6 @@
 #include <gmp.h>
 #include "../Buffers/NumbersBuffer.h"
 
-#define DEBUG
-
 typedef struct {
     __mpz_struct ***structure;
 

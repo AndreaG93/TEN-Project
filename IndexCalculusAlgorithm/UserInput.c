@@ -19,8 +19,10 @@ DLogProblemInstanceInput *allocateDLogProblemInstanceInput() {
 
 __mpz_struct* computeOptimalSmoothnessBound(unsigned long primeNumber) {
 
-    unsigned long smoothnessBound = (unsigned long) exp(sqrt(((log( (double) primeNumber)*log(log( (double) primeNumber)))/3)));
-    __mpz_struct* output = allocateAndSetNumberFromULL(smoothnessBound);
+    double smoothnessBound = exp(sqrt(((log( (double) primeNumber)*log(log( (double) primeNumber)))/3)));
+
+    smoothnessBound = smoothnessBound + smoothnessBound*0.5;
+    __mpz_struct* output = allocateAndSetNumberFromULL( (unsigned long) smoothnessBound);
 
     return output;
 }
@@ -54,7 +56,7 @@ DLogProblemInstanceInput *sanitizeRawUserInput(RawUserInput *input, unsigned lon
         else
             output->smoothnessBound = computeOptimalSmoothnessBound(mpz_get_ui(output->multiplicativeGroup));
 
-        gmp_fprintf(stderr, "[INFO] Using optimal theoretical value of smoothness bound: B = %Zd\n", output->smoothnessBound);
+        gmp_fprintf(stderr, "[INFO] Using sub-optimal theoretical value of smoothness bound: B = %Zd\n", output->smoothnessBound);
 
     } else {
 

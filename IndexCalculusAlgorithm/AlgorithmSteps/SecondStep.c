@@ -1,13 +1,12 @@
 #include <stdlib.h>
 #include <pthread.h>
+#include <math.h>
 #include "SecondStep.h"
 #include "../../Math/Number.h"
 #include "../../Math/Matrix.h"
 #include "../../Math/Common.h"
 #include "../RelationsRetrieval.h"
 #include "../../ThreadsPool/ThreadsPool.h"
-
-#define FURTHER_RELATIONS 100000
 
 SecondPhaseOutput *allocateSecondPhaseOutput(unsigned long long size) {
 
@@ -82,13 +81,16 @@ void startSecondStep(DLogProblemInstance *instance) {
 
     instance->secondPhaseOutput = getBaseToComputeKnownLogarithm(instance);
 
-    Matrix *equationSystem = allocateMatrix(instance->factorBase->length + FURTHER_RELATIONS, instance->factorBase->length + 1);
+    unsigned long moreRows = 75*instance->factorBase->length;
+    Matrix *equationSystem = allocateMatrix(instance->factorBase->length + moreRows, instance->factorBase->length + 1);
+
+    unsigned long totalRow = instance->factorBase->length + moreRows;
 
     pthread_t *pthreads = startThreadPool(instance->threadsPoolSize, &threadRoutineForRelationRetrieval, (void *) instance->threadsPoolData);
 
     fprintf(stderr, "--> Producing relations...\n");
 
-    for (unsigned long long currentRow = 0; currentRow != instance->factorBase->length + FURTHER_RELATIONS; currentRow++) {
+    for (unsigned long long currentRow = 0; currentRow != totalRow; currentRow++) {
 
         __mpz_struct **relation = popFromArrayOfCircularBufferRoundRobinManner(instance);
 

@@ -59,7 +59,6 @@ SecondPhaseOutput *getBaseToComputeKnownLogarithm(DLogProblemInstance *instance)
             if (mpz_cmp(instance->discreteLogarithm->base, currentNode->primeNumber) == 0)
                 break;
 
-
     } else
         for (currentNode = instance->factorBase->head; currentNode != NULL; currentNode = currentNode->next_node, index++)
             if (isGroupGenerator(currentNode->primeNumber, instance->discreteLogarithm->multiplicativeGroup, instance->numbersBuffer, instance->randomIntegerGenerator, true))
@@ -82,9 +81,9 @@ void startSecondStep(DLogProblemInstance *instance) {
     instance->secondPhaseOutput = getBaseToComputeKnownLogarithm(instance);
 
     unsigned long moreRows = 75*instance->factorBase->length;
-    Matrix *equationSystem = allocateMatrix(instance->factorBase->length + moreRows, instance->factorBase->length + 1);
+    unsigned long totalRow = instance->factorBase->length;
 
-    unsigned long totalRow = instance->factorBase->length + moreRows;
+    Matrix *equationSystem = allocateMatrix(totalRow, instance->factorBase->length + 1);
 
     pthread_t *pthreads = startThreadPool(instance->threadsPoolSize, &threadRoutineForRelationRetrieval, (void *) instance->threadsPoolData);
 

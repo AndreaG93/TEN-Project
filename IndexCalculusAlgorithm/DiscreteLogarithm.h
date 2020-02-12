@@ -10,6 +10,7 @@ typedef struct {
     __mpz_struct *argument;
     __mpz_struct *multiplicativeGroup;
     __mpz_struct *multiplicativeGroupMinusOne;
+    __mpz_struct *multiplicativeGroupDouble;
     __mpz_struct *value;
 } DiscreteLogarithm;
 

@@ -14,6 +14,8 @@ DiscreteLogarithm *allocateDiscreteLogarithm(__mpz_struct *base, __mpz_struct *a
         output->multiplicativeGroupMinusOne = allocateNumber();
         output->multiplicativeGroup = moduloOfMultiplicativeGroup;
         mpz_sub_ui(output->multiplicativeGroupMinusOne, output->multiplicativeGroup, 1);
+        output->multiplicativeGroupDouble = allocateNumber();
+        mpz_mul_ui(output->multiplicativeGroupDouble, output->multiplicativeGroup, 2);
     }
 
     return output;
@@ -25,6 +27,7 @@ void freeDiscreteLogarithm(DiscreteLogarithm *input) {
     freeNumber(input->multiplicativeGroup);
     freeNumber(input->multiplicativeGroupMinusOne);
     freeNumber(input->value);
+    free(input->multiplicativeGroupDouble);
 }
 
 bool isCorrect(DiscreteLogarithm *dLog) {

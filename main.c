@@ -5,9 +5,9 @@
 #include "IndexCalculusAlgorithm/UserInput.h"
 #include "Test/Tests.h"
 
-#define MAX_RANDOM_INTEGER 100
+#define MAX_RANDOM_INTEGER 10000
 #define NUMBER_BUFFER_LENGTH 25
-#define POOL_SIZE 4
+#define POOL_SIZE 1
 
 RawUserInput rawUserInput;
 
@@ -24,6 +24,7 @@ int main(int argc, char **argv) {
     return 0;
 #endif
 
+#ifdef RELEASE
     if (argc < 3) {
         fprintf(stderr, "USAGE: %s [dLogBase] [dLogArgument] [multiplicativeGroup] [ (OPTIONAL) smoothnessBound]\n", argv[0]);
         exit(EXIT_FAILURE);
@@ -37,6 +38,17 @@ int main(int argc, char **argv) {
         rawUserInput.smoothnessBound = argv[4];
     else
         rawUserInput.smoothnessBound = NULL;
+
+#endif
+#ifndef RELEASE
+
+    rawUserInput.dLogBase = "3";
+    rawUserInput.dLogArgument = "150";
+    rawUserInput.multiplicativeGroup = "48112959837082048697";
+    rawUserInput.smoothnessBound = NULL;
+
+#endif
+
 
     DLogProblemInstanceInput *input = sanitizeRawUserInput(&rawUserInput, MAX_RANDOM_INTEGER, NUMBER_BUFFER_LENGTH);
     DLogProblemInstance *dLogProblemInstance = allocateDLogProblemInstance(input, POOL_SIZE);

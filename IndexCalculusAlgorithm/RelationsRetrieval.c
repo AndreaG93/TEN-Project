@@ -3,7 +3,6 @@
 #include "../Math/Factorization.h"
 #include "../Math/Number.h"
 #include "../ThreadsPool/ThreadsPool.h"
-#include <math.h>
 
 typedef struct {
 
@@ -71,8 +70,10 @@ Relation *getRelation(DLogProblemInstance *instance, NumbersBuffer *numbersBuffe
 
         mpz_mod(randomNumber, randomNumber, instance->discreteLogarithm->multiplicativeGroup);
 
-        output->relationRightSide = factorizeOptimizedCheckingBSmoothness(randomNumber, instance->discreteLogarithm->multiplicativeGroup, instance->smoothnessBound, numbersBuffer, randomIntegerGenerator);
-
+        if (checkIfBSmooth(randomNumber, instance->smoothnessBound, numbersBuffer, randomIntegerGenerator)) {
+            output->relationRightSide = factorizeOptimizedCheckingBSmoothness(randomNumber, instance->discreteLogarithm->multiplicativeGroup, instance->smoothnessBound, numbersBuffer, randomIntegerGenerator);
+            fprintf(stderr, "dsdsa");
+        }
     } while (output->relationRightSide == NULL);
 
     releaseNumbers(numbersBuffer, 2);

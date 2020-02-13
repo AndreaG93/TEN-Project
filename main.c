@@ -5,13 +5,144 @@
 #include "IndexCalculusAlgorithm/UserInput.h"
 #include "Test/Tests.h"
 
-#define MAX_RANDOM_INTEGER 58
+#define MAX_RANDOM_INTEGER 2
 #define NUMBER_BUFFER_LENGTH 25
 #define POOL_SIZE 1
 
 RawUserInput rawUserInput;
 
+void functionxgcd(mpz_t old_r, mpz_t r, mpz_t quotient){
+    mpz_t prov;
+    mpz_init(prov);
+    mpz_set(prov, r);
+
+    mpz_t temp;
+    mpz_init(temp);
+    mpz_mul(temp, quotient, prov);
+
+    mpz_sub(r, old_r, temp);
+    mpz_set(old_r, prov);
+
+    mpz_clear(prov);
+    mpz_clear(temp);
+}
+
+int xgcd(mpz_t a, mpz_t b,mpz_t compare){
+
+
+    mpz_t s;
+    mpz_init(s);
+    mpz_set_ui(s, 0);
+    mpz_t t;
+    mpz_init(t);
+    mpz_set_ui(t, 1);
+    mpz_t r;
+    mpz_init(r);
+    mpz_set(r, b);
+    mpz_t old_s;
+    mpz_init(old_s);
+    mpz_set_ui(old_s, 1);
+    mpz_t old_t;
+    mpz_init(old_t);
+    mpz_set_ui(old_t, 0);
+    mpz_t old_r;
+    mpz_init(old_r);
+    mpz_set(old_r, a);
+    mpz_t temp1;
+    mpz_init(temp1);
+    mpz_t temp2;
+    mpz_init(temp2);
+    mpz_t quotient;
+    mpz_init(quotient);
+    int times = 0;
+
+    while(true){
+        //while(time < 3){
+
+        if(mpz_cmp_ui(r , 0) == 0){
+            mpz_clear(s);
+            mpz_clear(t);
+            mpz_clear(r);
+            mpz_clear(old_s);
+            mpz_clear(old_t);
+            mpz_clear(old_r);
+            mpz_clear(temp1);
+            mpz_clear(temp2);
+            mpz_clear(quotient);
+            //printf("return 0 in %d times\n", times);
+            return 0;
+        }
+        mpz_fdiv_q(quotient, old_r, r);
+        //printmpz("quotient = ", quotient);
+        functionxgcd(old_r, r, quotient);
+        functionxgcd(old_s, s, quotient);
+        functionxgcd(old_t, t, quotient);
+
+        times ++;
+
+        gmp_fprintf(stderr, "(%Zd) * 46617753060 + (%Zd) * 97011687217 = (%Zd)\n", old_s, old_t, old_r);
+    }
+
+    gmp_fprintf(stderr, "old_r %Zd\n", old_r);
+    gmp_fprintf(stderr, "old_s %Zd\n", old_s);
+    gmp_fprintf(stderr, "old_t %Zd\n", old_t);
+
+
+
+    //stampe
+    /*
+    pthread_mutex_lock(&lock);
+    printf("old_s * a + old_t * b = old_r\n");
+    mpz_t tempmul;
+    mpz_init(tempmul);
+    mpz_mul(tempmul, result[1], a);
+    mpz_t tempmul2;
+    printmpz("old_s = ", result[1]);
+    printmpz("a = ", a);
+    printmpz("old_t = ", result[2]);
+    printmpz("b = ", b);
+    printmpz("old_s * a = ", tempmul);
+    mpz_init(tempmul2);
+    mpz_mul(tempmul2, result[2], b);
+    printmpz("old_t * b = ", tempmul2);
+    mpz_add(tempmul, tempmul, tempmul2);
+    printmpz("result[0] = ", result[0]);
+    printmpz("risultato vero = ", tempmul);
+    sleep(1);
+    pthread_mutex_unlock(&lock);
+*/
+
+    mpz_clear(s);
+    mpz_clear(t);
+    mpz_clear(r);
+    mpz_clear(old_s);
+    mpz_clear(old_t);
+    mpz_clear(old_r);
+    mpz_clear(temp1);
+    mpz_clear(temp2);
+    mpz_clear(quotient);
+
+//	printf("return 1 in %d times\n", times);
+    return 1;
+
+}
+
+
+
+
+
 int main(int argc, char **argv) {
+
+    /*
+    __mpz_struct* rwrew = allocateAndSetNumberFromString("46617753060");
+    __mpz_struct* modulo = allocateAndSetNumberFromString("97011687217");
+    __mpz_struct* mddd = allocateNumber();
+    mpz_sqrt(mddd, modulo);
+    xgcd(rwrew, modulo, mddd);
+
+    return 0;
+*/
+
 
 #ifdef DEBUG
     computeOptimalSmoothnessBound();
@@ -42,10 +173,10 @@ int main(int argc, char **argv) {
 #endif
 #ifndef RELEASE
 
-    rawUserInput.dLogBase = "11";
+    rawUserInput.dLogBase = "10";
     rawUserInput.dLogArgument = "150";
-    rawUserInput.multiplicativeGroup = "179";
-    rawUserInput.smoothnessBound = "7";
+    rawUserInput.multiplicativeGroup = "97011687217";
+    rawUserInput.smoothnessBound = NULL;
 
 #endif
 

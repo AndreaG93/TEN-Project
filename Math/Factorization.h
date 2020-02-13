@@ -14,3 +14,5 @@ factorizeOptimizedCheckingBSmoothness(__mpz_struct *input, __mpz_struct *modulo,
 
 __mpz_struct *getFactorUsingPollardRho(__mpz_struct *numberToFactorize, NumbersBuffer *numbersBuffer,
                                        RandomIntegerGenerator *randomIntegerGenerator);
+
+bool checkIfBSmooth(__mpz_struct *input, __mpz_struct *smoothnessBound, NumbersBuffer *numbersBuffer, RandomIntegerGenerator *randomIntegerGenerator);

@@ -24,6 +24,7 @@ bool isBSmooth(OrderedFactorList *factorList, __mpz_struct *smoothnessBound) {
         return false;
 }
 
+
 bool factorizeUsingTrialDivisionCheckingBSmoothness(__mpz_struct *numberToFactorize, __mpz_struct *smoothnessBound, OrderedFactorList *allocatedFactorList, NumbersBuffer *numbersBuffer) {
 
     bool isNumberToFactorizeBSmooth = true;
@@ -175,6 +176,48 @@ OrderedFactorList *factorizeCheckingBSmoothness(__mpz_struct *input, __mpz_struc
     return output;
 }
 
+bool checkIfBSmooth(__mpz_struct *input, __mpz_struct *smoothnessBound, NumbersBuffer *numbersBuffer, RandomIntegerGenerator *randomIntegerGenerator) {
+
+    bool output = true;
+
+    if (mpz_cmp_si(input, 1) == 0)
+        return false;
+
+    __mpz_struct *numberToFactorize = retrieveNumberFromBuffer(numbersBuffer);
+    mpz_set(numberToFactorize, input);
+
+    while (mpz_probab_prime_p(numberToFactorize, 15) == 0) {
+
+        __mpz_struct *factor = getFactorUsingPollardRho(numberToFactorize, numbersBuffer, randomIntegerGenerator);
+        if (factor == NULL) {
+            output = false;
+            break;
+
+        } else {
+
+            if (mpz_cmp(factor, smoothnessBound) > 0) {
+                output = false;
+                freeNumber(factor);
+                break;
+            }
+
+            mpz_div(numberToFactorize, numberToFactorize, factor);
+            freeNumber(factor);
+        }
+    }
+
+    if (mpz_cmp(numberToFactorize, smoothnessBound) > 0)
+        output = false;
+
+    releaseNumber(numbersBuffer);
+    return output;
+}
+
+void SubForMulX() {
+
+}
+
+
 OrderedFactorList *factorizeOptimizedCheckingBSmoothness(__mpz_struct *input, __mpz_struct *modulo, __mpz_struct *smoothnessBound, NumbersBuffer *numbersBuffer, RandomIntegerGenerator *randomIntegerGenerator) {
 
     OrderedFactorList *output = NULL;
@@ -203,37 +246,40 @@ OrderedFactorList *factorizeOptimizedCheckingBSmoothness(__mpz_struct *input, __
 
     bool first = true;
 
-    mpz_set(remainder_0, modulo);
+    mpz_set(remainder_0, input);
     mpz_set_si(s_0, 1);
     mpz_set_si(t_0, 0);
 
-    mpz_set(remainder_1, input);
+    mpz_set(remainder_1, modulo);
     mpz_set_si(s_1, 0);
     mpz_set_si(t_1, 1);
 
     while (mpz_cmp_ui(remainder_1, 0) != 0) {
         mpz_tdiv_q(quotient, remainder_0, remainder_1);
 
-        mpz_mul(aux_1, s_1, quotient);
-        mpz_mul(aux_2, t_1, quotient);
-
-        mpz_set(aux_3, s_1);
-        mpz_set(aux_4, t_1);
-
-        mpz_sub(s_1, s_0, aux_1);
-        mpz_sub(t_1, t_0, aux_2);
-
-        mpz_set(s_0, aux_3);
-        mpz_set(t_0, aux_4);
-
-        mpz_mul(aux_1, s_1, modulo);
-        mpz_mul(aux_2, t_1, input);
-
+        mpz_mul(aux_1, remainder_1, quotient);
+        mpz_set(aux_2, remainder_0);
         mpz_set(remainder_0, remainder_1);
-        mpz_add(remainder_1, aux_1, aux_2);
+        mpz_sub(remainder_1, aux_2, aux_1);
 
-        mpz_mod(currentDenominator, t_1, modulo);
+        mpz_mul(aux_1, s_1, quotient);
+        mpz_set(aux_2, s_0);
+        mpz_set(s_0, s_1);
+        mpz_sub(s_1, aux_2, aux_1);
+
+        mpz_mul(aux_1, t_1, quotient);
+        mpz_set(aux_2, t_0);
+        mpz_set(t_0, t_1);
+        mpz_sub(t_1, aux_2, aux_1);
+
+        mpz_mod(currentDenominator, t_0, modulo);
         mpz_mod(currentNumerator, remainder_1, modulo);
+
+        if (checkIfBSmooth(currentNumerator,smoothnessBound, numbersBuffer, randomIntegerGenerator) && checkIfBSmooth(currentDenominator,smoothnessBound, numbersBuffer, randomIntegerGenerator))
+            gmp_fprintf(stderr,"--> Numera (%Zd) e (%Zd) is bsmooth\n", currentNumerator, currentDenominator);
+        else
+            gmp_fprintf(stderr,"--> Numera (%Zd) e (%Zd) NON SONO bsmooth\n", currentNumerator, currentDenominator);
+
 
         if (mpz_cmp_ui(currentDenominator, 1) != 0 && mpz_cmp_ui(currentDenominator, 0) != 0 && mpz_cmp_ui(currentNumerator, 1) != 0 && mpz_cmp_ui(currentNumerator, 0) != 0) {
 
@@ -242,7 +288,7 @@ OrderedFactorList *factorizeOptimizedCheckingBSmoothness(__mpz_struct *input, __
                 mpz_set(numerator, currentNumerator);
 
                 first = false;
-            } else if (mpz_cmp(currentDenominator, denominator) < 0 && mpz_cmp(currentNumerator, numerator) < 0) {
+            } else if (mpz_cmp(currentDenominator, denominator) <= 0 && mpz_cmp(currentNumerator, numerator) <= 0) {
                 mpz_set(denominator, currentDenominator);
                 mpz_set(numerator, currentNumerator);
             }

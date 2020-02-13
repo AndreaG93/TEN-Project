@@ -19,9 +19,8 @@ DLogProblemInstanceInput *allocateDLogProblemInstanceInput() {
 
 __mpz_struct* computeOptimalSmoothnessBound(unsigned long primeNumber) {
 
-    double smoothnessBound = exp(sqrt(((log( (double) primeNumber)*log(log( (double) primeNumber)))/3)));
+    double smoothnessBound = exp(sqrt(((log( (double) primeNumber)*log(log( (double) primeNumber)))/4)));
 
-    smoothnessBound = smoothnessBound + smoothnessBound*0.5;
     __mpz_struct* output = allocateAndSetNumberFromULL( (unsigned long) smoothnessBound);
 
     return output;

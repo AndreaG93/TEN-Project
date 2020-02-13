@@ -113,6 +113,7 @@ void startSecondStep(DLogProblemInstance *instance) {
         free(relation);
     }
 
+
     stopThreadsPool(instance);
     joinAndFreeThreadsPool(pthreads, instance->threadsPoolSize);
 

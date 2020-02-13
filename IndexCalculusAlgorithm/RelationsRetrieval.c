@@ -32,7 +32,9 @@ void deallocateRelation(Relation *input) {
     free(input);
 }
 
-Relation *getRelation(DLogProblemInstance *instance, NumbersBuffer *numbersBuffer, RandomIntegerGenerator *randomIntegerGenerator, __mpz_struct *logarithmArgument) {
+Relation *
+getRelation(DLogProblemInstance *instance, NumbersBuffer *numbersBuffer, RandomIntegerGenerator *randomIntegerGenerator,
+            __mpz_struct *logarithmArgument) {
 
     Relation *output = allocateRelation();
 
@@ -54,26 +56,27 @@ Relation *getRelation(DLogProblemInstance *instance, NumbersBuffer *numbersBuffe
 
         output->relationLeftSide = allocateOrderedFactorList();
 
-        for (FactorBaseNode *currentFactorBaseNode = instance->factorBase->head; currentFactorBaseNode != NULL; currentFactorBaseNode = currentFactorBaseNode->next_node) {
+
+        for (FactorBaseNode *currentFactorBaseNode = instance->factorBase->head;
+             currentFactorBaseNode != NULL; currentFactorBaseNode = currentFactorBaseNode->next_node) {
 
             __mpz_struct *currentPrimeNumber = allocateAndSetNumberFromNumber(currentFactorBaseNode->primeNumber);
             __mpz_struct *currentPrimeNumberExponent = selectUniformlyDistributedRandomInteger(randomIntegerGenerator);
 
-            appendFactor(output->relationLeftSide, currentPrimeNumber, currentPrimeNumberExponent);
-
-            mpz_pow_ui(power, currentPrimeNumber, mpz_get_ui(currentPrimeNumberExponent));
+            mpz_powm_ui(power, currentPrimeNumber, mpz_get_ui(currentPrimeNumberExponent), instance->discreteLogarithm->multiplicativeGroup);
             mpz_mul(randomNumber, randomNumber, power);
+
+            appendFactor(output->relationLeftSide, currentPrimeNumber, currentPrimeNumberExponent);
 
             if (mpz_cmp(randomNumber, instance->discreteLogarithm->multiplicativeGroup) > 0)
                 break;
+
         }
 
         mpz_mod(randomNumber, randomNumber, instance->discreteLogarithm->multiplicativeGroup);
+        output->relationRightSide = factorizeCheckingBSmoothness(randomNumber, instance->smoothnessBound, numbersBuffer,
+                                                                 randomIntegerGenerator);
 
-        if (checkIfBSmooth(randomNumber, instance->smoothnessBound, numbersBuffer, randomIntegerGenerator)) {
-            output->relationRightSide = factorizeOptimizedCheckingBSmoothness(randomNumber, instance->discreteLogarithm->multiplicativeGroup, instance->smoothnessBound, numbersBuffer, randomIntegerGenerator);
-            fprintf(stderr, "dsdsa");
-        }
     } while (output->relationRightSide == NULL);
 
     releaseNumbers(numbersBuffer, 2);
@@ -81,7 +84,8 @@ Relation *getRelation(DLogProblemInstance *instance, NumbersBuffer *numbersBuffe
     return output;
 }
 
-__mpz_struct **getLogarithmRelation(DLogProblemInstance *instance, NumbersBuffer *numbersBuffer, RandomIntegerGenerator *randomIntegerGenerator, __mpz_struct *logarithmArgument) {
+__mpz_struct **getLogarithmRelation(DLogProblemInstance *instance, NumbersBuffer *numbersBuffer,
+                                    RandomIntegerGenerator *randomIntegerGenerator, __mpz_struct *logarithmArgument) {
 
     Relation *relation = getRelation(instance, numbersBuffer, randomIntegerGenerator, logarithmArgument);
     __mpz_struct **output = allocateNumbersArray(instance->factorBase->length, true);
@@ -91,25 +95,31 @@ __mpz_struct **getLogarithmRelation(DLogProblemInstance *instance, NumbersBuffer
 
     int index = 0;
 
-    for (FactorBaseNode *currentFactorBaseNode = instance->factorBase->head; currentFactorBaseNode != NULL; currentFactorBaseNode = currentFactorBaseNode->next_node, index++) {
+    for (FactorBaseNode *currentFactorBaseNode = instance->factorBase->head;
+         currentFactorBaseNode != NULL; currentFactorBaseNode = currentFactorBaseNode->next_node, index++) {
 
         if (instance->currentIndexCalculusAlgorithmStep == 2) {
 
             if (currentLeftSideRelationNodeList != NULL && currentRightSideRelationNodeList != NULL) {
 
-                if (mpz_cmp(currentLeftSideRelationNodeList->factor->base, currentFactorBaseNode->primeNumber) == 0 && mpz_cmp(currentRightSideRelationNodeList->factor->base, currentFactorBaseNode->primeNumber) == 0) {
+                if (mpz_cmp(currentLeftSideRelationNodeList->factor->base, currentFactorBaseNode->primeNumber) == 0 &&
+                    mpz_cmp(currentRightSideRelationNodeList->factor->base, currentFactorBaseNode->primeNumber) == 0) {
 
-                    mpz_sub(*(output + index), currentLeftSideRelationNodeList->factor->exponent, currentRightSideRelationNodeList->factor->exponent);
+                    mpz_sub(*(output + index), currentLeftSideRelationNodeList->factor->exponent,
+                            currentRightSideRelationNodeList->factor->exponent);
 
                     currentLeftSideRelationNodeList = currentLeftSideRelationNodeList->next_node;
                     currentRightSideRelationNodeList = currentRightSideRelationNodeList->next_node;
 
-                } else if (mpz_cmp(currentLeftSideRelationNodeList->factor->base, currentFactorBaseNode->primeNumber) == 0) {
+                } else if (mpz_cmp(currentLeftSideRelationNodeList->factor->base, currentFactorBaseNode->primeNumber) ==
+                           0) {
 
                     mpz_set(*(output + index), currentLeftSideRelationNodeList->factor->exponent);
                     currentLeftSideRelationNodeList = currentLeftSideRelationNodeList->next_node;
 
-                } else if (mpz_cmp(currentRightSideRelationNodeList->factor->base, currentFactorBaseNode->primeNumber) == 0) {
+                } else if (
+                        mpz_cmp(currentRightSideRelationNodeList->factor->base, currentFactorBaseNode->primeNumber) ==
+                        0) {
 
                     mpz_mul_si(*(output + index), currentRightSideRelationNodeList->factor->exponent, -1);
                     currentRightSideRelationNodeList = currentRightSideRelationNodeList->next_node;
@@ -143,19 +153,24 @@ __mpz_struct **getLogarithmRelation(DLogProblemInstance *instance, NumbersBuffer
 
             if (currentLeftSideRelationNodeList != NULL && currentRightSideRelationNodeList != NULL) {
 
-                if (mpz_cmp(currentLeftSideRelationNodeList->factor->base, currentFactorBaseNode->primeNumber) == 0 && mpz_cmp(currentRightSideRelationNodeList->factor->base, currentFactorBaseNode->primeNumber) == 0) {
+                if (mpz_cmp(currentLeftSideRelationNodeList->factor->base, currentFactorBaseNode->primeNumber) == 0 &&
+                    mpz_cmp(currentRightSideRelationNodeList->factor->base, currentFactorBaseNode->primeNumber) == 0) {
 
-                    mpz_sub(*(output + index), currentRightSideRelationNodeList->factor->exponent, currentLeftSideRelationNodeList->factor->exponent);
+                    mpz_sub(*(output + index), currentRightSideRelationNodeList->factor->exponent,
+                            currentLeftSideRelationNodeList->factor->exponent);
 
                     currentLeftSideRelationNodeList = currentLeftSideRelationNodeList->next_node;
                     currentRightSideRelationNodeList = currentRightSideRelationNodeList->next_node;
 
-                } else if (mpz_cmp(currentLeftSideRelationNodeList->factor->base, currentFactorBaseNode->primeNumber) == 0) {
+                } else if (mpz_cmp(currentLeftSideRelationNodeList->factor->base, currentFactorBaseNode->primeNumber) ==
+                           0) {
 
                     mpz_mul_si(*(output + index), currentLeftSideRelationNodeList->factor->exponent, -1);
                     currentLeftSideRelationNodeList = currentLeftSideRelationNodeList->next_node;
 
-                } else if (mpz_cmp(currentRightSideRelationNodeList->factor->base, currentFactorBaseNode->primeNumber) == 0) {
+                } else if (
+                        mpz_cmp(currentRightSideRelationNodeList->factor->base, currentFactorBaseNode->primeNumber) ==
+                        0) {
 
                     mpz_set(*(output + index), currentRightSideRelationNodeList->factor->exponent);
                     currentRightSideRelationNodeList = currentRightSideRelationNodeList->next_node;
@@ -198,7 +213,7 @@ void *threadRoutineForRelationRetrieval(void *input) {
     DLogProblemInstance *instance = (DLogProblemInstance *) threadsPoolData->dLogProblemInstance;
 
     NumbersBuffer *numbersBuffer = allocateNumbersBuffer(instance->numbersBuffer->size);
-    RandomIntegerGenerator *randomIntegerGenerator = allocateRandomIntegerGenerator(instance->maxRandomInteger);
+    RandomIntegerGenerator *randomIntegerGenerator = allocateRandomIntegerGenerator(instance->discreteLogarithm->multiplicativeGroupMinusOne);
     CircularBuffer *circularBuffer = threadsPoolData->arrayOfCircularBuffer[threadID];
 
     while (threadsPoolData->stoppingCondition != true) {

@@ -248,7 +248,6 @@ void performGaussianElimination(Matrix *matrix, NumbersBuffer *numbersBuffer, __
     freeThreadMatrixArgument(threadMatrixArgument, poolThreadSize);
 }
 
-#ifdef DEBUG
 
 void printMatrix(Matrix *matrix) {
 
@@ -263,5 +262,3 @@ void printMatrix(Matrix *matrix) {
         fprintf(stdout, "\n");
     }
 }
-
-#endif

@@ -14,10 +14,15 @@ __mpz_struct *computeRequiredDiscreteLogarithmValue(__mpz_struct **relation, DLo
 
     for (unsigned long long index = 0; index < instance->factorBase->length; index++) {
 
-        mpz_mul(auxiliaryNumber, *(relation + index), *(instance->secondPhaseOutput->solution + index));
+        __mpz_struct* exp = *(relation + index);
+        __mpz_struct* logValue = *(instance->secondPhaseOutput->solution + index);
+        mpz_mul(auxiliaryNumber, exp, logValue);
         mpz_add(output, output, auxiliaryNumber);
     }
 
+    __mpz_struct* beta = *(relation + instance->factorBase->length);
+
+    mpz_add(output, output, *(relation + instance->factorBase->length));
     mpz_mod(output, output, instance->discreteLogarithm->multiplicativeGroupMinusOne);
 
     releaseNumber(instance->numbersBuffer);
@@ -31,5 +36,6 @@ void startThirdStep(DLogProblemInstance *instance) {
     __mpz_struct **relation;
 
     relation = getLogarithmRelation(instance, instance->numbersBuffer, instance->randomIntegerGenerator, instance->discreteLogarithm->argument);
+
     instance->discreteLogarithm->value = computeRequiredDiscreteLogarithmValue(relation, instance);
 }

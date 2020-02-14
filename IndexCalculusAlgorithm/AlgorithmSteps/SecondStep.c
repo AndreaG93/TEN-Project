@@ -22,22 +22,27 @@ SecondPhaseOutput *allocateSecondPhaseOutput(unsigned long long size) {
 
 SecondPhaseOutput *populateSecondPhaseOutput(DLogProblemInstance *instance, Matrix *resolvedEquationSystem) {
 
+    __mpz_struct* aux = retrieveNumberFromBuffer(instance->numbersBuffer);
+
     SecondPhaseOutput* output = allocateSecondPhaseOutput(instance->factorBase->length);
 
-    unsigned long long columnIndex = resolvedEquationSystem->columnLength - 1;
-    unsigned long long outputIndex = 0;
+    mpz_div_ui(aux, instance->discreteLogarithm->multiplicativeGroupMinusOne, 2);
+    mpz_set(*(output->solution), aux);
 
-    for (unsigned long long rowIndex = 0; rowIndex < instance->factorBase->length; rowIndex++, outputIndex++) {
+
+    unsigned long long columnIndex = resolvedEquationSystem->columnLength - 1;
+    unsigned long long outputIndex = 1;
+
+    for (unsigned long long rowIndex = 0; rowIndex < instance->factorBase->length - 1; rowIndex++, outputIndex++) {
         __mpz_struct *number = getNumberMatrixCell(resolvedEquationSystem, rowIndex, columnIndex);
         mpz_set(*(output->solution + outputIndex), number);
     }
 
+    releaseNumber(instance->numbersBuffer);
     return output;
 }
 
 void startSecondStep(DLogProblemInstance *instance) {
-
-
 
     unsigned long totalRow = instance->factorBase->length*2;
 

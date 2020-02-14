@@ -42,9 +42,9 @@ int main(int argc, char **argv) {
 #endif
 #ifndef RELEASE
 
-    rawUserInput.dLogBase = "11";
+    rawUserInput.dLogBase = "10";
     rawUserInput.dLogArgument = "13";
-    rawUserInput.multiplicativeGroup = "179";
+    rawUserInput.multiplicativeGroup = "97011687217";
     rawUserInput.smoothnessBound = NULL;
 
 #endif

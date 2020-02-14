@@ -114,61 +114,22 @@ __mpz_struct **getLogarithmRelation(DLogProblemInstance *instance, NumbersBuffer
     if (instance->currentIndexCalculusAlgorithmStep == 3) {
 
         for (FactorBaseNode *currentFactorBaseNode = instance->factorBase->head;
-             currentFactorBaseNode != NULL; currentFactorBaseNode = currentFactorBaseNode->next_node, index++) {
-            if (currentLeftSideRelationNodeList != NULL && currentRightSideRelationNodeList != NULL) {
+        currentFactorBaseNode != NULL; currentFactorBaseNode = currentFactorBaseNode->next_node, index++) {
 
-                if (mpz_cmp(currentLeftSideRelationNodeList->factor->base, currentFactorBaseNode->primeNumber) ==
-                    0 &&
-                    mpz_cmp(currentRightSideRelationNodeList->factor->base, currentFactorBaseNode->primeNumber) ==
-                    0) {
+            if (currentRightSideRelationNodeList != NULL && mpz_cmp(currentRightSideRelationNodeList->factor->base, currentFactorBaseNode->primeNumber) == 0) {
 
-                    mpz_sub(*(output + index), currentRightSideRelationNodeList->factor->exponent,
-                            currentLeftSideRelationNodeList->factor->exponent);
-
-                    currentLeftSideRelationNodeList = currentLeftSideRelationNodeList->next_node;
-                    currentRightSideRelationNodeList = currentRightSideRelationNodeList->next_node;
-
-                } else if (mpz_cmp(currentLeftSideRelationNodeList->factor->base,
-                                   currentFactorBaseNode->primeNumber) ==
-                           0) {
-
-                    mpz_mul_si(*(output + index), currentLeftSideRelationNodeList->factor->exponent, -1);
-                    currentLeftSideRelationNodeList = currentLeftSideRelationNodeList->next_node;
-
-                } else if (
-                        mpz_cmp(currentRightSideRelationNodeList->factor->base,
-                                currentFactorBaseNode->primeNumber) ==
-                        0) {
-
-                    mpz_set(*(output + index), currentRightSideRelationNodeList->factor->exponent);
-                    currentRightSideRelationNodeList = currentRightSideRelationNodeList->next_node;
-
-                } else
-                    mpz_set_ui(*(output + index), 0);
-
-            } else if (currentLeftSideRelationNodeList != NULL) {
-
-                if (mpz_cmp(currentLeftSideRelationNodeList->factor->base, currentFactorBaseNode->primeNumber) ==
-                    0) {
-
-                    mpz_mul_si(*(output + index), currentLeftSideRelationNodeList->factor->exponent, -1);
-                    currentLeftSideRelationNodeList = currentLeftSideRelationNodeList->next_node;
-                } else
-                    mpz_set_ui(*(output + index), 0);
-
-            } else if (currentRightSideRelationNodeList != NULL) {
-
-                if (mpz_cmp(currentRightSideRelationNodeList->factor->base, currentFactorBaseNode->primeNumber) ==
-                    0) {
-
-                    mpz_set(*(output + index), currentRightSideRelationNodeList->factor->exponent);
-                    currentRightSideRelationNodeList = currentRightSideRelationNodeList->next_node;
-                } else
-                    mpz_set_ui(*(output + index), 0);
+                mpz_set(*(output + index), currentRightSideRelationNodeList->factor->exponent);
+                currentRightSideRelationNodeList = currentRightSideRelationNodeList->next_node;
 
             } else
                 mpz_set_ui(*(output + index), 0);
         }
+
+        mpz_set(*(output + instance->factorBase->length), currentLeftSideRelationNodeList->factor->exponent);
+        mpz_mul_si(*(output + instance->factorBase->length), *(output + instance->factorBase->length), -1);
+
+
+
     }
 
     deallocateRelation(relation);

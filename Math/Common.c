@@ -38,7 +38,7 @@ bool isGroupGenerator(__mpz_struct *input, __mpz_struct *multiplicativeGroup, Nu
     mpz_set(possibleGenerator, input);
     mpz_sub_ui(multiplicativeGroupMinusOne, multiplicativeGroup, 1);
 
-    OrderedFactorList *list = factorizeCheckingBSmoothness(multiplicativeGroupMinusOne, NULL, numbersBuffer, randomIntegerGenerator);
+    OrderedFactorList *list = factorize(multiplicativeGroupMinusOne, numbersBuffer);
     if (list == NULL)
         exitPrintingFatalErrorMessage("isGroupGenerator", "Error while searching prime divisors of 'multiplicativeGroupMinusOne'.");
     else {

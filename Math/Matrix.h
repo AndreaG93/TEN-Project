@@ -20,6 +20,8 @@ __mpz_struct *getNumberMatrixCell(Matrix *matrix, unsigned long long rowIndex, u
 
 void performGaussianElimination(Matrix *matrix, NumbersBuffer *numbersBuffer, __mpz_struct *modulo, unsigned int poolThreadSize);
 
+
+
 void printMatrix(Matrix *matrix);
 
 

@@ -8,11 +8,7 @@
 #include "UserInput.h"
 
 typedef struct {
-
     __mpz_struct **solution;
-    __mpz_struct *base;
-    unsigned int indexOfBaseRespectToFactorBase;
-
 } SecondPhaseOutput;
 
 typedef struct {

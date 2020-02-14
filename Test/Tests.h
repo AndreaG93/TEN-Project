@@ -9,6 +9,7 @@
 #include "../Math/Matrix.h"
 #include "../Math/Common.h"
 
+/*
 void pollardRhoTest() {
 
     NumbersBuffer* numbersBuffer = allocateNumbersBuffer(30);
@@ -126,3 +127,4 @@ void foundGenerator() {
     freeNumbersBuffer(numbersBuffer);
     freeRandomIntegerGenerator(randomIntegerGenerator);
 }
+ */

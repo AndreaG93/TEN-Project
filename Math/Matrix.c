@@ -96,14 +96,113 @@ void sumRows(Matrix *matrix, unsigned long long sourceRow, unsigned long long ta
     releaseNumber(numbersBuffer);
 }
 
+typedef struct {
 
+    Matrix *matrix;
+    NumbersBuffer **numbersBuffer;
+    __mpz_struct *modulo;
+    pthread_barrier_t firstBarrier;
+    pthread_barrier_t secondBarrier;
 
+    unsigned int *firstRowToManage;
+    unsigned int *lastRowToManage;
 
+    unsigned int actualTargetRow;
+    unsigned int column;
 
+    bool exit;
+
+} ThreadMatrixArgument;
+
+ThreadMatrixArgument *allocateThreadMatrixArgument(Matrix *matrix, __mpz_struct *modulo, unsigned int threadPoolSize) {
+
+    ThreadMatrixArgument *output = malloc(sizeof(ThreadMatrixArgument));
+    if (output == NULL)
+        exit(EXIT_FAILURE);
+    else {
+        output->matrix = matrix;
+        output->modulo = modulo;
+        pthread_barrier_init(&output->firstBarrier,NULL,threadPoolSize + 1);
+        pthread_barrier_init(&output->secondBarrier,NULL,threadPoolSize + 1);
+
+        output->numbersBuffer = malloc(threadPoolSize * sizeof(NumbersBuffer *));
+        if (output->numbersBuffer == NULL)
+            exit(EXIT_FAILURE);
+
+        for (int threadID = 0; threadID < threadPoolSize; threadID++)
+            output->numbersBuffer[threadID] = allocateNumbersBuffer(2);
+
+        output->firstRowToManage = malloc(threadPoolSize * sizeof(unsigned int));
+        if (output->firstRowToManage == NULL)
+            exit(EXIT_FAILURE);
+
+        output->lastRowToManage = malloc(threadPoolSize * sizeof(unsigned int));
+        if (output->lastRowToManage == NULL)
+            exit(EXIT_FAILURE);
+
+        output->exit = false;
+    }
+
+    return output;
+}
+
+void freeThreadMatrixArgument(ThreadMatrixArgument *input, unsigned int threadPoolSize) {
+    free(input->firstRowToManage);
+    free(input->lastRowToManage);
+
+    for (int threadID = 0; threadID < threadPoolSize; threadID++)
+        freeNumbersBuffer(input->numbersBuffer[threadID]);
+
+    free(input->numbersBuffer);
+    pthread_barrier_destroy(&input->firstBarrier);
+    pthread_barrier_destroy(&input->secondBarrier);
+    free(input);
+}
+
+void *threadRoutineSubRowManagement(void *input) {
+
+    ThreadArgument *threadArgument = (ThreadArgument *) input;
+    ThreadMatrixArgument *threadMatrixArgument = (ThreadMatrixArgument *) threadArgument->threadArgument;
+
+    Matrix *matrix = threadMatrixArgument->matrix;
+    __mpz_struct *modulo = threadMatrixArgument->modulo;
+    NumbersBuffer *numbersBuffer = threadMatrixArgument->numbersBuffer[threadArgument->threadID];
+
+    while (true) {
+
+        pthread_barrier_wait(&threadMatrixArgument->firstBarrier);
+        if (threadMatrixArgument->exit == true)
+            break;
+
+        for (unsigned long long subRow = threadMatrixArgument->firstRowToManage[threadArgument->threadID]; subRow < threadMatrixArgument->lastRowToManage[threadArgument->threadID]; subRow++) {
+
+            if (subRow != threadMatrixArgument->actualTargetRow) {
+
+                __mpz_struct *multiplier = retrieveNumberFromBuffer(numbersBuffer);
+                mpz_set(multiplier, *(*(matrix->structure + threadMatrixArgument->column) + subRow));
+                mpz_mul_si(multiplier, multiplier, -1);
+
+                sumRows(matrix, threadMatrixArgument->actualTargetRow, subRow, multiplier, modulo, numbersBuffer);
+
+                releaseNumber(numbersBuffer);
+            }
+        }
+
+        pthread_barrier_wait(&threadMatrixArgument->secondBarrier);
+    }
+
+    free(threadArgument);
+
+    return NULL;
+}
 
 
 void performGaussianElimination(Matrix *matrix, NumbersBuffer *numbersBuffer, __mpz_struct *modulo, unsigned int poolThreadSize) {
 
+    ThreadMatrixArgument *threadMatrixArgument = allocateThreadMatrixArgument(matrix, modulo, poolThreadSize);
+    pthread_t *pthreads = startThreadPool(poolThreadSize, &threadRoutineSubRowManagement, (void *) threadMatrixArgument);
+
+    unsigned long long numberOfRowsPerThread = matrix->rowLength / poolThreadSize;
     unsigned long long actualTargetRow = 0;
 
     for (unsigned long long column = 0; column < matrix->columnLength; column++) {
@@ -121,26 +220,33 @@ void performGaussianElimination(Matrix *matrix, NumbersBuffer *numbersBuffer, __
                 mpz_clear(inverseOfCurrentElement);
                 free(inverseOfCurrentElement);
 
-                for (unsigned long long subRow = 0; subRow < matrix->rowLength; subRow++) {
+                threadMatrixArgument->column = column;
+                threadMatrixArgument->actualTargetRow = actualTargetRow;
 
-                    if (subRow != actualTargetRow) {
+                unsigned lastAssignedRow = 0;
+                for (int threadID = 0; threadID < poolThreadSize - 1; threadID++) {
+                    threadMatrixArgument->firstRowToManage[threadID] = lastAssignedRow;
+                    threadMatrixArgument->lastRowToManage[threadID] = lastAssignedRow + numberOfRowsPerThread;
 
-                        __mpz_struct *multiplier = allocateNumber();
-                        mpz_set(multiplier, *(*(matrix->structure + column) + subRow));
-                        mpz_mul_si(multiplier, multiplier, -1);
-
-                        sumRows(matrix, actualTargetRow, subRow, multiplier, modulo, numbersBuffer);
-
-                        mpz_clear(multiplier);
-                        free(multiplier);
-                    }
+                    lastAssignedRow = lastAssignedRow + numberOfRowsPerThread;
                 }
+                threadMatrixArgument->firstRowToManage[poolThreadSize - 1] = lastAssignedRow;
+                threadMatrixArgument->lastRowToManage[poolThreadSize - 1] = matrix->rowLength;
+
+                pthread_barrier_wait(&threadMatrixArgument->firstBarrier);
+                pthread_barrier_wait(&threadMatrixArgument->secondBarrier);
+
                 actualTargetRow++;
             }
         }
     }
-}
 
+    threadMatrixArgument->exit = true;
+
+    pthread_barrier_wait(&threadMatrixArgument->firstBarrier);
+    joinAndFreeThreadsPool(pthreads, poolThreadSize);
+    freeThreadMatrixArgument(threadMatrixArgument, poolThreadSize);
+}
 
 void printMatrix(Matrix *matrix) {
 

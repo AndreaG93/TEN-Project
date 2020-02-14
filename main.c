@@ -5,44 +5,13 @@
 #include "IndexCalculusAlgorithm/UserInput.h"
 #include "Test/Tests.h"
 
-#define MAX_RANDOM_INTEGER 25
+#define MAX_RANDOM_INTEGER 58
 #define NUMBER_BUFFER_LENGTH 25
-#define POOL_SIZE 1
+#define POOL_SIZE 4
 
 RawUserInput rawUserInput;
 
 int main(int argc, char **argv) {
-
-    /*
-    Matrix *matrix = allocateMatrix(3, 5);
-
-    setNumberMatrixCell(matrix, 0,0, allocateAndSetNumberFromString("0"));
-    setNumberMatrixCell(matrix, 0,1, allocateAndSetNumberFromString("2"));
-    setNumberMatrixCell(matrix, 0,2, allocateAndSetNumberFromString("1"));
-    setNumberMatrixCell(matrix, 0,3, allocateAndSetNumberFromString("0"));
-    setNumberMatrixCell(matrix, 0,4, allocateAndSetNumberFromString("-2"));
-
-    setNumberMatrixCell(matrix, 1,0, allocateAndSetNumberFromString("0"));
-    setNumberMatrixCell(matrix, 1,1, allocateAndSetNumberFromString("-1"));
-    setNumberMatrixCell(matrix, 1,2, allocateAndSetNumberFromString("2"));
-    setNumberMatrixCell(matrix, 1,3, allocateAndSetNumberFromString("-1"));
-    setNumberMatrixCell(matrix, 1,4, allocateAndSetNumberFromString("-3"));
-
-    setNumberMatrixCell(matrix, 2,0, allocateAndSetNumberFromString("0"));
-    setNumberMatrixCell(matrix, 2,1, allocateAndSetNumberFromString("-2"));
-    setNumberMatrixCell(matrix, 2,2, allocateAndSetNumberFromString("-1"));
-    setNumberMatrixCell(matrix, 2,3, allocateAndSetNumberFromString("1"));
-    setNumberMatrixCell(matrix, 2,4, allocateAndSetNumberFromString("-5"));
-
-
-    printMatrix(matrix);
-    performGaussianElimination(matrix, allocateNumbersBuffer(10), allocateAndSetNumberFromString("178"),0);
-    printMatrix(matrix);
-
-    return 0;
-*/
-
-
 
 #ifdef DEBUG
     computeOptimalSmoothnessBound();
@@ -76,9 +45,10 @@ int main(int argc, char **argv) {
     rawUserInput.dLogBase = "11";
     rawUserInput.dLogArgument = "13";
     rawUserInput.multiplicativeGroup = "179";
-    rawUserInput.smoothnessBound = "15";
+    rawUserInput.smoothnessBound = NULL;
 
 #endif
+
 
     DLogProblemInstanceInput *input = sanitizeRawUserInput(&rawUserInput, MAX_RANDOM_INTEGER, NUMBER_BUFFER_LENGTH);
     DLogProblemInstance *dLogProblemInstance = allocateDLogProblemInstance(input, POOL_SIZE);

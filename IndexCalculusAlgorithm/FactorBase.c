@@ -126,6 +126,8 @@ __mpz_struct* getPrimeNumber(FactorBase *factorBase, unsigned int index) {
 
 void populateFactorBase(FactorBase *factorBase, __mpz_struct *smoothnessBound) {
 
+    __insertIntoFactorBase(factorBase, allocateAndSetNumberFromString("-1"));
+
     bool isSmoothnessBoundReached = __isFactorBasePopulatedFromFileUntilSmoothnessBound(factorBase, smoothnessBound);
 
     if (!isSmoothnessBoundReached) {

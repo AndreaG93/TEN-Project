@@ -29,26 +29,7 @@ void startThirdStep(DLogProblemInstance *instance) {
 
     instance->currentIndexCalculusAlgorithmStep = 3;
     __mpz_struct **relation;
-    __mpz_struct *finalOutput;
 
     relation = getLogarithmRelation(instance, instance->numbersBuffer, instance->randomIntegerGenerator, instance->discreteLogarithm->argument);
-    finalOutput = computeRequiredDiscreteLogarithmValue(relation, instance);
-
-    if (mpz_cmp(instance->secondPhaseOutput->base, instance->discreteLogarithm->base) == 0) {
-        instance->discreteLogarithm->value = finalOutput;
-    } else {
-
-        freeNumbersArray(relation, instance->factorBase->length);
-
-        __mpz_struct *numerator = finalOutput;
-        __mpz_struct *denominator;
-
-
-        relation = getLogarithmRelation(instance, instance->numbersBuffer, instance->randomIntegerGenerator, instance->discreteLogarithm->base);
-        denominator = computeRequiredDiscreteLogarithmValue(relation, instance);
-
-        mpz_invert(denominator, denominator, instance->discreteLogarithm->multiplicativeGroupMinusOne);
-        mpz_mul(instance->discreteLogarithm->value, numerator, denominator);
-        mpz_mod(instance->discreteLogarithm->value, instance->discreteLogarithm->value, instance->discreteLogarithm->multiplicativeGroupMinusOne);
-    }
+    instance->discreteLogarithm->value = computeRequiredDiscreteLogarithmValue(relation, instance);
 }

@@ -25,21 +25,18 @@ typedef struct {
 
 typedef struct {
 
-    unsigned int currentIndexCalculusAlgorithmStep;
-    unsigned int threadsPoolSize;
-    unsigned int currentThreadIDFromWhichExtractData;
-
-    DiscreteLogarithm *discreteLogarithm;
     FactorBase *factorBase;
-    ThreadsPoolData *threadsPoolData;
+    DiscreteLogarithm *discreteLogarithm;
     NumbersBuffer *numbersBuffer;
     RandomIntegerGenerator *randomIntegerGenerator;
+    ThreadsPoolData *threadsPoolData;
 
-    __mpz_struct *maxRandomInteger;
     __mpz_struct *smoothnessBound;
-    __mpz_struct **indexMethodSecondPhaseOutput;
+    __mpz_struct **solutionOfSecondPhase;
 
-    SecondPhaseOutput *secondPhaseOutput;
+    unsigned int threadsPoolSize;
+    unsigned int currentIndexCalculusAlgorithmStep;
+    unsigned int currentThreadIDFromWhichExtractData;
 
 } DLogProblemInstance;
 

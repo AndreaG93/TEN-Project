@@ -1,41 +1,26 @@
 #include <stdlib.h>
 #include <pthread.h>
-#include <math.h>
 #include "SecondStep.h"
 #include "../../Math/Number.h"
 #include "../../Math/Matrix.h"
-#include "../../Math/Common.h"
 #include "../RelationsRetrieval.h"
 #include "../../ThreadsPool/ThreadsPool.h"
 
-SecondPhaseOutput *allocateSecondPhaseOutput(unsigned long long size) {
+__mpz_struct **populateSecondPhaseOutput(DLogProblemInstance *instance, Matrix *resolvedEquationSystem) {
 
-    SecondPhaseOutput *output = malloc(sizeof(SecondPhaseOutput));
-    if (output == NULL)
-        exit(EXIT_FAILURE);
-    else
-        output->solution = allocateNumbersArray(size, true);
+    __mpz_struct **output = allocateNumbersArray(instance->factorBase->length, true);
 
+    __mpz_struct *auxiliary = retrieveNumberFromBuffer(instance->numbersBuffer);
 
-    return output;
-}
-
-SecondPhaseOutput *populateSecondPhaseOutput(DLogProblemInstance *instance, Matrix *resolvedEquationSystem) {
-
-    __mpz_struct* aux = retrieveNumberFromBuffer(instance->numbersBuffer);
-
-    SecondPhaseOutput* output = allocateSecondPhaseOutput(instance->factorBase->length);
-
-    mpz_div_ui(aux, instance->discreteLogarithm->multiplicativeGroupMinusOne, 2);
-    mpz_set(*(output->solution), aux);
-
+    mpz_div_ui(auxiliary, instance->discreteLogarithm->multiplicativeGroupMinusOne, 2);
+    mpz_set(*(output), auxiliary);
 
     unsigned long long columnIndex = resolvedEquationSystem->columnLength - 1;
     unsigned long long outputIndex = 1;
 
     for (unsigned long long rowIndex = 0; rowIndex < instance->factorBase->length - 1; rowIndex++, outputIndex++) {
         __mpz_struct *number = getNumberMatrixCell(resolvedEquationSystem, rowIndex, columnIndex);
-        mpz_set(*(output->solution + outputIndex), number);
+        mpz_set(*(output + outputIndex), number);
     }
 
     releaseNumber(instance->numbersBuffer);
@@ -44,7 +29,7 @@ SecondPhaseOutput *populateSecondPhaseOutput(DLogProblemInstance *instance, Matr
 
 void startSecondStep(DLogProblemInstance *instance) {
 
-    unsigned long totalRow = instance->factorBase->length*2;
+    unsigned long totalRow = instance->factorBase->length * 2;
 
     Matrix *equationSystem = allocateMatrix(totalRow, instance->factorBase->length + 1);
 
@@ -60,21 +45,21 @@ void startSecondStep(DLogProblemInstance *instance) {
 
             __mpz_struct *currentNumber = *(relation + currentColumn);
             setNumberMatrixCell(equationSystem, currentRow, currentColumn, currentNumber);
-
         }
-
         free(relation);
     }
-
 
     stopThreadsPool(instance);
     joinAndFreeThreadsPool(pthreads, instance->threadsPoolSize);
 
     fprintf(stderr, "--> Resolving equation system...\n");
     performGaussianElimination(equationSystem, instance->numbersBuffer, instance->discreteLogarithm->multiplicativeGroupMinusOne, instance->threadsPoolSize);
-    printMatrix(equationSystem);
 
-    instance->secondPhaseOutput = populateSecondPhaseOutput(instance, equationSystem);
+#ifdef DEBUG
+    printMatrix(equationSystem);
+#endif
+
+    instance->solutionOfSecondPhase = populateSecondPhaseOutput(instance, equationSystem);
 
     freeMatrix(equationSystem);
 }

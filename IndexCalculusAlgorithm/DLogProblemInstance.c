@@ -41,7 +41,6 @@ DLogProblemInstance *allocateDLogProblemInstance(DLogProblemInstanceInput *input
         output->threadsPoolData = allocateThreadsPoolData(output, threadsPoolSize);
 
         output->smoothnessBound = input->smoothnessBound;
-        output->maxRandomInteger = input->maxRandomInteger;
         output->randomIntegerGenerator = input->randomIntegerGenerator;
         output->numbersBuffer = input->numbersBuffer;
 
@@ -54,13 +53,12 @@ DLogProblemInstance *allocateDLogProblemInstance(DLogProblemInstanceInput *input
 
 void freeDLogProblemInstance(DLogProblemInstance *input) {
 
+    freeNumbersArray(input->solutionOfSecondPhase, input->factorBase->length);
     freeNumbersBuffer(input->numbersBuffer);
     freeRandomIntegerGenerator(input->randomIntegerGenerator);
     freeDiscreteLogarithm(input->discreteLogarithm);
     freeFactorBase(input->factorBase);
     freeThreadsPoolData(input->threadsPoolData);
-
-    freeNumber(input->maxRandomInteger);
     freeNumber(input->smoothnessBound);
 
     free(input);
@@ -68,6 +66,7 @@ void freeDLogProblemInstance(DLogProblemInstance *input) {
 
 void freeThreadsPoolData(ThreadsPoolData *input) {
     free(input->arrayOfCircularBuffer);
+    free(input);
 }
 
 void stopThreadsPool(DLogProblemInstance *instance) {

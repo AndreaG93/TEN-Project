@@ -113,24 +113,6 @@ void freeOrderedFactorList(OrderedFactorList *list) {
     free(list);
 }
 
-void printOrderedFactorList(OrderedFactorList *list) {
-
-    OrderedFactorListNode *currentNode = list->head;
-
-    while (true) {
-
-        if (currentNode->next_node != NULL) {
-            gmp_fprintf(stderr, "[ %Zd ^ %Zd ] * ", currentNode->factor->base, currentNode->factor->exponent);
-            currentNode = currentNode->next_node;
-        } else {
-            gmp_fprintf(stderr, "[ %Zd ^ %Zd ]", currentNode->factor->base, currentNode->factor->exponent);
-            break;
-        }
-    }
-
-    fprintf(stderr, "\n");
-}
-
 OrderedFactorList *mergeOrderedFactorListUsingOptimization(OrderedFactorList *listA, OrderedFactorList *listB) {
 
     OrderedFactorList *output = allocateOrderedFactorList();
@@ -185,3 +167,23 @@ OrderedFactorList *mergeOrderedFactorListUsingOptimization(OrderedFactorList *li
 
     return output;
 }
+
+#ifdef DEBUG
+void printOrderedFactorList(OrderedFactorList *list) {
+
+    OrderedFactorListNode *currentNode = list->head;
+
+    while (true) {
+
+        if (currentNode->next_node != NULL) {
+            gmp_fprintf(stderr, "[ %Zd ^ %Zd ] * ", currentNode->factor->base, currentNode->factor->exponent);
+            currentNode = currentNode->next_node;
+        } else {
+            gmp_fprintf(stderr, "[ %Zd ^ %Zd ]", currentNode->factor->base, currentNode->factor->exponent);
+            break;
+        }
+    }
+
+    fprintf(stderr, "\n");
+}
+#endif

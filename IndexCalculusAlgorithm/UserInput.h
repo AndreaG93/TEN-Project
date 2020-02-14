@@ -16,13 +16,12 @@ typedef struct {
     __mpz_struct *dLogArgument;
     __mpz_struct *smoothnessBound;
     __mpz_struct *multiplicativeGroup;
-    __mpz_struct *maxRandomInteger;
 
     NumbersBuffer *numbersBuffer;
     RandomIntegerGenerator *randomIntegerGenerator;
 
 } DLogProblemInstanceInput;
 
-DLogProblemInstanceInput *sanitizeRawUserInput(RawUserInput *input, unsigned long maxRandomInteger, unsigned long numbersBufferSize);
+DLogProblemInstanceInput *sanitizeRawUserInput(RawUserInput *input, unsigned long numbersBufferSize);
 
 __mpz_struct* computeOptimalSmoothnessBound(unsigned long primeNumber);

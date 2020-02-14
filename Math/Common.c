@@ -24,7 +24,7 @@ bool isPrime(__mpz_struct *input) {
     }
 }
 
-bool isGroupGenerator(__mpz_struct *input, __mpz_struct *multiplicativeGroup, NumbersBuffer *numbersBuffer, RandomIntegerGenerator *randomIntegerGenerator, bool suppressOutput) {
+bool isGroupGenerator(__mpz_struct *input, __mpz_struct *multiplicativeGroup, NumbersBuffer *numbersBuffer) {
 
     bool output = true;
 
@@ -51,8 +51,7 @@ bool isGroupGenerator(__mpz_struct *input, __mpz_struct *multiplicativeGroup, Nu
 
             if (mpz_cmp_ui(result, 1) == 0) {
 
-                if (suppressOutput == false)
-                    gmp_printf("[WARNING] In Z_(%Zd): %Zd^(%Zd-1/%Zd) = %Zd\n", multiplicativeGroup, possibleGenerator, multiplicativeGroup, currentNode->factor->base, result);
+                gmp_printf("[WARNING] In Z_(%Zd): %Zd^(%Zd-1/%Zd) = %Zd\n", multiplicativeGroup, possibleGenerator, multiplicativeGroup, currentNode->factor->base, result);
 
                 output = false;
                 break;

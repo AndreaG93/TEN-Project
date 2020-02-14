@@ -24,6 +24,8 @@ void appendFactor(OrderedFactorList *list, __mpz_struct *primeNumber, __mpz_stru
 
 void insertFactor(OrderedFactorList *list, __mpz_struct *primeNumber, __mpz_struct *primeNumberExponent);
 
-void printOrderedFactorList(OrderedFactorList *list);
-
 OrderedFactorList * mergeOrderedFactorListUsingOptimization(OrderedFactorList *listA, OrderedFactorList *listB);
+
+#ifdef DEBUG
+void printOrderedFactorList(OrderedFactorList *list);
+#endif

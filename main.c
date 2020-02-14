@@ -3,26 +3,13 @@
 #include "IndexCalculusAlgorithm/AlgorithmSteps/SecondStep.h"
 #include "IndexCalculusAlgorithm/AlgorithmSteps/FirstStep.h"
 #include "IndexCalculusAlgorithm/UserInput.h"
-#include "Test/Tests.h"
 
-#define MAX_RANDOM_INTEGER 58
 #define NUMBER_BUFFER_LENGTH 25
 #define POOL_SIZE 4
 
 RawUserInput rawUserInput;
 
 int main(int argc, char **argv) {
-
-#ifdef DEBUG
-    computeOptimalSmoothnessBound();
-    pollardRhoTest();
-    factorizationTest();
-    factorizationCheckingBSmoothnessTest();
-    relationGenerationTest();
-    numberAllocationDeAllocation();
-    foundGenerator();
-    return 0;
-#endif
 
 #ifdef RELEASE
     if (argc < 3) {
@@ -42,15 +29,15 @@ int main(int argc, char **argv) {
 #endif
 #ifndef RELEASE
 
-    rawUserInput.dLogBase = "10";
+    rawUserInput.dLogBase = "11";
     rawUserInput.dLogArgument = "13";
-    rawUserInput.multiplicativeGroup = "97011687217";
+    rawUserInput.multiplicativeGroup = "179";
     rawUserInput.smoothnessBound = NULL;
 
 #endif
 
 
-    DLogProblemInstanceInput *input = sanitizeRawUserInput(&rawUserInput, MAX_RANDOM_INTEGER, NUMBER_BUFFER_LENGTH);
+    DLogProblemInstanceInput *input = sanitizeRawUserInput(&rawUserInput, NUMBER_BUFFER_LENGTH);
     DLogProblemInstance *dLogProblemInstance = allocateDLogProblemInstance(input, POOL_SIZE);
     free(input);
 

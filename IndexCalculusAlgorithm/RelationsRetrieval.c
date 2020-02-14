@@ -3,7 +3,6 @@
 #include "../Math/Factorization.h"
 #include "../Math/Number.h"
 #include "../ThreadsPool/ThreadsPool.h"
-#include "RelationsRetrieval.h"
 
 typedef struct {
 
@@ -12,7 +11,7 @@ typedef struct {
 
 } RawRelation;
 
-RawRelation *allocateRelation() {
+RawRelation *allocateRawRelation() {
 
     RawRelation *output = malloc(sizeof(RawRelation));
 
@@ -35,14 +34,8 @@ void freeRawRelation(RawRelation *input) {
 
 RawRelation *getRawRelation(DLogProblemInstance *instance, NumbersBuffer *numbersBuffer, RandomIntegerGenerator *randomIntegerGenerator) {
 
-    RawRelation *output = allocateRelation();
-
-    __mpz_struct **buffer = retrieveNumbersFromBuffer(numbersBuffer, 1);
-
-    __mpz_struct *power = buffer[0];
-
-    __mpz_struct *sqrtB = allocateNumber(); // TODO release this number
-    mpz_sqrt(sqrtB, instance->smoothnessBound);
+    RawRelation *output = allocateRawRelation();
+    __mpz_struct *power = retrieveNumberFromBuffer(numbersBuffer);
 
     do {
 
@@ -59,21 +52,22 @@ RawRelation *getRawRelation(DLogProblemInstance *instance, NumbersBuffer *number
 
         mpz_mod(power, power, instance->discreteLogarithm->multiplicativeGroup);
 
-        output->factorListOfRandomBSmoothNumber = factorizeCheckingBSmoothness(power, instance->smoothnessBound, mpz_get_ui(sqrtB), numbersBuffer);
+        output->factorListOfRandomBSmoothNumber = factorizeCheckingBSmoothnessOptimized(power, instance->discreteLogarithm->multiplicativeGroup, instance->discreteLogarithm->magnitudeOfMultiplicativeGroup, instance->smoothnessBound, numbersBuffer, instance->smoothnessBoundSqrt);
 
     } while (output->factorListOfRandomBSmoothNumber == NULL);
 
-    releaseNumbers(numbersBuffer, 1);
-    freeNumber(sqrtB);
+    releaseNumber(numbersBuffer);
+
+
     return output;
 }
 
 __mpz_struct **getRelation(DLogProblemInstance *instance, NumbersBuffer *numbersBuffer, RandomIntegerGenerator *randomIntegerGenerator) {
 
-    RawRelation *relation = getRawRelation(instance, numbersBuffer, randomIntegerGenerator);
+    RawRelation *rawRelation = getRawRelation(instance, numbersBuffer, randomIntegerGenerator);
     __mpz_struct **output = allocateNumbersArray(instance->factorBase->length + 1, true);
 
-    OrderedFactorListNode *currentRightSideRelationNodeList = relation->factorListOfRandomBSmoothNumber->head;
+    OrderedFactorListNode *currentNodeOfRawRelation = rawRelation->factorListOfRandomBSmoothNumber->head;
 
     int index = 0;
 
@@ -83,16 +77,16 @@ __mpz_struct **getRelation(DLogProblemInstance *instance, NumbersBuffer *numbers
         for (FactorBaseNode *currentFactorBaseNode = instance->factorBase->head;
              currentFactorBaseNode != NULL; currentFactorBaseNode = currentFactorBaseNode->next_node, index++) {
 
-            if (currentRightSideRelationNodeList != NULL && mpz_cmp(currentRightSideRelationNodeList->factor->base, currentFactorBaseNode->primeNumber) == 0) {
+            if (currentNodeOfRawRelation != NULL && mpz_cmp(currentNodeOfRawRelation->factor->base, currentFactorBaseNode->primeNumber) == 0) {
 
-                mpz_set(*(output + index), currentRightSideRelationNodeList->factor->exponent);
-                currentRightSideRelationNodeList = currentRightSideRelationNodeList->next_node;
+                mpz_set(*(output + index), currentNodeOfRawRelation->factor->exponent);
+                currentNodeOfRawRelation = currentNodeOfRawRelation->next_node;
 
             } else
                 mpz_set_ui(*(output + index), 0);
         }
 
-        mpz_set(*(output + instance->factorBase->length), relation->randomExponentOfGenerator);
+        mpz_set(*(output + instance->factorBase->length), rawRelation->randomExponentOfGenerator);
     }
 
     if (instance->currentIndexCalculusAlgorithmStep == 3) {
@@ -100,20 +94,20 @@ __mpz_struct **getRelation(DLogProblemInstance *instance, NumbersBuffer *numbers
         for (FactorBaseNode *currentFactorBaseNode = instance->factorBase->head;
              currentFactorBaseNode != NULL; currentFactorBaseNode = currentFactorBaseNode->next_node, index++) {
 
-            if (currentRightSideRelationNodeList != NULL && mpz_cmp(currentRightSideRelationNodeList->factor->base, currentFactorBaseNode->primeNumber) == 0) {
+            if (currentNodeOfRawRelation != NULL && mpz_cmp(currentNodeOfRawRelation->factor->base, currentFactorBaseNode->primeNumber) == 0) {
 
-                mpz_set(*(output + index), currentRightSideRelationNodeList->factor->exponent);
-                currentRightSideRelationNodeList = currentRightSideRelationNodeList->next_node;
+                mpz_set(*(output + index), currentNodeOfRawRelation->factor->exponent);
+                currentNodeOfRawRelation = currentNodeOfRawRelation->next_node;
 
             } else
                 mpz_set_ui(*(output + index), 0);
         }
 
-        mpz_set(*(output + instance->factorBase->length), relation->randomExponentOfGenerator);
+        mpz_set(*(output + instance->factorBase->length), rawRelation->randomExponentOfGenerator);
         mpz_mul_si(*(output + instance->factorBase->length), *(output + instance->factorBase->length), -1);
     }
 
-    freeRawRelation(relation);
+    freeRawRelation(rawRelation);
     return output;
 }
 

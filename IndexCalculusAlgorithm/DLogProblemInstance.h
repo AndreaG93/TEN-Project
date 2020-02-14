@@ -8,10 +8,6 @@
 #include "UserInput.h"
 
 typedef struct {
-    __mpz_struct **solution;
-} SecondPhaseOutput;
-
-typedef struct {
 
     void *dLogProblemInstance;
 
@@ -32,6 +28,7 @@ typedef struct {
     ThreadsPoolData *threadsPoolData;
 
     __mpz_struct *smoothnessBound;
+    __mpz_struct *smoothnessBoundSqrt;
     __mpz_struct **solutionOfSecondPhase;
 
     unsigned int threadsPoolSize;

@@ -46,6 +46,9 @@ DLogProblemInstance *allocateDLogProblemInstance(DLogProblemInstanceInput *input
 
         output->threadsPoolSize = threadsPoolSize;
         output->currentThreadIDFromWhichExtractData = 0;
+
+        output->smoothnessBoundSqrt = allocateNumber();
+        mpz_sqrt(output->smoothnessBoundSqrt, output->smoothnessBound);
     }
 
     return output;
@@ -60,6 +63,7 @@ void freeDLogProblemInstance(DLogProblemInstance *input) {
     freeFactorBase(input->factorBase);
     freeThreadsPoolData(input->threadsPoolData);
     freeNumber(input->smoothnessBound);
+    freeNumber(input->smoothnessBoundSqrt);
 
     free(input);
 }

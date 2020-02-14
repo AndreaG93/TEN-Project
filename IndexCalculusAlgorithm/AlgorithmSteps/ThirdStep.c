@@ -31,5 +31,5 @@ void startThirdStep(DLogProblemInstance *instance) {
 
     instance->discreteLogarithm->value = computeRequiredDiscreteLogarithmValue(relation, instance);
 
-    freeNumbersArray(relation, instance->factorBase->length);
+    freeNumbersArray(relation, instance->factorBase->length + 1);
 }

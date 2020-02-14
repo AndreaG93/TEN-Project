@@ -8,6 +8,7 @@
 #include "Number.h"
 #include "RandomNumber.h"
 #include "Common.h"
+#include "../IndexCalculusAlgorithm/DLogProblemInstance.h"
 
 
 void pollardRhoFunction2(__mpz_struct *output, __mpz_struct *input, __mpz_struct *modulo) {
@@ -17,7 +18,8 @@ void pollardRhoFunction2(__mpz_struct *output, __mpz_struct *input, __mpz_struct
     mpz_mod(output, output, modulo);
 }
 
-__mpz_struct *getFactorUsingPollardRho2(__mpz_struct *numberToFactorize, unsigned long long maxTrials, NumbersBuffer *numbersBuffer) {
+__mpz_struct *
+getFactorUsingPollardRho2(__mpz_struct *numberToFactorize, unsigned long long maxTrials, NumbersBuffer *numbersBuffer) {
 
     __mpz_struct *output = allocateNumber();
 
@@ -58,7 +60,9 @@ __mpz_struct *getFactorUsingPollardRho2(__mpz_struct *numberToFactorize, unsigne
     return output;
 }
 
-OrderedFactorList *factorizeCheckingBSmoothness(__mpz_struct *input, __mpz_struct *smoothnessBound, int maxPollardRhoTrials, NumbersBuffer *numbersBuffer) {
+OrderedFactorList *
+factorizeCheckingBSmoothness(__mpz_struct *input, __mpz_struct *smoothnessBound, int maxPollardRhoTrials,
+                             NumbersBuffer *numbersBuffer) {
 
     if (mpz_cmp_ui(input, 0) == 0 || mpz_cmp_ui(input, 1) == 0)
         return NULL;
@@ -197,118 +201,128 @@ OrderedFactorList *factorize(__mpz_struct *input, NumbersBuffer *numbersBuffer) 
     return output;
 }
 
+void functionxgcd(mpz_t old_r, mpz_t r, mpz_t quotient) {
+    mpz_t prov;
+    mpz_init(prov);
+    mpz_set(prov, r);
 
+    mpz_t temp;
+    mpz_init(temp);
+    mpz_mul(temp, quotient, prov);
 
+    mpz_sub(r, old_r, temp);
+    mpz_set(old_r, prov);
 
-
-OrderedFactorList *factorizeOptimizedCheckingBSmoothness(__mpz_struct *input, __mpz_struct *modulo, __mpz_struct *smoothnessBound, NumbersBuffer *numbersBuffer, RandomIntegerGenerator *randomIntegerGenerator) {
-
-    OrderedFactorList *output = NULL;
-
-    __mpz_struct **buffer = retrieveNumbersFromBuffer(numbersBuffer, 15);
-
-    __mpz_struct *remainder_0 = buffer[0];
-    __mpz_struct *remainder_1 = buffer[1];
-
-    __mpz_struct *s_0 = buffer[2];
-    __mpz_struct *t_0 = buffer[3];
-    __mpz_struct *s_1 = buffer[4];
-    __mpz_struct *t_1 = buffer[5];
-    __mpz_struct *quotient = buffer[6];
-
-    __mpz_struct *aux_1 = buffer[7];
-    __mpz_struct *aux_2 = buffer[8];
-    __mpz_struct *aux_3 = buffer[9];
-    __mpz_struct *aux_4 = buffer[10];
-
-    __mpz_struct *numerator = buffer[11];
-    __mpz_struct *denominator = buffer[12];
-
-    __mpz_struct *currentNumerator = buffer[13];
-    __mpz_struct *currentDenominator = buffer[14];
-
-    bool first = true;
-
-    mpz_set(remainder_0, modulo);
-    mpz_set_si(s_0, 1);
-    mpz_set_si(t_0, 0);
-
-    mpz_set(remainder_1, input);
-    mpz_set_si(s_1, 0);
-    mpz_set_si(t_1, 1);
-
-    while (mpz_cmp_ui(remainder_1, 0) != 0) {
-        mpz_tdiv_q(quotient, remainder_0, remainder_1);
-
-        mpz_mul(aux_1, s_1, quotient);
-        mpz_mul(aux_2, t_1, quotient);
-
-        mpz_set(aux_3, s_1);
-        mpz_set(aux_4, t_1);
-
-        mpz_sub(s_1, s_0, aux_1);
-        mpz_sub(t_1, t_0, aux_2);
-
-        mpz_set(s_0, aux_3);
-        mpz_set(t_0, aux_4);
-
-        mpz_mul(aux_1, s_1, modulo);
-        mpz_mul(aux_2, t_1, input);
-
-        mpz_set(remainder_0, remainder_1);
-        mpz_add(remainder_1, aux_1, aux_2);
-
-        mpz_mod(currentDenominator, t_1, modulo);
-        mpz_mod(currentNumerator, remainder_1, modulo);
-
-        if (mpz_cmp_ui(currentDenominator, 1) != 0 && mpz_cmp_ui(currentDenominator, 0) != 0 && mpz_cmp_ui(currentNumerator, 1) != 0 && mpz_cmp_ui(currentNumerator, 0) != 0) {
-
-            if (first) {
-                mpz_set(denominator, currentDenominator);
-                mpz_set(numerator, currentNumerator);
-
-                first = false;
-            } else if (mpz_cmp(currentDenominator, denominator) < 0 && mpz_cmp(currentNumerator, numerator) < 0) {
-                mpz_set(denominator, currentDenominator);
-                mpz_set(numerator, currentNumerator);
-            }
-        }
-    }
-
-    if (first) {
-        output = factorizeCheckingBSmoothness(input, smoothnessBound, numbersBuffer, randomIntegerGenerator);
-    } else {
-
-        OrderedFactorList *numeratorOrderFactorList = factorizeCheckingBSmoothness(numerator, smoothnessBound, numbersBuffer, randomIntegerGenerator);
-        OrderedFactorList *denominatorOrderFactorList = factorizeCheckingBSmoothness(denominator, smoothnessBound, numbersBuffer, randomIntegerGenerator);
-
-        if (numeratorOrderFactorList != NULL && denominatorOrderFactorList != NULL) {
-
-            output = mergeOrderedFactorListUsingOptimization(numeratorOrderFactorList, denominatorOrderFactorList);
-
-            freeOrderedFactorList(numeratorOrderFactorList);
-            freeOrderedFactorList(denominatorOrderFactorList);
-
-        } else {
-
-            if (numeratorOrderFactorList != NULL)
-                freeOrderedFactorList(numeratorOrderFactorList);
-
-            if (denominatorOrderFactorList != NULL)
-                freeOrderedFactorList(denominatorOrderFactorList);
-        }
-    }
-
-
-    releaseNumbers(numbersBuffer, 15);
-    return output;
+    mpz_clear(prov);
+    mpz_clear(temp);
 }
 
+int xgcd(mpz_t *result, mpz_t a, mpz_t b, mpz_t compare) {
 
 
+    mpz_t s;
+    mpz_init(s);
+    mpz_set_ui(s, 0);
+    mpz_t t;
+    mpz_init(t);
+    mpz_set_ui(t, 1);
+    mpz_t r;
+    mpz_init(r);
+    mpz_set(r, b);
+    mpz_t old_s;
+    mpz_init(old_s);
+    mpz_set_ui(old_s, 1);
+    mpz_t old_t;
+    mpz_init(old_t);
+    mpz_set_ui(old_t, 0);
+    mpz_t old_r;
+    mpz_init(old_r);
+    mpz_set(old_r, a);
+    mpz_t temp1;
+    mpz_init(temp1);
+    mpz_t temp2;
+    mpz_init(temp2);
+    mpz_t quotient;
+    mpz_init(quotient);
+    int times = 0;
+
+    while (mpz_cmp(old_r, compare) > 0) {
+        //while(time < 3){
+
+        if (mpz_cmp_ui(r, 0) == 0) {
+            mpz_clear(s);
+            mpz_clear(t);
+            mpz_clear(r);
+            mpz_clear(old_s);
+            mpz_clear(old_t);
+            mpz_clear(old_r);
+            mpz_clear(temp1);
+            mpz_clear(temp2);
+            mpz_clear(quotient);
+            //printf("return 0 in %d times\n", times);
+            return 0;
+        }
+        mpz_fdiv_q(quotient, old_r, r);
+        //printmpz("quotient = ", quotient);
+        functionxgcd(old_r, r, quotient);
+        functionxgcd(old_s, s, quotient);
+        functionxgcd(old_t, t, quotient);
+
+        times++;
+    }
+
+    mpz_set(result[0], old_r);
+    mpz_set(result[1], old_s);
+    mpz_set(result[2], old_t);
+
+    mpz_clear(s);
+    mpz_clear(t);
+    mpz_clear(r);
+    mpz_clear(old_s);
+    mpz_clear(old_t);
+    mpz_clear(old_r);
+    mpz_clear(temp1);
+    mpz_clear(temp2);
+    mpz_clear(quotient);
+
+    return 1;
+
+}
+
+OrderedFactorList *factorizeCheckingBSmoothnessOptimized(__mpz_struct *input, __mpz_struct *multiplicativeGroup,
+                                                         __mpz_struct *magnitudeOfMultiplicativeGroup,
+                                                         __mpz_struct *smoothnessBound, NumbersBuffer *numbersBuffer,
+                                                         __mpz_struct *sqrtB) {
 
 
+    mpz_t *result = malloc(3 * sizeof(mpz_t));
+    mpz_init(result[0]);
+    mpz_init(result[1]);
+    mpz_init(result[2]);
 
+    OrderedFactorList *numerator = NULL;
+    OrderedFactorList *denominator = NULL;
 
+    if (xgcd(result, multiplicativeGroup, input, magnitudeOfMultiplicativeGroup) == 1) {
 
+        denominator = factorizeCheckingBSmoothness(result[2], smoothnessBound, mpz_get_d(sqrtB), numbersBuffer);
+        if (denominator != NULL) {
 
+            numerator = factorizeCheckingBSmoothness(result[0], smoothnessBound, mpz_get_d(sqrtB), numbersBuffer);
+            if (numerator != NULL) {
+
+                OrderedFactorList *output = mergeOrderedFactorListUsingOptimization(numerator, denominator);
+                freeOrderedFactorList(numerator);
+                freeOrderedFactorList(denominator);
+
+                return output;
+
+            } else {
+                freeOrderedFactorList(denominator);
+                return NULL;
+            }
+        } else
+            return NULL;
+    }
+    return NULL;
+}

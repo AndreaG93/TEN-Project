@@ -10,24 +10,30 @@ DiscreteLogarithm *allocateDiscreteLogarithm(__mpz_struct *base, __mpz_struct *a
     else {
         output->argument = argument;
         output->base = base;
-        output->value = allocateNumber();
+        output->value = NULL;
         output->multiplicativeGroupMinusOne = allocateNumber();
         output->multiplicativeGroup = moduloOfMultiplicativeGroup;
         mpz_sub_ui(output->multiplicativeGroupMinusOne, output->multiplicativeGroup, 1);
-        output->multiplicativeGroupDouble = allocateNumber();
-        mpz_mul_ui(output->multiplicativeGroupDouble, output->multiplicativeGroup, 2);
+
+        __mpz_struct* ten = allocateAndSetNumberFromULL(10);
+
+        output->magnitudeOfMultiplicativeGroup = allocateNumber();
+        mpz_pow_ui(output->magnitudeOfMultiplicativeGroup, ten, mpz_sizeinbase(output->multiplicativeGroup, 10) / 2);
+
+        freeNumber(ten);
     }
 
     return output;
 }
 
 void freeDiscreteLogarithm(DiscreteLogarithm *input) {
+
     freeNumber(input->argument);
     freeNumber(input->base);
     freeNumber(input->multiplicativeGroup);
     freeNumber(input->multiplicativeGroupMinusOne);
     freeNumber(input->value);
-    free(input->multiplicativeGroupDouble);
+    freeNumber(input->magnitudeOfMultiplicativeGroup);
 }
 
 bool isCorrect(DiscreteLogarithm *dLog) {

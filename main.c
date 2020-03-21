@@ -12,6 +12,7 @@ RawUserInput rawUserInput;
 int main(int argc, char **argv) {
 
 #ifdef RELEASE
+
     if (argc < 3) {
         fprintf(stderr, "USAGE: %s [dLogBase] [dLogArgument] [multiplicativeGroup] [ (OPTIONAL) smoothnessBound]\n", argv[0]);
         exit(EXIT_FAILURE);
@@ -29,9 +30,9 @@ int main(int argc, char **argv) {
 #endif
 #ifndef RELEASE
 
-    rawUserInput.dLogBase = "11";
+    rawUserInput.dLogBase = "3";
     rawUserInput.dLogArgument = "13";
-    rawUserInput.multiplicativeGroup = "179";
+    rawUserInput.multiplicativeGroup = "48112959837082048697";
     rawUserInput.smoothnessBound = NULL;
 
 #endif

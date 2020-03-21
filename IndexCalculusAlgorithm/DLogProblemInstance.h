@@ -1,21 +1,20 @@
 #pragma once
 
 #include <gmp.h>
+
 #include "DiscreteLogarithm.h"
-#include "../Math/RandomNumber.h"
 #include "FactorBase.h"
-#include "../Buffers/CircularBuffer.h"
 #include "UserInput.h"
+
+#include "../Math/RandomNumber.h"
+#include "../DataStructure/SemiLockFreeQueue.h"
 
 typedef struct {
 
     void *dLogProblemInstance;
 
-    CircularBuffer **arrayOfCircularBuffer;
+    SemiLockFreeQueue* semiLockFreeQueue;
     bool stoppingCondition;
-
-    pthread_cond_t pthreadCondition;
-    pthread_mutex_t pthreadMutex;
 
 } ThreadsPoolData;
 
@@ -33,7 +32,6 @@ typedef struct {
 
     unsigned int threadsPoolSize;
     unsigned int currentIndexCalculusAlgorithmStep;
-    unsigned int currentThreadIDFromWhichExtractData;
 
 } DLogProblemInstance;
 
@@ -44,5 +42,3 @@ void stopThreadsPool(DLogProblemInstance *instance);
 void freeDLogProblemInstance(DLogProblemInstance *input);
 
 void freeThreadsPoolData(ThreadsPoolData *input);
-
-void *popFromArrayOfCircularBufferRoundRobinManner(DLogProblemInstance* instance);

@@ -114,23 +114,23 @@ __mpz_struct **getRelation(DLogProblemInstance *instance, NumbersBuffer *numbers
 void *threadRoutineForRelationRetrieval(void *input) {
 
     ThreadArgument *threadArgument = (ThreadArgument *) input;
-    unsigned int threadID = threadArgument->threadID;
     ThreadsPoolData *threadsPoolData = (ThreadsPoolData *) threadArgument->threadArgument;
     DLogProblemInstance *instance = (DLogProblemInstance *) threadsPoolData->dLogProblemInstance;
 
     NumbersBuffer *numbersBuffer = allocateNumbersBuffer(instance->numbersBuffer->size);
     RandomIntegerGenerator *randomIntegerGenerator = allocateRandomIntegerGenerator(
             instance->discreteLogarithm->multiplicativeGroup);
-    CircularBuffer *circularBuffer = threadsPoolData->arrayOfCircularBuffer[threadID];
+
+    SemiLockFreeQueue *semiLockFreeQueue = threadsPoolData->semiLockFreeQueue;
 
     while (threadsPoolData->stoppingCondition != true) {
 
         __mpz_struct **relation = getRelation(instance, numbersBuffer, randomIntegerGenerator);
-        pushIntoCircularBuffer(circularBuffer, relation);
+        enqueue(semiLockFreeQueue, relation);
+
     }
 
     free(threadArgument);
-    freeCircularBuffer(circularBuffer);
     freeNumbersBuffer(numbersBuffer);
     freeRandomIntegerGenerator(randomIntegerGenerator);
 

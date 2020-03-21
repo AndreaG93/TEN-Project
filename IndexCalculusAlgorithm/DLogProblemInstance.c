@@ -2,27 +2,16 @@
 #include "DLogProblemInstance.h"
 #include "../Math/Number.h"
 
-ThreadsPoolData *allocateThreadsPoolData(DLogProblemInstance *dLogProblemInstance, unsigned int threadsPoolSize) {
+ThreadsPoolData *allocateThreadsPoolData(DLogProblemInstance *dLogProblemInstance) {
 
     ThreadsPoolData *output = malloc(sizeof(ThreadsPoolData));
     if (output == NULL)
         exit(EXIT_FAILURE);
     else {
-        output->arrayOfCircularBuffer = malloc(threadsPoolSize * sizeof(CircularBuffer*));
-        if (output->arrayOfCircularBuffer == NULL)
-            exit(EXIT_FAILURE);
 
-        for (unsigned int index = 0; index < threadsPoolSize; index++)
-            output->arrayOfCircularBuffer[index] = allocateCircularBuffer();
-
+        output->semiLockFreeQueue = allocateSemiLockFreeQueue();
         output->stoppingCondition = false;
         output->dLogProblemInstance = dLogProblemInstance;
-
-        if (pthread_mutex_init(&(output->pthreadMutex), NULL) != 0)
-            exit(EXIT_FAILURE);
-
-        if (pthread_cond_init(&(output->pthreadCondition), NULL) != 0)
-            exit(EXIT_FAILURE);
     }
 
     return output;
@@ -38,14 +27,12 @@ DLogProblemInstance *allocateDLogProblemInstance(DLogProblemInstanceInput *input
         output->currentIndexCalculusAlgorithmStep = 2;
 
         output->discreteLogarithm = allocateDiscreteLogarithm(input->dLogBase, input->dLogArgument, input->multiplicativeGroup);
-        output->threadsPoolData = allocateThreadsPoolData(output, threadsPoolSize);
+        output->threadsPoolData = allocateThreadsPoolData(output);
 
         output->smoothnessBound = input->smoothnessBound;
         output->randomIntegerGenerator = input->randomIntegerGenerator;
         output->numbersBuffer = input->numbersBuffer;
-
         output->threadsPoolSize = threadsPoolSize;
-        output->currentThreadIDFromWhichExtractData = 0;
 
         output->smoothnessBoundSqrt = allocateNumber();
         mpz_sqrt(output->smoothnessBoundSqrt, output->smoothnessBound);
@@ -69,24 +56,10 @@ void freeDLogProblemInstance(DLogProblemInstance *input) {
 }
 
 void freeThreadsPoolData(ThreadsPoolData *input) {
-    free(input->arrayOfCircularBuffer);
+//    free(input->arrayOfCircularBuffer);
     free(input);
 }
 
 void stopThreadsPool(DLogProblemInstance *instance) {
     instance->threadsPoolData->stoppingCondition = true;
-}
-
-void *popFromArrayOfCircularBufferRoundRobinManner(DLogProblemInstance* instance) {
-
-    CircularBuffer **buffers = instance->threadsPoolData->arrayOfCircularBuffer;
-
-    void *output = NULL;
-
-    while (output == NULL) {
-        output = popFromCircularBuffer(buffers[instance->currentThreadIDFromWhichExtractData]);
-        instance->currentThreadIDFromWhichExtractData = (instance->currentThreadIDFromWhichExtractData + 1) % instance->threadsPoolSize;
-    }
-
-    return output;
 }

@@ -39,7 +39,12 @@ void startSecondStep(DLogProblemInstance *instance) {
 
     for (unsigned long long currentRow = 0; currentRow != totalRow; currentRow++) {
 
-        __mpz_struct **relation = popFromArrayOfCircularBufferRoundRobinManner(instance);
+        __mpz_struct **relation;
+
+        do {
+            relation = dequeue(instance->threadsPoolData->semiLockFreeQueue);
+        } while (relation == NULL);
+
 
         for (unsigned long long currentColumn = 0; currentColumn < instance->factorBase->length + 1; currentColumn++) {
 

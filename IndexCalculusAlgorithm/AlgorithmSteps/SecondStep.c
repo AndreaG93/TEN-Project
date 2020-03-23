@@ -27,6 +27,8 @@ __mpz_struct **populateSecondPhaseOutput(DLogProblemInstance *instance, Matrix *
     return output;
 }
 
+
+
 void startSecondStep(DLogProblemInstance *instance) {
 
     unsigned long totalRow = instance->factorBase->length * 2;
@@ -44,7 +46,6 @@ void startSecondStep(DLogProblemInstance *instance) {
         do {
             relation = dequeue(instance->threadsPoolData->semiLockFreeQueue);
         } while (relation == NULL);
-
 
         for (unsigned long long currentColumn = 0; currentColumn < instance->factorBase->length + 1; currentColumn++) {
 

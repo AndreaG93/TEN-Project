@@ -259,11 +259,13 @@ int xgcd(mpz_t *result, mpz_t a, mpz_t b, mpz_t compare) {
             mpz_clear(temp1);
             mpz_clear(temp2);
             mpz_clear(quotient);
-            //printf("return 0 in %d times\n", times);
+
+
             return 0;
         }
         mpz_fdiv_q(quotient, old_r, r);
-        //printmpz("quotient = ", quotient);
+
+
         functionxgcd(old_r, r, quotient);
         functionxgcd(old_s, s, quotient);
         functionxgcd(old_t, t, quotient);
@@ -293,7 +295,6 @@ OrderedFactorList *factorizeCheckingBSmoothnessOptimized(__mpz_struct *input, __
                                                          __mpz_struct *magnitudeOfMultiplicativeGroup,
                                                          __mpz_struct *smoothnessBound, NumbersBuffer *numbersBuffer,
                                                          __mpz_struct *sqrtB) {
-
 
     mpz_t *result = malloc(3 * sizeof(mpz_t));
     mpz_init(result[0]);

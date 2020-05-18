@@ -4,7 +4,7 @@
 #include "IndexCalculusAlgorithm/AlgorithmSteps/FirstStep.h"
 #include "IndexCalculusAlgorithm/UserInput.h"
 
-#define NUMBER_BUFFER_LENGTH 25
+#define NUMBER_BUFFER_LENGTH 30
 #define POOL_SIZE 4
 
 RawUserInput rawUserInput;
@@ -36,7 +36,6 @@ int main(int argc, char **argv) {
     rawUserInput.smoothnessBound = NULL;
 
 #endif
-
 
     DLogProblemInstanceInput *input = sanitizeRawUserInput(&rawUserInput, NUMBER_BUFFER_LENGTH);
     DLogProblemInstance *dLogProblemInstance = allocateDLogProblemInstance(input, POOL_SIZE);

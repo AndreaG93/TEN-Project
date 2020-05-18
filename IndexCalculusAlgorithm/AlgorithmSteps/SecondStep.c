@@ -31,7 +31,7 @@ __mpz_struct **populateSecondPhaseOutput(DLogProblemInstance *instance, Matrix *
 
 void startSecondStep(DLogProblemInstance *instance) {
 
-    unsigned long totalRow = instance->factorBase->length * 2;
+    unsigned long totalRow = instance->factorBase->length * 3;
 
     Matrix *equationSystem = allocateMatrix(totalRow, instance->factorBase->length + 1);
 

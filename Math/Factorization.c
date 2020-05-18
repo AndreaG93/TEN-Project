@@ -11,7 +11,7 @@
 #include "../IndexCalculusAlgorithm/DLogProblemInstance.h"
 
 
-void pollardRhoFunction2(__mpz_struct *output, __mpz_struct *input, __mpz_struct *modulo) {
+void pollardRhoFunction(__mpz_struct *output, __mpz_struct *input, __mpz_struct *modulo) {
 
     mpz_pow_ui(output, input, 2);
     mpz_add_ui(output, output, 1);
@@ -19,7 +19,7 @@ void pollardRhoFunction2(__mpz_struct *output, __mpz_struct *input, __mpz_struct
 }
 
 __mpz_struct *
-getFactorUsingPollardRho2(__mpz_struct *numberToFactorize, unsigned long long maxTrials, NumbersBuffer *numbersBuffer) {
+getFactorUsingPollardRho(__mpz_struct *numberToFactorize, unsigned long long maxTrials, NumbersBuffer *numbersBuffer) {
 
     __mpz_struct *output = allocateNumber();
 
@@ -41,9 +41,9 @@ getFactorUsingPollardRho2(__mpz_struct *numberToFactorize, unsigned long long ma
             break;
         }
 
-        pollardRhoFunction2(x, x, numberToFactorize);
-        pollardRhoFunction2(y, y, numberToFactorize);
-        pollardRhoFunction2(y, y, numberToFactorize);
+        pollardRhoFunction(x, x, numberToFactorize);
+        pollardRhoFunction(y, y, numberToFactorize);
+        pollardRhoFunction(y, y, numberToFactorize);
 
         mpz_sub(XMinusY, x, y);
         mpz_abs(XMinusY, XMinusY);
@@ -83,12 +83,12 @@ factorizeCheckingBSmoothness(__mpz_struct *input, __mpz_struct *smoothnessBound,
     }
 
     while (mpz_probab_prime_p(numberToFactorize, 15) == 0) {
-        factor = getFactorUsingPollardRho2(numberToFactorize, maxPollardRhoTrials, numbersBuffer);
+        factor = getFactorUsingPollardRho(numberToFactorize, maxPollardRhoTrials, numbersBuffer);
         if (factor == NULL)
             goto ExitFailure;
 
         while (mpz_probab_prime_p(factor, 15) == 0) {
-            factor = getFactorUsingPollardRho2(factor, maxPollardRhoTrials, numbersBuffer);
+            factor = getFactorUsingPollardRho(factor, maxPollardRhoTrials, numbersBuffer);
             if (factor == NULL)
                 goto ExitFailure;
         }
@@ -180,7 +180,7 @@ OrderedFactorList *factorize(__mpz_struct *input, NumbersBuffer *numbersBuffer) 
     factorizeUsingTrialDivision(numberToFactorize, output, numbersBuffer);
     while (mpz_cmp_si(numberToFactorize, 1) > 0) {
 
-        __mpz_struct *factor = getFactorUsingPollardRho2(numberToFactorize, 500, numbersBuffer);
+        __mpz_struct *factor = getFactorUsingPollardRho(numberToFactorize, 500, numbersBuffer);
         if (factor == NULL)
             factor = allocateAndSetNumberFromNumber(numberToFactorize);
 
@@ -201,74 +201,57 @@ OrderedFactorList *factorize(__mpz_struct *input, NumbersBuffer *numbersBuffer) 
     return output;
 }
 
-void functionxgcd(mpz_t old_r, mpz_t r, mpz_t quotient) {
-    mpz_t prov;
-    mpz_init(prov);
-    mpz_set(prov, r);
+void extendedEuclidSupport(mpz_t old_r, mpz_t r, mpz_t quotient, NumbersBuffer *numbersBuffer) {
 
-    mpz_t temp;
-    mpz_init(temp);
-    mpz_mul(temp, quotient, prov);
+    __mpz_struct **buffer = retrieveNumbersFromBuffer(numbersBuffer, 2);
 
-    mpz_sub(r, old_r, temp);
-    mpz_set(old_r, prov);
+    __mpz_struct *temp1 = buffer[0];
+    mpz_set(temp1, r);
 
-    mpz_clear(prov);
-    mpz_clear(temp);
+    __mpz_struct *temp2 = buffer[1];
+    mpz_mul(temp2, quotient, temp1);
+
+    mpz_sub(r, old_r, temp2);
+    mpz_set(old_r, temp1);
+
+    releaseNumbers(numbersBuffer, 2);
 }
 
-int xgcd(mpz_t *result, mpz_t a, mpz_t b, mpz_t compare) {
+int extendedEuclid(mpz_t *result, mpz_t a, mpz_t b, mpz_t compare, NumbersBuffer *numbersBuffer) {
 
+    __mpz_struct **buffer = retrieveNumbersFromBuffer(numbersBuffer, 7);
 
-    mpz_t s;
-    mpz_init(s);
-    mpz_set_ui(s, 0);
-    mpz_t t;
-    mpz_init(t);
-    mpz_set_ui(t, 1);
-    mpz_t r;
-    mpz_init(r);
-    mpz_set(r, b);
-    mpz_t old_s;
-    mpz_init(old_s);
+    __mpz_struct *s = buffer[0];
+    __mpz_struct *t = buffer[1];
+    __mpz_struct *r = buffer[2];
+    __mpz_struct *old_s = buffer[3];
+    __mpz_struct *old_t = buffer[4];
+    __mpz_struct *old_r = buffer[5];
+    __mpz_struct *quotient = buffer[6];
+
     mpz_set_ui(old_s, 1);
-    mpz_t old_t;
-    mpz_init(old_t);
     mpz_set_ui(old_t, 0);
-    mpz_t old_r;
-    mpz_init(old_r);
     mpz_set(old_r, a);
-    mpz_t temp1;
-    mpz_init(temp1);
-    mpz_t temp2;
-    mpz_init(temp2);
-    mpz_t quotient;
-    mpz_init(quotient);
+
+    mpz_set_ui(s, 0);
+    mpz_set_ui(t, 1);
+    mpz_set(r, b);
+
     int times = 0;
 
     while (mpz_cmp(old_r, compare) > 0) {
-        //while(time < 3){
 
         if (mpz_cmp_ui(r, 0) == 0) {
-            mpz_clear(s);
-            mpz_clear(t);
-            mpz_clear(r);
-            mpz_clear(old_s);
-            mpz_clear(old_t);
-            mpz_clear(old_r);
-            mpz_clear(temp1);
-            mpz_clear(temp2);
-            mpz_clear(quotient);
 
-
+            releaseNumbers(numbersBuffer, 9);
             return 0;
         }
+
         mpz_fdiv_q(quotient, old_r, r);
 
-
-        functionxgcd(old_r, r, quotient);
-        functionxgcd(old_s, s, quotient);
-        functionxgcd(old_t, t, quotient);
+        extendedEuclidSupport(old_r, r, quotient, numbersBuffer);
+        extendedEuclidSupport(old_s, s, quotient, numbersBuffer);
+        extendedEuclidSupport(old_t, t, quotient, numbersBuffer);
 
         times++;
     }
@@ -277,18 +260,9 @@ int xgcd(mpz_t *result, mpz_t a, mpz_t b, mpz_t compare) {
     mpz_set(result[1], old_s);
     mpz_set(result[2], old_t);
 
-    mpz_clear(s);
-    mpz_clear(t);
-    mpz_clear(r);
-    mpz_clear(old_s);
-    mpz_clear(old_t);
-    mpz_clear(old_r);
-    mpz_clear(temp1);
-    mpz_clear(temp2);
-    mpz_clear(quotient);
+    releaseNumbers(numbersBuffer, 7);
 
     return 1;
-
 }
 
 OrderedFactorList *factorizeCheckingBSmoothnessOptimized(__mpz_struct *input, __mpz_struct *multiplicativeGroup,
@@ -304,7 +278,7 @@ OrderedFactorList *factorizeCheckingBSmoothnessOptimized(__mpz_struct *input, __
     OrderedFactorList *numerator = NULL;
     OrderedFactorList *denominator = NULL;
 
-    if (xgcd(result, multiplicativeGroup, input, magnitudeOfMultiplicativeGroup) == 1) {
+    if (extendedEuclid(result, multiplicativeGroup, input, magnitudeOfMultiplicativeGroup, numbersBuffer) == 1) {
 
         denominator = factorizeCheckingBSmoothness(result[2], smoothnessBound, mpz_get_d(sqrtB), numbersBuffer);
         if (denominator != NULL) {

@@ -1,3 +1,4 @@
+#include <gmp.h>
 #include "../DLogProblemInstance.h"
 #include "../../Math/Number.h"
 #include "../../Math/OrderedFactorList.h"
@@ -23,13 +24,31 @@ __mpz_struct *computeRequiredDiscreteLogarithmValue(__mpz_struct **relation, DLo
     return output;
 }
 
+void printSecondPhaseSolution(DLogProblemInstance *instance) {
+
+    fprintf(stderr, "Second Phase Solution...\n");
+
+    for (unsigned long long index = 0; index < instance->factorBase->length; index++)
+        gmp_fprintf(stderr, " %Zd ", *(instance->solutionOfSecondPhase + index));
+
+    fprintf(stderr, "\n");
+}
+
 void startThirdStep(DLogProblemInstance *instance) {
 
     instance->currentIndexCalculusAlgorithmStep = 3;
 
-    __mpz_struct** relation = getRelation(instance, instance->numbersBuffer, instance->randomIntegerGenerator);
+#ifdef DEBUG
+    printSecondPhaseSolution(instance);
+#endif
 
-    instance->discreteLogarithm->value = computeRequiredDiscreteLogarithmValue(relation, instance);
+    do {
 
-    freeNumbersArray(relation, instance->factorBase->length + 1);
+        __mpz_struct **relation = getRelation(instance, instance->numbersBuffer, instance->randomIntegerGenerator);
+
+        instance->discreteLogarithm->value = computeRequiredDiscreteLogarithmValue(relation, instance);
+
+        freeNumbersArray(relation, instance->factorBase->length + 1);
+
+    } while (isCorrect(instance->discreteLogarithm) == false);
 }

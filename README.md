@@ -5,20 +5,24 @@ TEN (aka "Teoria Elementare dei Numeri") project AA 2019/2020 (*Tor Vergata Univ
 
 ### How to use
 
+#### (For Ubuntu Users) Note that `cmake` and `libgmp3-dev` packages are required!
+#### If you are using another Linux-based OS, please install `gmp` (see [official GMP website](https://gmplib.org/)) and `cmake`
+
 1. Inside your `$HOME` directory, clone this repository using following command:
 
     `git clone https://github.com/AndreaG93/TEN-Project`
 
-1. In order to build makefile, run following:
+1. Change your current directory into `$HOME/TEN-Project`:
 
-    `cmake $HOME/TEN-Project/CMakeLists.txt`
+    `cd $HOME/TEN-Project`
 
-1. Finally build this project using `make`:
+1. Build this project using following commands:
 
-    `make --directory=$HOME/TEN-Project`
+    `cmake -Bbuild -H.`
     
-    Alternatively, change you current directory into `$HOME/TEN-Project` and run `make`
-
+    `cmake --build build --target all`
+  
 1. Run `DLogResolver` binary file:
 
-    `$HOME/TEN-Project/DLogResolver [dLogBase] [dLogArgument] [multiplicativeGroup] [ (OPTIONAL) smoothnessBound ]`
+    `/build/DLogResolver [dLogBase] [dLogArgument] [multiplicativeGroup] [ (OPTIONAL) smoothnessBound ]`
+

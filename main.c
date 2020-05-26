@@ -6,6 +6,7 @@
 
 #define NUMBER_BUFFER_LENGTH 30
 #define POOL_SIZE 4
+#define RELEASE
 
 RawUserInput rawUserInput;
 
@@ -29,6 +30,8 @@ int main(int argc, char **argv) {
 
 #endif
 #ifndef RELEASE
+
+    // Used for tests...
 
     rawUserInput.dLogBase = "3";
     rawUserInput.dLogArgument = "13";

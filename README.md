@@ -1,7 +1,7 @@
 # DLogResolver
 Discrete logarithm resolver using *Index Calculus Algorithm*. 
 
-TEN (aka "Teoria Elementare dei Numeri") project AA 2019/2020 (*Tor Vergata University*).
+TEN ("Teoria Elementare dei Numeri") project AA 2019/2020 (*Tor Vergata University*).
 
 ### How to use
 

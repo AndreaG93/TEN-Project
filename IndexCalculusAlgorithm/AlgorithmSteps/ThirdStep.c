@@ -4,6 +4,8 @@
 #include "../../Math/OrderedFactorList.h"
 #include "../RelationsRetrieval.h"
 
+#define RETRIES 25
+
 __mpz_struct *computeRequiredDiscreteLogarithmValue(__mpz_struct **relation, DLogProblemInstance *instance) {
 
     __mpz_struct *auxiliaryNumber = retrieveNumberFromBuffer(instance->numbersBuffer);
@@ -36,6 +38,7 @@ void printSecondPhaseSolution(DLogProblemInstance *instance) {
 
 void startThirdStep(DLogProblemInstance *instance) {
 
+    int retry = 0;
     instance->currentIndexCalculusAlgorithmStep = 3;
 
 #ifdef DEBUG
@@ -44,11 +47,12 @@ void startThirdStep(DLogProblemInstance *instance) {
 
     do {
 
+        retry++;
         __mpz_struct **relation = getRelation(instance, instance->numbersBuffer, instance->randomIntegerGenerator);
 
         instance->discreteLogarithm->value = computeRequiredDiscreteLogarithmValue(relation, instance);
 
         freeNumbersArray(relation, instance->factorBase->length + 1);
 
-    } while (isCorrect(instance->discreteLogarithm) == false);
+    } while (isCorrect(instance->discreteLogarithm) == false && retry <= RETRIES);
 }

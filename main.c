@@ -47,7 +47,6 @@ int main(int argc, char **argv) {
     gmp_fprintf(stderr, "[INFO] Start computing log_(%Zd) (%Zd) in Z*_(%Zd)\n", dLogProblemInstance->discreteLogarithm->base, dLogProblemInstance->discreteLogarithm->argument, dLogProblemInstance->discreteLogarithm->multiplicativeGroup);
     gmp_fprintf(stderr, "[INFO] Smoothness Bound set to %Zd\n", dLogProblemInstance->smoothnessBound);
 
-
     fprintf(stderr, "Start 1° algorithm step...\n");
     startFirstStep(dLogProblemInstance);
     fprintf(stderr, "Start 2° algorithm step...\n");

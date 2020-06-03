@@ -26,6 +26,7 @@ __mpz_struct *computeRequiredDiscreteLogarithmValue(__mpz_struct **relation, DLo
     return output;
 }
 
+#ifdef DEBUG
 void printSecondPhaseSolution(DLogProblemInstance *instance) {
 
     fprintf(stderr, "Second Phase Solution...\n");
@@ -35,6 +36,7 @@ void printSecondPhaseSolution(DLogProblemInstance *instance) {
 
     fprintf(stderr, "\n");
 }
+#endif
 
 void startThirdStep(DLogProblemInstance *instance) {
 

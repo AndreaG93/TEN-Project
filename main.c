@@ -35,7 +35,7 @@ int main(int argc, char **argv) {
 
     rawUserInput.dLogBase = "7";
     rawUserInput.dLogArgument = "13";
-    rawUserInput.multiplicativeGroup = "4811296546546456546456559";
+    rawUserInput.multiplicativeGroup = "481129654654645654645656013";
     rawUserInput.smoothnessBound = NULL;
 
 #endif
@@ -76,8 +76,6 @@ int main(int argc, char **argv) {
 // =================================================================================
 // Prime                             | LogBase     | Argument       | Time
 // =================================================================================
-// 97011687217                       | 10          | 157            | 0m0.085s
+// 97011687217                       | 10          | 157            | 0m0.082s
 // 48112959837082048697              | 3           | 100            | 0m10.945s
 // 4811296546546456546456559         | 7           | 22             | 3m38.503s
-// 481129654654645654645656013       | 3
-

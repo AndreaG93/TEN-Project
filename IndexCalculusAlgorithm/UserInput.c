@@ -62,11 +62,6 @@ DLogProblemInstanceInput *sanitizeRawUserInput(RawUserInput *input, unsigned lon
 
     output->randomIntegerGenerator = allocateRandomIntegerGenerator(output->multiplicativeGroup);
 
-    if (isGroupGenerator(output->dLogBase, output->multiplicativeGroup, output->numbersBuffer) == false) {
-        gmp_fprintf(stderr, "[WARNING] Specified logarithm's base (%Zd) is NOT a generator in Z_(%Zd)\n", output->dLogBase, output->multiplicativeGroup);
-        exitPrintingFatalErrorMessage("getVerifiedDLogProblemInstanceInput", "Invalid 'dLogBase'");
-    }
-
     mpz_mod(output->dLogArgument, output->dLogArgument, output->multiplicativeGroup);
 
     return output;

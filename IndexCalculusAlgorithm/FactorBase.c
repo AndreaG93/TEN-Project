@@ -120,10 +120,6 @@ void freeFactorBase(FactorBase* input) {
     free(input);
 }
 
-__mpz_struct* getPrimeNumber(FactorBase *factorBase, unsigned int index) {
-    return *(factorBase->arrayOfPrime + index);
-}
-
 void populateFactorBase(FactorBase *factorBase, __mpz_struct *smoothnessBound) {
 
     __insertIntoFactorBase(factorBase, allocateAndSetNumberFromString("-1"));

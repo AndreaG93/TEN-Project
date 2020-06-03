@@ -22,5 +22,3 @@ FactorBase *allocateFactorBase();
 void freeFactorBase(FactorBase* input);
 
 void populateFactorBase(FactorBase *factorBase, __mpz_struct *smoothnessBound);
-
-__mpz_struct* getPrimeNumber(FactorBase *factorBase, unsigned int index);

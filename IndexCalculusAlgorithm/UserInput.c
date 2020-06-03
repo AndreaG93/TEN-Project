@@ -67,5 +67,7 @@ DLogProblemInstanceInput *sanitizeRawUserInput(RawUserInput *input, unsigned lon
         exitPrintingFatalErrorMessage("getVerifiedDLogProblemInstanceInput", "Invalid 'dLogBase'");
     }
 
+    mpz_mod(output->dLogArgument, output->dLogArgument, output->multiplicativeGroup);
+
     return output;
 }

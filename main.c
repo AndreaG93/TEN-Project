@@ -14,7 +14,7 @@ int main(int argc, char **argv) {
 
 #ifdef RELEASE
 
-    if (argc < 3) {
+    if (argc < 4) {
         fprintf(stderr, "USAGE: %s [dLogBase] [dLogArgument] [multiplicativeGroup] [ (OPTIONAL) smoothnessBound]\n", argv[0]);
         exit(EXIT_FAILURE);
     }
@@ -73,8 +73,9 @@ int main(int argc, char **argv) {
 }
 
 // SOME PRIME USED FOR TESTS
-// ================================================
-// Prime                    | Smallest Generator
-// ================================================
-// 97011687217              | 10
-// 48112959837082048697     | 3
+// =================================================================================
+// Prime                             | LogBase     | Argument       | Time
+// =================================================================================
+// 97011687217                       | 10          | 157            | 0m0.085s
+// 48112959837082048697              | 3           | 100            | 0m10.945s
+// 4811296546546456546456559         | 7           | 22             | 3m38.503s

@@ -21,7 +21,7 @@ __mpz_struct* computeOptimalSmoothnessBound(unsigned long primeNumber) {
 
     double smoothnessBound = exp(sqrt(((log( (double) primeNumber)*log(log( (double) primeNumber)))/3)));
 
-    return allocateAndSetNumberFromULL( (unsigned long) smoothnessBound);
+    return allocateAndSetNumberFromULL( smoothnessBound * 2);
 }
 
 DLogProblemInstanceInput *sanitizeRawUserInput(RawUserInput *input, unsigned long numbersBufferSize) {

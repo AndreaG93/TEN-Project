@@ -56,7 +56,6 @@ void freeDLogProblemInstance(DLogProblemInstance *input) {
 }
 
 void freeThreadsPoolData(ThreadsPoolData *input) {
-//    free(input->arrayOfCircularBuffer);
     free(input);
 }
 

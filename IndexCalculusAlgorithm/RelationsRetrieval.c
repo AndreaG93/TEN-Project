@@ -47,10 +47,10 @@ RawRelation *getRawRelation(DLogProblemInstance *instance, NumbersBuffer *number
         mpz_powm(power, instance->discreteLogarithm->base, output->randomExponentOfGenerator, instance->discreteLogarithm->multiplicativeGroup);
 
         if (instance->currentIndexCalculusAlgorithmStep == 3) {
-            mpz_mul(power, power, instance->discreteLogarithm->argument);
-        }
 
-        mpz_mod(power, power, instance->discreteLogarithm->multiplicativeGroup);
+            mpz_mul(power, power, instance->discreteLogarithm->argument);
+            mpz_mod(power, power, instance->discreteLogarithm->multiplicativeGroup);
+        }
 
         output->factorListOfRandomBSmoothNumber = factorizeCheckingBSmoothnessOptimized(power, instance->discreteLogarithm->multiplicativeGroup, instance->discreteLogarithm->magnitudeOfMultiplicativeGroup, instance->smoothnessBound, numbersBuffer, instance->smoothnessBoundSqrt);
 

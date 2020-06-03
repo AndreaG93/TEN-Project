@@ -206,9 +206,9 @@ void extendedEuclidSupport(mpz_t old_r, mpz_t r, mpz_t quotient, NumbersBuffer *
     __mpz_struct **buffer = retrieveNumbersFromBuffer(numbersBuffer, 2);
 
     __mpz_struct *temp1 = buffer[0];
-    mpz_set(temp1, r);
-
     __mpz_struct *temp2 = buffer[1];
+
+    mpz_set(temp1, r);
     mpz_mul(temp2, quotient, temp1);
 
     mpz_sub(r, old_r, temp2);
@@ -217,7 +217,7 @@ void extendedEuclidSupport(mpz_t old_r, mpz_t r, mpz_t quotient, NumbersBuffer *
     releaseNumbers(numbersBuffer, 2);
 }
 
-int extendedEuclid(mpz_t *result, mpz_t a, mpz_t b, mpz_t compare, NumbersBuffer *numbersBuffer) {
+int extendedEuclid(__mpz_struct **result, mpz_t a, mpz_t b, mpz_t compare, NumbersBuffer *numbersBuffer) {
 
     __mpz_struct **buffer = retrieveNumbersFromBuffer(numbersBuffer, 7);
 
@@ -257,8 +257,7 @@ int extendedEuclid(mpz_t *result, mpz_t a, mpz_t b, mpz_t compare, NumbersBuffer
     }
 
     mpz_set(result[0], old_r);
-    mpz_set(result[1], old_s);
-    mpz_set(result[2], old_t);
+    mpz_set(result[1], old_t);
 
     releaseNumbers(numbersBuffer, 7);
 
@@ -270,17 +269,14 @@ OrderedFactorList *factorizeCheckingBSmoothnessOptimized(__mpz_struct *input, __
                                                          __mpz_struct *smoothnessBound, NumbersBuffer *numbersBuffer,
                                                          __mpz_struct *sqrtB) {
 
-    mpz_t *result = malloc(3 * sizeof(mpz_t));
-    mpz_init(result[0]);
-    mpz_init(result[1]);
-    mpz_init(result[2]);
+    __mpz_struct **result = allocateNumbersArray(2, true);
 
     OrderedFactorList *numerator = NULL;
     OrderedFactorList *denominator = NULL;
 
     if (extendedEuclid(result, multiplicativeGroup, input, magnitudeOfMultiplicativeGroup, numbersBuffer) == 1) {
 
-        denominator = factorizeCheckingBSmoothness(result[2], smoothnessBound, mpz_get_d(sqrtB), numbersBuffer);
+        denominator = factorizeCheckingBSmoothness(result[1], smoothnessBound, mpz_get_d(sqrtB), numbersBuffer);
         if (denominator != NULL) {
 
             numerator = factorizeCheckingBSmoothness(result[0], smoothnessBound, mpz_get_d(sqrtB), numbersBuffer);

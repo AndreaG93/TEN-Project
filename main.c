@@ -33,9 +33,9 @@ int main(int argc, char **argv) {
 
     // Used for tests...
 
-    rawUserInput.dLogBase = "3";
+    rawUserInput.dLogBase = "7";
     rawUserInput.dLogArgument = "13";
-    rawUserInput.multiplicativeGroup = "48112959837082048697";
+    rawUserInput.multiplicativeGroup = "4811296546546456546456559";
     rawUserInput.smoothnessBound = NULL;
 
 #endif
@@ -79,3 +79,5 @@ int main(int argc, char **argv) {
 // 97011687217                       | 10          | 157            | 0m0.085s
 // 48112959837082048697              | 3           | 100            | 0m10.945s
 // 4811296546546456546456559         | 7           | 22             | 3m38.503s
+// 481129654654645654645656013       | 3
+

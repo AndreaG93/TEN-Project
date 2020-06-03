@@ -138,15 +138,10 @@ calcFactorOfPowers(__mpz_struct *input, NumbersBuffer *numbersBuffer, OrderedFac
 }
 
 void factorizeUsingTrialDivision(__mpz_struct *numberToFactorize, OrderedFactorList *allocatedFactorList,
-                                 NumbersBuffer *numbersBuffer) {
+                                 NumbersBuffer *numbersBuffer, __mpz_struct * currentPossibleFactor) {
 
 
-    __mpz_struct **buffer = retrieveNumbersFromBuffer(numbersBuffer, 2);
-
-    __mpz_struct *currentPossibleFactor = buffer[0];
-    __mpz_struct *remainder = buffer[1];
-
-    mpz_set_ui(currentPossibleFactor, 2);
+    __mpz_struct *remainder = retrieveNumberFromBuffer(numbersBuffer);
 
     while (mpz_cmp_si(numberToFactorize, 1) > 0) {
 
@@ -163,7 +158,7 @@ void factorizeUsingTrialDivision(__mpz_struct *numberToFactorize, OrderedFactorL
             break;
     }
 
-    releaseNumbers(numbersBuffer, 2);
+    releaseNumber(numbersBuffer);
 }
 
 
@@ -174,10 +169,20 @@ OrderedFactorList *factorize(__mpz_struct *input, NumbersBuffer *numbersBuffer) 
 
     OrderedFactorList *output = allocateOrderedFactorList();
 
-    __mpz_struct *numberToFactorize = retrieveNumberFromBuffer(numbersBuffer);
-    mpz_set(numberToFactorize, input);
+    __mpz_struct **buffer = retrieveNumbersFromBuffer(numbersBuffer, 2);
 
-    factorizeUsingTrialDivision(numberToFactorize, output, numbersBuffer);
+    __mpz_struct *numberToFactorize = buffer[0];
+    __mpz_struct *currentPossibleFactor = buffer[1];
+
+    mpz_set(numberToFactorize, input);
+    mpz_set_ui(currentPossibleFactor, 2);
+
+    while (mpz_cmp_si(currentPossibleFactor, 100) < 0) {
+
+        factorizeUsingTrialDivision(numberToFactorize, output, numbersBuffer, currentPossibleFactor);
+        mpz_nextprime(currentPossibleFactor, currentPossibleFactor);
+    }
+
     while (mpz_cmp_si(numberToFactorize, 1) > 0) {
 
         __mpz_struct *factor = getFactorUsingPollardRho(numberToFactorize, 500, numbersBuffer);
@@ -197,7 +202,7 @@ OrderedFactorList *factorize(__mpz_struct *input, NumbersBuffer *numbersBuffer) 
             freeNumber(factor);
     }
 
-    releaseNumber(numbersBuffer);
+    releaseNumbers(numbersBuffer, 2);
     return output;
 }
 

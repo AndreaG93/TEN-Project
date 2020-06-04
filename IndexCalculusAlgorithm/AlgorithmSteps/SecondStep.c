@@ -1,5 +1,4 @@
 #include <stdlib.h>
-#include <pthread.h>
 #include "SecondStep.h"
 #include "../../Math/Number.h"
 #include "../../Math/Matrix.h"

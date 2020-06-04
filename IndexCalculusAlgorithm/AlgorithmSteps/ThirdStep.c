@@ -1,7 +1,6 @@
 #include <gmp.h>
 #include "../DLogProblemInstance.h"
 #include "../../Math/Number.h"
-#include "../../Math/OrderedFactorList.h"
 #include "../RelationsRetrieval.h"
 
 #define RETRIES 25

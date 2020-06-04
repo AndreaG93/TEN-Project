@@ -248,6 +248,7 @@ void performGaussianElimination(Matrix *matrix, NumbersBuffer *numbersBuffer, __
     freeThreadMatrixArgument(threadMatrixArgument, poolThreadSize);
 }
 
+#ifdef DEBUG
 void printMatrix(Matrix *matrix) {
 
     for (unsigned long long rowIndex = 0; rowIndex < matrix->rowLength; rowIndex++) {
@@ -257,7 +258,7 @@ void printMatrix(Matrix *matrix) {
             gmp_printf("%Zd ", number);
         }
 
-
         fprintf(stdout, "\n");
     }
 }
+#endif

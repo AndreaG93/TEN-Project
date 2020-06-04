@@ -65,7 +65,6 @@ RawRelation *getRawRelation(DLogProblemInstance *instance, NumbersBuffer *number
 
     releaseNumber(numbersBuffer);
 
-
     return output;
 }
 

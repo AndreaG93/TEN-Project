@@ -2,10 +2,10 @@
 
 typedef struct {
 
-    void *tail;
-    void *head;
+    void *tail __attribute__((aligned(64)));;
+    void *head __attribute__((aligned(64)));;
 
-} SemiLockFreeQueue;
+} SemiLockFreeQueue __attribute__((aligned(64)));;
 
 SemiLockFreeQueue *allocateSemiLockFreeQueue();
 
